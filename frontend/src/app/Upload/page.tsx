@@ -115,38 +115,7 @@ const UploadPage = () => {
           </div>
         )}
 
-        {/* Search Section */}
-        <h2 className="text-xl font-bold mt-10">
-          Search for transcript or report
-        </h2>
-        <p className="text-gray-400 mb-4">
-          Fill in the necessary fields to find a specific call.
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Call ID"
-            className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
-          />
-          <input
-            type="text"
-            placeholder="Client"
-            className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
-          />
-          <input
-            type="date"
-            className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
-          />
-          <input
-            type="time"
-            className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
-          />
-        </div>
-
-        <button className="w-full sm:w-auto px-6 py-2 rounded-full text-white transition bg-[#635169] border border-[#E5E8EB] hover:opacity-90">
-          Search
-        </button>
+        <div className="mb-6"></div>
         <CallTable />
       </div>
     </div>
