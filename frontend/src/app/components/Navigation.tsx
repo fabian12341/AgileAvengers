@@ -36,9 +36,11 @@ const Navigation = () => {
             Uploads
           </Button>
         </Link>
+        <Link href="/Reports">
         <Button variant="ghost" className="text-white hover:text-gray-300">
           Reports
         </Button>
+        </Link>
         <UserCircle size={24} className="text-white" />
       </div>
 
