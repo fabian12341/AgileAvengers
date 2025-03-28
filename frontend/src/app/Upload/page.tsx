@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import Navigation from "../components/Navigation";
 import { FileText } from "lucide-react";
-import CallTable from "../components/ui/calltable";
+import CallTable from "../components/Data/calltable";
 
 const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import TableComponent from "./tablecomponent";
 import CallSearch from "./callsearch";
 
-interface Call {
+export interface Call {
   id: number;
   name: string;
   date: string;
@@ -10,7 +10,7 @@ interface Call {
   agent: string;
 }
 
-const callsData: Call[] = [
+export const callsData: Call[] = [
   {
     id: 1,
     name: "John Doe",
