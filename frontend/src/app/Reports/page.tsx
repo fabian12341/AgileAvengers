@@ -2,13 +2,15 @@
 import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
+import { callsData } from "../components/Data/calltable"; // ajusta la ruta si es necesario
+
 
 const ReportsPage = () => {
+  const clients = Array.from(new Set(callsData.map(call => call.name)));
   const [isGenerating, setIsGenerating] = useState(true); // Puedes poner false por defecto
   const [selectedClient, setSelectedClient] = useState("");
 
   // Simulación de clientes (se reemplazará con datos del backend)
-  const clients = ["Client A", "Client B", "Client C"];
 
   return (
     <>
@@ -16,17 +18,19 @@ const ReportsPage = () => {
       <main className="min-h-screen bg-gray-900 text-white px-8 py-10">
         <div className="w-full max-w-4xl">
           <h1 className="text-2xl font-bold mb-2">Generate report</h1>
-          <p className="mb-8">
+          <p className="text-gray-400 mb-4">
             Please fill out the following information to generate a report for a group of calls.
           </p>
 
-          <div className="flex flex-wrap gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
             <select
               value={selectedClient}
               onChange={(e) => setSelectedClient(e.target.value)}
-              className="bg-transparent border border-gray-400 text-white px-4 py-2 rounded w-[200px]"
+              className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             >
-              <option value="" disabled>
+              <option value="" disabled
+                className="text-gray-400 mb-4"
+              >
                 Select Client
               </option>
               {clients.map((client, index) => (
@@ -39,16 +43,16 @@ const ReportsPage = () => {
             <input
               type="date"
               placeholder="Start Date"
-              className="bg-transparent border border-gray-400 text-white px-4 py-2 rounded w-[200px]"
+              className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             />
             <input
               type="date"
               placeholder="End Date"
-              className="bg-transparent border border-gray-400 text-white px-4 py-2 rounded w-[200px]"
+              className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             />
           </div>
 
-          <Button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded mb-10">
+          <Button className="w-full sm:w-auto px-6 py-2 mt-4 rounded-full text-white transition bg-[#635169] border border-[#E5E8EB] hover:opacity-90">
             Generate
           </Button>
 
@@ -60,10 +64,10 @@ const ReportsPage = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded">
+                <Button className="flex items-center gap-2 bg-gray-800 border border-gray-600 px-4 py-2 rounded-md text-white hover:bg-gray-700 transition">
                   View
                 </Button>
-                <Button className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded">
+                <Button className="flex items-center gap-2 bg-gray-800 border border-gray-600 px-4 py-2 rounded-md text-white hover:bg-gray-700 transition">
                   Download
                 </Button>
               </div>
