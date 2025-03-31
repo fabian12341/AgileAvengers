@@ -11,7 +11,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 #################################### Path to audio file ####################################
-audio_path = "audios/conversacion.mp3"
+audio_path = "Python/audios/conversacion.mp3"
 audio, sr = librosa.load(audio_path, sr=None)  # Load audio file
 
 
@@ -156,7 +156,7 @@ data = {
 }
 
 # Save as a JSON file
-file_name = "call_analysis.json"
+file_name = "Python/call_analysis.json"
 with open(file_name, "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2, ensure_ascii=False)
 
