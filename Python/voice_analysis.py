@@ -22,8 +22,9 @@ def extract_speaker_audio(audio_path, segments, output_dir="speaker_audios/"):
         speaker_audio_segments[speaker].append((start_ms, end_ms))
 
     # Create output directory if it doesn't exist
+    output_dir = os.path.join(os.path.dirname(__file__), "speaker_audios/")
     os.makedirs(output_dir, exist_ok=True)
-
+    
     # Extract and save audio segments for each speaker
     for speaker, times in speaker_audio_segments.items():
         speaker_audio = AudioSegment.silent(duration=0)  # Empty audio file to append segments to
