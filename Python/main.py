@@ -17,7 +17,7 @@ audio, sr = librosa.load(audio_path, sr=None)  # Load audio file
 
 #################################### Constants ####################################
 DURATION = librosa.get_duration(y=audio, sr=sr) 
-CLIENT = "XX"
+CLIENT = "Checando"
 AGENT = "XX"
 LANGUAGE = "es" # "es" for Spanish, "en" for English, "any" for anything else
 NUM_SPEAKERS = 2 # needs to be >=2
