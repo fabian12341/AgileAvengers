@@ -1,14 +1,12 @@
 from transformers import pipeline
 
-#################################### Separate transcript by speakers ####################################
-
+# Function to extract speaker transcripts using segments
 def extract_speaker_transcripts(segments):
     
     # Dictionary to store transcripts for each speaker
     speaker_transcripts = {}
 
     for segment in segments:
-        # print(segment)
         speaker = segment["speaker"]
         temp_segment = segment["text"]
         
@@ -19,9 +17,7 @@ def extract_speaker_transcripts(segments):
     
     return speaker_transcripts
 
-
-#################################### Standardize sentiment ####################################
-
+# Function to standardize sentiment labels
 def standardize_sentiment(label, score, model_name):
     if model_name == "pysentimiento/robertuito-sentiment-analysis":
         label_map = {"POS": "positive", "NEU": "neutral", "NEG": "negative"}
@@ -42,14 +38,13 @@ def standardize_sentiment(label, score, model_name):
     return {"sentiment": standardized_label, "score": score}
 
 
-#################################### Split text into chunks ####################################
- 
+# Function to chunk text into smaller segments
 def chunk_text_by_size(text, chunk_size):
     chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
     return chunks
 
-#################################### Text analysis ####################################
 
+# Function analyze text sentiment
 def extract_text_sentiment(transcript, language, chunk_size=512):
     # Initialize the sentiment analysis model based on the language
     if language == 'es':

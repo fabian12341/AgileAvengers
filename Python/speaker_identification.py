@@ -10,11 +10,13 @@ def load_classifier(language):
     else:
         return pipeline("zero-shot-classification", model="XLM-Roberta")
 
+
 # Classifies the speaker as AGENT or CLIENT, with added context
 def classify_speaker(text, speaker_role, classifier):
     context = f"This is a customer service dialogue. The speaker is a {speaker_role}. "
     result = classifier(context + text, candidate_labels=["AGENT", "CLIENT"])
     return result
+
 
 # Groups text by speaker, assigns probabilities, and labels them consistently
 def label_transcript(transcript, language='es'):
@@ -80,8 +82,5 @@ def label_transcript(transcript, language='es'):
     
     # Join the formatted lines with newlines
     labeled_transcript = "\n".join(formatted_lines)
-    # print("\nLabeled Transcript:")
-    # print(labeled_transcript)
-    
     return labeled_transcript, role_map
     

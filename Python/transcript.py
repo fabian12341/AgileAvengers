@@ -14,7 +14,6 @@ embedding_model = PretrainedSpeakerEmbedding(
     "speechbrain/spkrec-ecapa-voxceleb",
     device=torch.device("cpu"))
 
-#################################### Transcribe audio ####################################
 
 def transcribe_audio(language, num_speakers, audio_path, model_size):
     model_name = model_size

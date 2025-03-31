@@ -7,7 +7,6 @@ import parselmouth
 from transformers import pipeline
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-#################################### Separate audio by speakers ####################################
 def extract_speaker_audio(audio_path, segments, output_dir="speaker_audios/"):
 
     # Load the original audio file
@@ -46,8 +45,6 @@ def extract_speaker_audio(audio_path, segments, output_dir="speaker_audios/"):
     print(audio_paths)
     return audio_paths
 
-
-#################################### Voice characteristics analysis with Librosa ####################################
 
 def extract_audio_features(audio_paths):   
     features = {}  # Dictionary to store features for each speaker
@@ -108,8 +105,6 @@ def extract_audio_features(audio_paths):
     
     return features
 
-
-#################################### Voice amotion analysis ####################################
 
 def analyze_voice_emotion(audio_paths, chunk_duration_ms=30000):
     # Load the emotion detection pipeline with the 'superb/wav2vec2-base-superb-er' model
