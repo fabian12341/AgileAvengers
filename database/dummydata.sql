@@ -1,8 +1,12 @@
+USE CallCenterDB;
+
+
 -- Insert Teams
 INSERT INTO Teams (name) VALUES
 ('Team Alpha'),
 ('Team Beta'),
 ('Team Gamma');
+
 
 -- Insert Users (Employees)
 INSERT INTO Users (name, role, email, password, id_team) VALUES
@@ -21,6 +25,7 @@ INSERT INTO Users (name, role, email, password, id_team) VALUES
 ('George Yellow', 'Agent', 'george.yellow@company.com', 'password123', 3),
 ('Lily Orange', 'Agent', 'lily.orange@company.com', 'password123', 3),
 ('James Pink', 'Agent', 'james.pink@company.com', 'password123', 3);
+
 
 -- Insert Clients (Company names)
 INSERT INTO Clients (name) VALUES
@@ -45,6 +50,7 @@ INSERT INTO Clients (name) VALUES
 ('RapidGrowth Corp.'),
 ('WorldWide Holdings');
 
+
 -- Insert Projects
 INSERT INTO Projects (name, id_client) VALUES
 ('Project A - Tech Innovations', 1),
@@ -68,78 +74,9 @@ INSERT INTO Projects (name, id_client) VALUES
 ('Project S - RapidGrowth', 19),
 ('Project T - WorldWide Holdings', 20);
 
--- Insert Emotions
-INSERT INTO Emotions (happiness, sadness, anger, neutrality, text_negative, text_sentiment_score, overall_sentiment_score) VALUES
-(0.8, 0.1, 0.05, 0.05, 'positive', 0.9, 0.85),
-(0.6, 0.3, 0.05, 0.1, 'neutral', 0.7, 0.65),
-(0.7, 0.2, 0.05, 0.05, 'positive', 0.8, 0.75),
-(0.4, 0.5, 0.1, 0.05, 'negative', 0.3, 0.45),
-(0.3, 0.6, 0.1, 0.05, 'negative', 0.4, 0.35),
-(0.9, 0.05, 0.05, 0.05, 'positive', 0.95, 0.9),
-(0.5, 0.3, 0.1, 0.1, 'neutral', 0.7, 0.65),
-(0.7, 0.2, 0.05, 0.05, 'positive', 0.8, 0.75),
-(0.3, 0.5, 0.1, 0.1, 'negative', 0.35, 0.4),
-(0.6, 0.3, 0.05, 0.1, 'neutral', 0.65, 0.6),
-(0.8, 0.1, 0.05, 0.05, 'positive', 0.9, 0.85),
-(0.5, 0.3, 0.05, 0.15, 'neutral', 0.7, 0.65),
-(0.3, 0.5, 0.1, 0.1, 'negative', 0.35, 0.4),
-(0.6, 0.3, 0.05, 0.1, 'neutral', 0.65, 0.6),
-(0.8, 0.1, 0.05, 0.05, 'positive', 0.9, 0.85),
-(0.6, 0.3, 0.05, 0.1, 'neutral', 0.7, 0.65),
-(0.9, 0.05, 0.05, 0.05, 'positive', 0.95, 0.9),
-(0.7, 0.2, 0.05, 0.05, 'positive', 0.8, 0.75),
-(0.3, 0.5, 0.1, 0.1, 'negative', 0.35, 0.4),
-(0.4, 0.5, 0.1, 0.05, 'negative', 0.35, 0.45);
-
--- Insert 20 Calls (1 for each)
-INSERT INTO Calls (date, duration, silence_percentage, id_user, id_client, id_emotions) VALUES
-('2025-03-01 08:00:00', 300, 10, 1, 1, 1),
-('2025-03-02 09:00:00', 320, 15, 2, 2, 4),
-('2025-03-03 10:00:00', 310, 12, 3, 3, 5),
-('2025-03-04 11:00:00', 340, 20, 4, 4, 6),
-('2025-03-05 12:00:00', 330, 18, 5, 5, 7),
-('2025-03-06 13:00:00', 315, 25, 6, 6, 10),
-('2025-03-07 14:00:00', 300, 22, 7, 7, 11),
-('2025-03-08 15:00:00', 310, 10, 8, 8, 12),
-('2025-03-09 16:00:00', 325, 14, 9, 9, 13),
-('2025-03-10 17:00:00', 335, 15, 10, 10, 14),
-('2025-03-11 18:00:00', 300, 10, 11, 11, 15),
-('2025-03-12 19:00:00', 320, 16, 12, 12, 16),
-('2025-03-13 20:00:00', 310, 12, 13, 13, 17),
-('2025-03-14 21:00:00', 340, 18, 14, 14, 18),
-('2025-03-15 22:00:00', 300, 20, 15, 15, 19),
-('2025-03-16 23:00:00', 315, 14, 16, 16, 20),
-('2025-03-17 08:30:00', 330, 11, 17, 17, 21),
-('2025-03-18 09:30:00', 310, 13, 18, 18, 22),
-('2025-03-19 10:30:00', 320, 15, 19, 19, 23),
-('2025-03-20 11:30:00', 340, 10, 20, 20, 24);
-
--- Insert Transcripts (assuming random text and language)
-INSERT INTO Transcripts (text, language, num_speakers, id_call) VALUES
-('Hello, how can I help you today?', 'English', 2, 1),
-('I need help with my order.', 'English', 2, 2),
-('Can you give me more details?', 'English', 2, 3),
-('I am facing an issue with the product.', 'English', 2, 4),
-('Let me check the status for you.', 'English', 2, 5),
-('What’s the problem with the service?', 'English', 2, 6),
-('I have a question about the delivery.', 'English', 2, 7),
-('There’s an issue with the payment.', 'English', 2, 8),
-('I need more information on your products.', 'English', 2, 9),
-('Can you assist with the refund process?', 'English', 2, 10),
-('I need technical support for my device.', 'English', 2, 11),
-('I’m looking for a new service.', 'English', 2, 12),
-('Could you explain how the warranty works?', 'English', 2, 13),
-('Can you provide some troubleshooting steps?', 'English', 2, 14),
-('I need to speak with a manager.', 'English', 2, 15),
-('Let me transfer you to the appropriate department.', 'English', 2, 16),
-('I am not happy with the service.', 'English', 2, 17),
-('Please hold while I check your information.', 'English', 2, 18),
-('I would like to cancel my order.', 'English', 2, 19),
-('Can you explain the process to me?', 'English', 2, 20);
-
 
 -- Insert Emotions data for each call (one overall call and one for each speaker)
-INSERT INTO Emotions (happiness, sadness, anger, neutrality, text_negative, text_sentiment_score, overall_sentiment_score) VALUES
+INSERT INTO Emotions (happiness, sadness, anger, neutrality, text_sentiment, text_sentiment_score, overall_sentiment_score) VALUES
 -- Call 1
 (0.75, 0.05, 0.10, 0.10, 'positive', 0.85, 0.72), -- Overall
 (0.70, 0.10, 0.05, 0.15, 'positive', 0.80, 0.74), -- Agent
@@ -222,6 +159,55 @@ INSERT INTO Emotions (happiness, sadness, anger, neutrality, text_negative, text
 (0.75, 0.05, 0.05, 0.15, 'neutral', 0.80, 0.71); -- Client
 
 
+
+-- Insert 20 Calls (1 for each)
+INSERT INTO Calls (date, duration, silence_percentage, id_user, id_client, id_emotions) VALUES
+('2025-03-01 08:00:00', 300, 10, 3, 1, 1),
+('2025-03-02 09:00:00', 320, 15, 4, 2, 4),
+('2025-03-03 10:00:00', 310, 12, 5, 3, 5),
+('2025-03-04 11:00:00', 340, 20, 3, 4, 6),
+('2025-03-05 12:00:00', 330, 18, 4, 5, 7),
+('2025-03-06 13:00:00', 315, 25, 5, 6, 10),
+('2025-03-07 14:00:00', 300, 22, 8, 7, 11),
+('2025-03-08 15:00:00', 310, 10, 9, 8, 12),
+('2025-03-09 16:00:00', 325, 14, 10, 9, 13),
+('2025-03-10 17:00:00', 335, 15, 8, 10, 14),
+('2025-03-11 18:00:00', 300, 10, 9, 11, 15),
+('2025-03-12 19:00:00', 320, 16, 10, 12, 16),
+('2025-03-13 20:00:00', 310, 12, 3, 13, 17),
+('2025-03-14 21:00:00', 340, 18, 4, 14, 18),
+('2025-03-15 22:00:00', 300, 20, 5, 15, 19),
+('2025-03-16 23:00:00', 315, 14, 13, 16, 20),
+('2025-03-17 08:30:00', 330, 11, 14, 17, 21),
+('2025-03-18 09:30:00', 310, 13, 15, 18, 22),
+('2025-03-19 10:30:00', 320, 15, 13, 19, 23),
+('2025-03-20 11:30:00', 340, 10, 14, 20, 24);
+
+
+-- Insert Transcripts (assuming random text and language)
+INSERT INTO Transcripts (text, language, num_speakers, id_call) VALUES
+('Hello, how can I help you today?', 'English', 2, 1),
+('I need help with my order.', 'English', 2, 2),
+('Can you give me more details?', 'English', 2, 3),
+('I am facing an issue with the product.', 'English', 2, 4),
+('Let me check the status for you.', 'English', 2, 5),
+('What’s the problem with the service?', 'English', 2, 6),
+('I have a question about the delivery.', 'English', 2, 7),
+('There’s an issue with the payment.', 'English', 2, 8),
+('I need more information on your products.', 'English', 2, 9),
+('Can you assist with the refund process?', 'English', 2, 10),
+('I need technical support for my device.', 'English', 2, 11),
+('I’m looking for a new service.', 'English', 2, 12),
+('Could you explain how the warranty works?', 'English', 2, 13),
+('Can you provide some troubleshooting steps?', 'English', 2, 14),
+('I need to speak with a manager.', 'English', 2, 15),
+('Let me transfer you to the appropriate department.', 'English', 2, 16),
+('I am not happy with the service.', 'English', 2, 17),
+('Please hold while I check your information.', 'English', 2, 18),
+('I would like to cancel my order.', 'English', 2, 19),
+('Can you explain the process to me?', 'English', 2, 20);
+
+
 -- Insert Speaker_Analysis for each call (2 speakers per call: agent and client)
 INSERT INTO Speaker_Analysis (role, id_call, id_emotions) VALUES
 -- Call 1
@@ -284,5 +270,3 @@ INSERT INTO Speaker_Analysis (role, id_call, id_emotions) VALUES
 -- Call 20
 ('Agent', 20, 59),
 ('Client', 20, 60);
-
-
