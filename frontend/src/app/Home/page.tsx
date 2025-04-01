@@ -1,5 +1,3 @@
-"use client"; // Si estás en App Router (app/)
-
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 
@@ -10,15 +8,12 @@ export default function Login() {
   return (
     <div className="flex h-screen items-center justify-center bg-gray-900">
       <div className="w-96 p-8 rounded-xl bg-gray-800 shadow-lg">
-        <h1 className="text-white text-3xl font-semibold mb-6 text-center">
-          NEORIS
-        </h1>
+        <h1 className="text-white text-3xl font-semibold mb-6 text-center">NEORIS</h1>
         <div className="mb-4">
           <label className="text-gray-400 text-sm">Username</label>
           <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
-            <span className="text-gray-400">
-              <FaUser size={20} />
-            </span>
+            <FaUser  className="text-gray-400" size={20} />
+
             <input
               type="text"
               className="bg-transparent border-none outline-none text-white w-full ml-2"
@@ -30,9 +25,7 @@ export default function Login() {
         <div className="mb-4">
           <label className="text-gray-400 text-sm">Password</label>
           <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
-            <span className="text-gray-400">
-              <FaLock size={20} />
-            </span>
+          <FaUser className="text-gray-400" size={20} />
             <input
               type="password"
               className="bg-transparent border-none outline-none text-white w-full ml-2"
@@ -51,5 +44,3 @@ export default function Login() {
     </div>
   );
 }
-
-
