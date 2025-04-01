@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TableComponent from "./tablecomponent";
 import CallSearch from "./callsearch";
 
@@ -10,43 +10,29 @@ export interface Call {
   agent: string;
 }
 
-export const callsData: Call[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    date: "2025-03-25",
-    duration: "5:32",
-    agent: "Jose Miguel",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    date: "2025-03-24",
-    duration: "8:15",
-    agent: "Marco Martinez",
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    date: "2025-03-23",
-    duration: "12:45",
-    agent: "Gabriel Aguilera",
-  },
-  {
-    id: 4,
-    name: "Robbie Williams",
-    date: "2025-03-26",
-    duration: "8:45",
-    agent: "Dan Reynolds",
-  },
-];
+interface CallTableProps {
+  onDataLoad?: (calls: Call[]) => void;
+}
 
-const CallTable: React.FC = () => {
+const CallTable: React.FC<CallTableProps> = ({ onDataLoad }) => {
+  const [callsData, setCallsData] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [view, setView] = useState<"none" | "transcription" | "report">("none");
   const [searchId, setSearchId] = useState("");
   const [searchClient, setSearchClient] = useState("");
   const [searchDate, setSearchDate] = useState("");
+
+  useEffect(() => {
+    fetch("/calls")
+      .then((res) => res.json())
+      .then((data) => {
+        setCallsData(data);
+        if (onDataLoad) {
+          onDataLoad(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching calls:", err));
+  }, []);
 
   const handleView = (call: Call, type: "transcription" | "report") => {
     setSelectedCall(call);
