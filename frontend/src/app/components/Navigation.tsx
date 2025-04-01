@@ -13,7 +13,7 @@ const Navigation = () => {
     <nav className="flex items-center justify-between p-4 bg-gray-900 text-white">
       {/* Logo */}
       <div className="flex items-center">
-        <Link href="/">
+        <Link href="/Home">
           <Image
             src={myLogo}
             alt="Logo"
@@ -26,7 +26,7 @@ const Navigation = () => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex gap-4">
-        <Link href="/">
+        <Link href="/Home">
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Home
           </Button>
@@ -37,9 +37,9 @@ const Navigation = () => {
           </Button>
         </Link>
         <Link href="/Reports">
-        <Button variant="ghost" className="text-white hover:text-gray-300">
-          Reports
-        </Button>
+          <Button variant="ghost" className="text-white hover:text-gray-300">
+            Reports
+          </Button>
         </Link>
         <UserCircle size={24} className="text-white" />
       </div>

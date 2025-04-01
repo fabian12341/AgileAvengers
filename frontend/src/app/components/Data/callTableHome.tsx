@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import TableComponent from "./tablecomponent";
-import CallSearch from "./callsearch";
+import TableComponent from "./tablecomponentHome";
 
 export interface Call {
   id: number;
@@ -111,38 +110,16 @@ export const callsData: Call[] = [
 const CallTable: React.FC = () => {
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [view, setView] = useState<"none" | "transcription" | "report">("none");
-  const [searchId, setSearchId] = useState("");
-  const [searchClient, setSearchClient] = useState("");
-  const [searchDate, setSearchDate] = useState("");
 
   const handleView = (call: Call, type: "transcription" | "report") => {
     setSelectedCall(call);
     setView(type);
   };
 
-  const filteredCalls = callsData.filter((call) => {
-    return (
-      (searchId === "" || call.id.toString().includes(searchId)) &&
-      (searchClient === "" ||
-        call.name.toLowerCase().includes(searchClient.toLowerCase())) &&
-      (searchDate === "" || call.date === searchDate)
-    );
-  });
-
   return (
     <div>
-      {/* Search Section */}
-      <CallSearch
-        searchId={searchId}
-        setSearchId={setSearchId}
-        searchClient={searchClient}
-        setSearchClient={setSearchClient}
-        searchDate={searchDate}
-        setSearchDate={setSearchDate}
-      />
-
       <TableComponent
-        calls={filteredCalls.map((call) => ({
+        calls={callsData.map((call) => ({
           ...call,
           onView: (type) => handleView(call, type),
         }))}
