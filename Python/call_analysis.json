@@ -1,0 +1,112 @@
+{
+  "agent": "XX",
+  "client": "Checando",
+  "call_duration": 30.480979166666668,
+  "datetime": "2023-10-01 12:00:00",
+  "silence_percentage": 58.27544207867196,
+  "language": "es",
+  "num_speakers": 2,
+  "transcript": [
+    {
+      "speaker": "CLIENT 1",
+      "text": " Hola, ¿qué tal?"
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Tú eres..."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Mark, no, Filipe, no."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Pao."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Hola, yo soy Ana."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Encantada."
+    },
+    {
+      "speaker": "AGENT",
+      "text": " Ana, yo no hablo muy bien español."
+    },
+    {
+      "speaker": "AGENT",
+      "text": " Y no sé si conoces a un profesor para ir a clases."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Sí, conozco una profesora."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Se llama Cecilia Carreras."
+    },
+    {
+      "speaker": "CLIENT 1",
+      "text": " Vive en la calle San José."
+    },
+    {
+      "speaker": "AGENT",
+      "text": " ¿Tú?"
+    }
+  ],
+  "overall_emotion": 63.96416551229777,
+  "voice_features": {
+    "CLIENT 1": {
+      "Pitch Mean": 239.2816898093369,
+      "Pitch Std Dev": 38.42485195902252,
+      "Loudness (RMS Energy)": 0.019954141229391098,
+      "Zero-Crossing Rate": 0.17003809529752395,
+      "Harmonics-to-Noise Ratio": -97.43443338244911,
+      "Tempo (BPM)": 144.23076923076923
+    },
+    "AGENT": {
+      "Pitch Mean": 159.74261075397544,
+      "Pitch Std Dev": 45.360237689418426,
+      "Loudness (RMS Energy)": 0.01764686591923237,
+      "Zero-Crossing Rate": 0.14938910243610223,
+      "Harmonics-to-Noise Ratio": -104.63108842934119,
+      "Tempo (BPM)": 89.28571428571429
+    }
+  },
+  "emotions": {
+    "original": {
+      "ang": 0.39921128551941365,
+      "hap": 0.19265934824943542,
+      "neu": 0.40638429298996925,
+      "sad": 0.001745094486977905
+    },
+    "CLIENT 1": {
+      "ang": 0.9017744660377502,
+      "hap": 0.059208281338214874,
+      "neu": 0.03885432332754135,
+      "sad": 0.00016299058916047215
+    },
+    "AGENT": {
+      "ang": 0.7064059972763062,
+      "hap": 0.18079984188079834,
+      "neu": 0.08936574310064316,
+      "sad": 0.023428404703736305
+    }
+  },
+  "text_emotion": {
+    "original": {
+      "sentiment": "neutral",
+      "score": 0.8023279309272766
+    },
+    "CLIENT 1": {
+      "sentiment": "neutral",
+      "score": 0.6283745765686035
+    },
+    "AGENT": {
+      "sentiment": "negative",
+      "score": 0.5776597261428833
+    }
+  }
+}
