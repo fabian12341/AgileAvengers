@@ -1,21 +1,16 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
+import { callsData } from "../components/Data/calltable"; // ajusta la ruta si es necesario
+
 
 const ReportsPage = () => {
-  const [clients, setClients] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(true);
+  const clients = Array.from(new Set(callsData.map(call => call.name)));
+  const [isGenerating, setIsGenerating] = useState(true); // Puedes poner false por defecto
   const [selectedClient, setSelectedClient] = useState("");
 
-  useEffect(() => {
-    fetch("/calls")
-      .then((res) => res.json())
-      .then((data: { name: string }[]) => {
-        const uniqueClients = Array.from(new Set(data.map((call) => call.name)));
-        setClients(uniqueClients);
-      });
-  }, []);
+  // Simulación de clientes (se reemplazará con datos del backend)
 
   return (
     <>
@@ -31,20 +26,30 @@ const ReportsPage = () => {
             <select
               value={selectedClient}
               onChange={(e) => setSelectedClient(e.target.value)}
-              className="bg-gray-800 text-white p-2 rounded-md w-full border border-gray-600"
+              className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             >
-              <option value="" disabled className="text-gray-400">
+              <option value="" disabled
+                className="text-gray-400 mb-4"
+              >
                 Select Client
               </option>
               {clients.map((client, index) => (
-                <option key={index} value={client}>
+                <option key={index} value={client} className="text-black">
                   {client}
                 </option>
               ))}
             </select>
 
-            <input type="date" className="bg-gray-800 p-2 rounded-md w-full border border-gray-600" />
-            <input type="date" className="bg-gray-800 p-2 rounded-md w-full border border-gray-600" />
+            <input
+              type="date"
+              placeholder="Start Date"
+              className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+            />
+            <input
+              type="date"
+              placeholder="End Date"
+              className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+            />
           </div>
 
           <Button className="w-full sm:w-auto px-6 py-2 mt-4 rounded-full text-white transition bg-[#635169] border border-[#E5E8EB] hover:opacity-90">
