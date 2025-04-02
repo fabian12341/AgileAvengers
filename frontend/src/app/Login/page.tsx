@@ -1,15 +1,21 @@
-"use client"; // Si estás en App Router (app/)
+"use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaUser, FaLock } from "react-icons/fa";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push("/Home");
+  };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-900">
-      <div className="w-96 p-8 rounded-xl bg-gray-800 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
+      <div className="w-full max-w-md p-6 sm:p-8 rounded-xl bg-gray-800 shadow-lg">
         <h1 className="text-white text-3xl font-semibold mb-6 text-center">
           NEORIS
         </h1>
@@ -24,6 +30,7 @@ export default function Login() {
               className="bg-transparent border-none outline-none text-white w-full ml-2"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
             />
           </div>
         </div>
@@ -38,18 +45,22 @@ export default function Login() {
               className="bg-transparent border-none outline-none text-white w-full ml-2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
             />
           </div>
         </div>
         <div className="text-right mb-4">
-          <a href="#" className="text-purple-400 text-sm">Forgot password?</a>
+          <a href="#" className="text-purple-400 text-sm">
+            Forgot password?
+          </a>
         </div>
-        <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg font-semibold">
+        <button
+          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition duration-300"
+          onClick={handleLogin}
+        >
           Login
         </button>
       </div>
     </div>
   );
 }
-
-
