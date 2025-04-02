@@ -57,14 +57,16 @@ const Navigation = () => {
               Home
             </Button>
           </Link>
-          <Link href="/upload">
+          <Link href="/Upload">
             <Button variant="ghost" className="text-white hover:text-gray-300">
               Uploads
             </Button>
           </Link>
-          <Button variant="ghost" className="text-white hover:text-gray-300">
-            Reports
-          </Button>
+          <Link href="/Reports">
+            <Button variant="ghost" className="text-white hover:text-gray-300">
+              Reports
+            </Button>
+          </Link>
           <UserCircle size={24} className="text-white mx-auto mt-2" />
         </div>
       )}
