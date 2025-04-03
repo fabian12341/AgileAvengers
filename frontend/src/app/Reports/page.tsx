@@ -2,15 +2,14 @@
 import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
-import { callsData } from "../components/Data/calltable"; // ajusta la ruta si es necesario
-
+import { useCallsData } from "../hooks/useCallData";
 
 const ReportsPage = () => {
+  const callsData = useCallsData();
   const clients = Array.from(new Set(callsData.map(call => call.name)));
-  const [isGenerating, setIsGenerating] = useState(true); // Puedes poner false por defecto
-  const [selectedClient, setSelectedClient] = useState("");
 
-  // Simulación de clientes (se reemplazará con datos del backend)
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
 
   return (
     <>
@@ -28,9 +27,7 @@ const ReportsPage = () => {
               onChange={(e) => setSelectedClient(e.target.value)}
               className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             >
-              <option value="" disabled
-                className="text-gray-400 mb-4"
-              >
+              <option value="" disabled className="text-gray-400 mb-4">
                 Select Client
               </option>
               {clients.map((client, index) => (
