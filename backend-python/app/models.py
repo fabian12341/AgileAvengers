@@ -7,6 +7,9 @@ class User(db.Model):
     email = db.Column(db.String(100))
     role = db.Column(db.String(50))
 
+    calls = db.relationship('Call', backref='user', lazy=True)
+
+
 class Call(db.Model):
     __tablename__ = 'calls'
     id_call = db.Column(db.Integer, primary_key=True)
@@ -17,3 +20,12 @@ class Call(db.Model):
     id_client = db.Column(db.Integer)
     id_emotions = db.Column(db.Integer)
 
+    transcript = db.relationship('Transcript', uselist=False, backref='call', lazy=True)
+
+
+class Transcript(db.Model):
+    __tablename__ = 'transcripts'
+    id_transcript = db.Column(db.Integer, primary_key=True)
+    id_call = db.Column(db.Integer, db.ForeignKey('calls.id_call'))
+    text = db.Column(db.Text)
+    language = db.Column(db.String(10))

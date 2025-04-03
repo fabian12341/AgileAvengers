@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from .models import Call
 from .models import User
+from .models import Transcript
 
 main = Blueprint('main', __name__)
 
@@ -30,13 +31,14 @@ def get_users():
     
 @main.route('/calls/users')
 def get_calls_with_users():
-    from .models import Call, User
-    from . import db
-
-    results = db.session.query(Call, User).join(User, Call.id_user == User.id_user).all()
+    from .models import Call
+    calls = Call.query.all()
 
     response = []
-    for call, user in results:
+    for call in calls:
+        user = call.user
+        transcript = call.transcript
+
         response.append({
             "id_call": call.id_call,
             "date": call.date.strftime("%Y-%m-%d %H:%M:%S"),
@@ -50,7 +52,12 @@ def get_calls_with_users():
                 "name": user.name,
                 "email": user.email,
                 "role": user.role
-            }
+            } if user else None,
+            "transcript": {
+                "id_transcript": transcript.id_transcript,
+                "text": transcript.text,
+                "language": transcript.language
+            } if transcript else None
         })
 
     return jsonify(response)
