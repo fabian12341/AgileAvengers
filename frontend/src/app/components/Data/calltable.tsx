@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TableComponent from "./tablecomponent";
 import CallSearch from "./callsearch";
 
@@ -12,108 +12,46 @@ export interface Call {
   transcript: { speaker: string; message: string }[];
 }
 
-export const callsData: Call[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    date: "2025-03-25",
-    duration: "5:32",
-    agent: "Jose Miguel",
-    sentimentScore: 90,
-    transcript: [
-      {
-        speaker: "John Doe",
-        message: "Hi, I'm calling about my recent order.",
-      },
-      {
-        speaker: "Jose Miguel",
-        message: "Sorry to hear that. What's the order number?",
-      },
-      { speaker: "John Doe", message: "It's order number 1234." },
-      {
-        speaker: "Jose Miguel",
-        message: "I see, let me check on that for you.",
-      },
-      { speaker: "John Doe", message: "Thank you." },
-    ],
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    date: "2025-03-24",
-    duration: "8:15",
-    agent: "Marco Martinez",
-    sentimentScore: 70,
-    transcript: [
-      {
-        speaker: "Jane Smith",
-        message: "Hello, I have an issue with my account.",
-      },
-      {
-        speaker: "Marco Martinez",
-        message: "Can you please provide your account ID?",
-      },
-      { speaker: "Jane Smith", message: "Sure, it's 5678." },
-      {
-        speaker: "Marco Martinez",
-        message: "Thanks, I'm looking into it now.",
-      },
-      { speaker: "Jane Smith", message: "Appreciate it." },
-    ],
-  },
-  {
-    id: 3,
-    name: "Bob Johnson",
-    date: "2025-03-23",
-    duration: "12:45",
-    agent: "Gabriel Aguilera",
-    sentimentScore: 88,
-    transcript: [
-      {
-        speaker: "Bob Johnson",
-        message: "Hi, I need help with a payment issue.",
-      },
-      {
-        speaker: "Gabriel Aguilera",
-        message: "Of course, can you tell me more?",
-      },
-      {
-        speaker: "Bob Johnson",
-        message: "I was charged twice for the same order.",
-      },
-      {
-        speaker: "Gabriel Aguilera",
-        message: "I’ll check the transaction history.",
-      },
-      { speaker: "Bob Johnson", message: "Thanks for your help." },
-    ],
-  },
-  {
-    id: 4,
-    name: "Robbie Williams",
-    date: "2025-03-26",
-    duration: "8:45",
-    agent: "Dan Reynolds",
-    sentimentScore: 92,
-    transcript: [
-      {
-        speaker: "Robbie Williams",
-        message: "Hey, I need to update my shipping address.",
-      },
-      { speaker: "Dan Reynolds", message: "Sure, what’s the new address?" },
-      { speaker: "Robbie Williams", message: "123 Main St, New York." },
-      { speaker: "Dan Reynolds", message: "Got it, I’ve updated it for you." },
-      { speaker: "Robbie Williams", message: "Great, thanks!" },
-    ],
-  },
-];
-
 const CallTable: React.FC = () => {
+  const [callsData, setCallsData] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [view, setView] = useState<"none" | "transcription" | "report">("none");
   const [searchId, setSearchId] = useState("");
   const [searchClient, setSearchClient] = useState("");
   const [searchDate, setSearchDate] = useState("");
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/calls/users`, {
+      headers: {
+        "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const calls: Call[] = data.map((call: any) => ({
+          id: call.id_call,
+          name: call.user?.name || "Desconocido",
+          date: call.date.split(" ")[0],
+          duration: `${Math.floor(call.duration / 60)}:${(call.duration % 60)
+            .toString()
+            .padStart(2, "0")}`,
+          agent: call.user?.role || "Sin rol",
+          sentimentScore: 80,
+          transcript: call.transcript?.text
+            ? [
+                {
+                  speaker: call.user?.name || "Agente",
+                  message: call.transcript.text,
+                },
+              ]
+            : [],
+        }));
+        setCallsData(calls);
+      })
+      .catch((error) => {
+        console.error("Error al obtener las llamadas:", error);
+      });
+  }, []);
 
   const handleView = (call: Call, type: "transcription" | "report") => {
     setSelectedCall(call);
@@ -131,7 +69,6 @@ const CallTable: React.FC = () => {
 
   return (
     <div>
-      {/* Search Section */}
       <CallSearch
         searchId={searchId}
         setSearchId={setSearchId}
@@ -157,13 +94,11 @@ const CallTable: React.FC = () => {
             <div className="space-y-4">
               {selectedCall.transcript.map((entry, index) => (
                 <div key={index} className="flex items-start space-x-3">
-                  {/* Avatar Placeholder */}
                   <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
                     <span className="text-white text-xs">
                       {entry.speaker.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  {/* Speaker and Message */}
                   <div>
                     <p className="text-sm font-semibold text-white uppercase">
                       {entry.speaker}
