@@ -1,12 +1,19 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, abort
+import os
 from .models import Call
 from .models import User
 from .models import Transcript
 
 main = Blueprint('main', __name__)
 
+def require_api_key():
+    api_key = request.headers.get("X-API-KEY")
+    if api_key != os.getenv("API_KEY"):
+        abort(401, description="API key inválida o ausente")
+
 @main.route('/calls')
 def get_calls():
+    require_api_key()
     calls = Call.query.all()
     return jsonify([
         {
@@ -19,6 +26,7 @@ def get_calls():
 
 @main.route('/users')
 def get_users():
+    require_api_key()
     users = User.query.all()
     return jsonify([
         {
@@ -31,6 +39,7 @@ def get_users():
     
 @main.route('/calls/users')
 def get_calls_with_users():
+    require_api_key()
     from .models import Call
     calls = Call.query.all()
 
