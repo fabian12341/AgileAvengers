@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request, abort
 import os
 from .models import Call
 from .models import User
-from .models import Transcript
+from .models import Report
+
 
 main = Blueprint('main', __name__)
 
@@ -68,6 +69,19 @@ def get_calls_with_users():
                 "language": transcript.language
             } if transcript else None
         })
+        
 
-    return jsonify(response)
+@main.route('/reports')
+def get_reports():
+    require_api_key()
+    reports = Report.query.all()
+    return jsonify([
+        {
+            "id_report": r.id_report,
+            "path": r.path,
+            "summary": r.summary,
+            "id_call": r.id_call
+        } for r in reports
+    ])
+
 
