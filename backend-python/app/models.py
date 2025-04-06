@@ -29,3 +29,12 @@ class Transcript(db.Model):
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'))
     text = db.Column(db.Text)
     language = db.Column(db.String(10))
+
+class Report(db.Model):
+    __tablename__ = 'Reports'  # Asegúrate que el nombre coincida con tu BD (con mayúscula inicial)
+    id_report = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String(255))
+    summary = db.Column(db.Text)
+    id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'))
+    call = db.relationship('Call', backref='report', uselist=False)
+
