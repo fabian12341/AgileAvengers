@@ -19,9 +19,12 @@ class Call(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey('Users.id_user'))
     id_client = db.Column(db.Integer)
     id_emotions = db.Column(db.Integer)
-
+    
     transcript = db.relationship('Transcript', uselist=False, backref='call', lazy=True)
-    report = db.relationship("Report", back_populates="call", uselist=False)
+    report_id = db.Column(db.Integer, db.ForeignKey('Reports.id_report'))
+    report = db.relationship("Report", back_populates="calls")
+
+
 
 
 
@@ -33,12 +36,12 @@ class Transcript(db.Model):
     language = db.Column(db.String(10))
 
 class Report(db.Model):
-    __tablename__ = 'Reports'  # Asegúrate que el nombre coincida con tu BD (con mayúscula inicial)
+    __tablename__ = 'Reports'
     id_report = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(255))
     summary = db.Column(db.Text)
-    id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'))
-    call = db.relationship("Call", back_populates="report")
-    report_id = db.Column(db.Integer, db.ForeignKey("Reports.id_report"), nullable=True)
+
+    calls = db.relationship("Call", back_populates="report")
+
 
 

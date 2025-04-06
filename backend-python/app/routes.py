@@ -72,45 +72,48 @@ def get_calls_with_users():
 
 @main.route('/reports/from-calls', methods=['POST'])
 def create_report_from_calls():
-    data = request.get_json()
-    call_ids = data.get("call_ids")
+    try:
+        data = request.get_json()
+        print("Datos recibidos:", data)
 
-    if not call_ids or not isinstance(call_ids, list):
-        return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
+        call_ids = data.get("call_ids")
+        if not call_ids or not isinstance(call_ids, list):
+            return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
 
-    # Buscar las llamadas
-    calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
-    if len(calls) != len(call_ids):
-        return jsonify({"error": "Una o más llamadas no existen"}), 404
+        calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
+        print("Llamadas encontradas:", [call.id_call for call in calls])
 
-    # Juntar todos los textos de los transcripts
-    texts = [
-        call.transcript.text for call in calls
-        if call.transcript and call.transcript.text
-    ]
-    if not texts:
-        return jsonify({"error": "Ninguna llamada tiene transcript"}), 400
+        texts = []
+        for call in calls:
+            print(f"Transcript para llamada {call.id_call}:", call.transcript)
+            if call.transcript and call.transcript.text:
+                texts.append(call.transcript.text)
 
-    # Generar resumen automático (versión simple)
-    full_text = " ".join(texts)
-    sentences = full_text.split(".")
-    summary = ". ".join(sentences[:3]).strip() + "."
+        if not texts:
+            return jsonify({"error": "Ninguna llamada tiene transcript"}), 400
 
-    # Crear el reporte
-    report = Report(summary=summary)
-    db.session.add(report)
-    db.session.flush()  # Para obtener el ID
+        full_text = " ".join(texts)
+        sentences = full_text.split(".")
+        summary = ". ".join(sentences[:3]).strip() + "."
 
-    # Asignar el reporte a cada llamada
-    for call in calls:
-        call.report_id = report.id_report
+        report = Report(summary=summary)
+        db.session.add(report)
+        db.session.flush()
 
-    db.session.commit()
+        for call in calls:
+            call.report_id = report.id_report
 
-    return jsonify({
-        "message": "Reporte creado exitosamente",
-        "id_report": report.id_report,
-        "summary": summary
-    }), 201
+        db.session.commit()
+
+        return jsonify({
+            "message": "Reporte creado exitosamente",
+            "id_report": report.id_report,
+            "summary": summary
+        }), 201
+
+    except Exception as e:
+        print("🔥 Error inesperado:", str(e))
+        return jsonify({"error": "Error interno del servidor"}), 500
+
 
 
