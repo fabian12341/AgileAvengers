@@ -127,12 +127,11 @@ def list_reports():
         {
             "id_report": r.id_report,
             "summary": r.summary,
-            "calls": [
-                {
-                    "id_call": c.id_call,
-                    "date": c.date.strftime("%Y-%m-%d"),
-                    "client": c.id_client
-                } for c in r.calls
-            ]
+            "call": {
+                "id_call": r.call.id_call,
+                "date": r.call.date.strftime("%Y-%m-%d"),
+                "client": r.call.id_client,
+                "agent": r.call.user.name if r.call.user else "Desconocido"
+            } if r.call else None
         } for r in reports
     ])

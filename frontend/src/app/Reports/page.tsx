@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
 import { useCallsData } from "../hooks/useCallData";
-import ReportModal from "../components/Reportmodal";
+import ReportModal from "../components/ReportModal";
 
 const ReportsPage = () => {
   const callsData = useCallsData();
