@@ -21,7 +21,9 @@ class Call(db.Model):
     id_emotions = db.Column(db.Integer)
 
     report_id = db.Column(db.Integer, db.ForeignKey('Reports.id_report'))
+    report = db.relationship("Report", back_populates="calls")  # ✅ Esta línea
     transcript = db.relationship('Transcript', uselist=False, backref='call', lazy=True)
+
 
 class Transcript(db.Model):
     __tablename__ = 'Transcripts'
