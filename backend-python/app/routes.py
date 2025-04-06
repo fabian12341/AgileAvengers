@@ -76,36 +76,63 @@ def get_calls_with_users():
 
 
 @main.route('/reports/from-calls', methods=['POST'])
-def create_report_from_calls():
+def create_reports_from_calls():
     try:
         data = request.get_json()
         call_ids = data.get("call_ids")
 
-        if not call_ids or not isinstance(call_ids, list) or len(call_ids) != 1:
-            return jsonify({"error": "Debes enviar exactamente un call_id"}), 400
+        if not call_ids or not isinstance(call_ids, list):
+            return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
 
-        call = Call.query.get(call_ids[0])
-        if not call:
-            return jsonify({"error": "La llamada no existe"}), 404
+        calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
+        if len(calls) != len(call_ids):
+            return jsonify({"error": "Una o más llamadas no existen"}), 404
 
-        if not call.transcript or not call.transcript.text:
-            return jsonify({"error": "La llamada no tiene transcript"}), 400
+        created_reports = []
 
-        # Generar resumen
-        sentences = call.transcript.text.split(".")
-        summary = ". ".join(sentences[:3]).strip() + "."
+        for call in calls:
+            if call.transcript and call.transcript.text:
+                text = call.transcript.text
+                sentences = text.split(".")
+                summary = ". ".join(sentences[:3]).strip() + "."
 
-        # Crear reporte
-        report = Report(summary=summary, id_call=call.id_call)
-        db.session.add(report)
+                report = Report(summary=summary, id_call=call.id_call)
+                db.session.add(report)
+                db.session.flush()
+
+                created_reports.append({
+                    "id_report": report.id_report,
+                    "summary": summary,
+                    "id_call": call.id_call
+                })
+
         db.session.commit()
 
+        if not created_reports:
+            return jsonify({"error": "Ninguna llamada tenía transcript"}), 400
+
         return jsonify({
-            "message": "Reporte creado exitosamente",
-            "id_report": report.id_report,
-            "summary": summary
+            "message": "Reportes generados exitosamente",
+            "reports": created_reports
         }), 201
 
     except Exception as e:
-        print("🔥 Error:", str(e))
+        print("🔥 Error al generar reportes:", str(e))
         return jsonify({"error": "Error interno del servidor"}), 500
+
+@main.route('/reports', methods=['GET'])
+def list_reports():
+    reports = Report.query.all()
+    return jsonify([
+        {
+            "id_report": r.id_report,
+            "summary": r.summary,
+            "calls": [
+                {
+                    "id_call": c.id_call,
+                    "date": c.date.strftime("%Y-%m-%d"),
+                    "client": c.id_client
+                } for c in r.calls
+            ]
+        } for r in reports
+    ])

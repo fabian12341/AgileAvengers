@@ -1,8 +1,10 @@
+// src/app/reports/page.tsx
 "use client";
 import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
 import { useCallsData } from "../hooks/useCallData";
+import ReportModal from "../components/Reportmodal";
 
 const ReportsPage = () => {
   const callsData = useCallsData();
@@ -12,6 +14,8 @@ const ReportsPage = () => {
   const [selectedClient, setSelectedClient] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [reports, setReports] = useState<any[]>([]);
+  const [selectedReport, setSelectedReport] = useState<any | null>(null);
 
   const generateReport = async () => {
     const filteredCallIds = callsData
@@ -22,7 +26,7 @@ const ReportsPage = () => {
                             (!endDate || callDate <= new Date(endDate));
         return matchesClient && matchesDate;
       })
-      .map(call => call.id); // Replace 'id_call' with the correct property name, e.g., 'id'
+      .map(call => call.id);
 
     if (filteredCallIds.length === 0) {
       alert("No se encontraron llamadas para generar el reporte.");
@@ -42,8 +46,11 @@ const ReportsPage = () => {
       });
 
       const data = await res.json();
-      console.log("Reporte generado:", data);
-      alert("Reporte generado correctamente. ID: " + data.id_report);
+      if (Array.isArray(data.reports)) {
+        setReports(data.reports);
+      } else if (data.id_report) {
+        setReports([{ ...data }]);
+      }
     } catch (error) {
       console.error("Error al generar el reporte:", error);
       alert("Error al generar el reporte.");
@@ -107,8 +114,29 @@ const ReportsPage = () => {
               </div>
             </>
           )}
+
+          {reports.length > 0 && (
+            <div className="mt-6 space-y-4">
+              {reports.map((report, index) => (
+                <div
+                  key={index}
+                  onClick={() => setSelectedReport(report)}
+                  className="cursor-pointer p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition"
+                >
+                  📄 Reporte de llamada del {report.date || 'día desconocido'}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
+
+      {selectedReport && (
+        <ReportModal
+          report={selectedReport}
+          onClose={() => setSelectedReport(null)}
+        />
+      )}
     </>
   );
 };
