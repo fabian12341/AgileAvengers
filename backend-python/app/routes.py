@@ -39,36 +39,41 @@ def get_users():
 @main.route('/calls/users')
 def get_calls_with_users():
     require_api_key()
-    from .models import Call
-    calls = Call.query.all()
+    try:
+        calls = Call.query.all()
 
-    response = []
-    for call in calls:
-        user = call.user
-        transcript = call.transcript
+        response = []
+        for call in calls:
+            user = call.user
+            transcript = call.transcript
 
-        response.append({
-            "id_call": call.id_call,
-            "date": call.date.strftime("%Y-%m-%d %H:%M:%S"),
-            "duration": call.duration,
-            "silence_percentage": call.silence_percentage,
-            "id_user": call.id_user,
-            "id_client": call.id_client,
-            "id_emotions": call.id_emotions,
-            "user": {
-                "id": user.id_user,
-                "name": user.name,
-                "email": user.email,
-                "role": user.role
-            } if user else None,
-            "transcript": {
-                "id_transcript": transcript.id_transcript,
-                "text": transcript.text,
-                "language": transcript.language
-            } if transcript else None
-        })
+            response.append({
+                "id_call": call.id_call,
+                "date": call.date.strftime("%Y-%m-%d %H:%M:%S"),
+                "duration": call.duration,
+                "silence_percentage": call.silence_percentage,
+                "id_user": call.id_user,
+                "id_client": call.id_client,
+                "id_emotions": call.id_emotions,
+                "user": {
+                    "id": user.id_user,
+                    "name": user.name,
+                    "email": user.email,
+                    "role": user.role
+                } if user else None,
+                "transcript": {
+                    "id_transcript": transcript.id_transcript,
+                    "text": transcript.text,
+                    "language": transcript.language
+                } if transcript else None
+            })
 
-    return jsonify(response)
+        return jsonify(response)
+
+    except Exception as e:
+        print("🔥 Error en /calls/users:", str(e))
+        return jsonify({"error": "Error interno en /calls/users"}), 500
+
 
 @main.route('/reports/from-calls', methods=['POST'])
 def create_report_from_calls():
