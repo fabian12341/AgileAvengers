@@ -21,6 +21,8 @@ class Call(db.Model):
     id_emotions = db.Column(db.Integer)
 
     transcript = db.relationship('Transcript', uselist=False, backref='call', lazy=True)
+    report = db.relationship("Report", back_populates="call", uselist=False)
+
 
 
 class Transcript(db.Model):
@@ -36,5 +38,7 @@ class Report(db.Model):
     path = db.Column(db.String(255))
     summary = db.Column(db.Text)
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'))
-    call = db.relationship('Call', backref='report', uselist=False)
+    call = db.relationship("Call", back_populates="report")
+    report_id = db.Column(db.Integer, db.ForeignKey("Reports.id_report"), nullable=True)
+
 

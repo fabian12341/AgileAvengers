@@ -10,6 +10,47 @@ const ReportsPage = () => {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedClient, setSelectedClient] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const generateReport = async () => {
+    const filteredCallIds = callsData
+      .filter(call => {
+        const matchesClient = selectedClient === "" || call.name === selectedClient;
+        const callDate = new Date(call.date);
+        const matchesDate = (!startDate || callDate >= new Date(startDate)) &&
+                            (!endDate || callDate <= new Date(endDate));
+        return matchesClient && matchesDate;
+      })
+      .map(call => call.id); // Replace 'id_call' with the correct property name, e.g., 'id'
+
+    if (filteredCallIds.length === 0) {
+      alert("No se encontraron llamadas para generar el reporte.");
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/from-calls`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || ""
+        },
+        body: JSON.stringify({ call_ids: filteredCallIds })
+      });
+
+      const data = await res.json();
+      console.log("Reporte generado:", data);
+      alert("Reporte generado correctamente. ID: " + data.id_report);
+    } catch (error) {
+      console.error("Error al generar el reporte:", error);
+      alert("Error al generar el reporte.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <>
@@ -39,17 +80,22 @@ const ReportsPage = () => {
 
             <input
               type="date"
-              placeholder="Start Date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
               className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             />
             <input
               type="date"
-              placeholder="End Date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
               className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
             />
           </div>
 
-          <Button className="w-full sm:w-auto px-6 py-2 mt-4 rounded-full text-white transition bg-[#635169] border border-[#E5E8EB] hover:opacity-90">
+          <Button
+            className="w-full sm:w-auto px-6 py-2 mt-4 rounded-full text-white transition bg-[#635169] border border-[#E5E8EB] hover:opacity-90"
+            onClick={generateReport}
+          >
             Generate
           </Button>
 
@@ -58,15 +104,6 @@ const ReportsPage = () => {
               <p className="mb-2">Generating report...</p>
               <div className="w-full max-w-xl h-2 bg-gray-700 rounded-full overflow-hidden mb-6">
                 <div className="h-full bg-purple-500 w-[65%] transition-all duration-1000"></div>
-              </div>
-
-              <div className="flex gap-4">
-                <Button className="flex items-center gap-2 bg-gray-800 border border-gray-600 px-4 py-2 rounded-md text-white hover:bg-gray-700 transition">
-                  View
-                </Button>
-                <Button className="flex items-center gap-2 bg-gray-800 border border-gray-600 px-4 py-2 rounded-md text-white hover:bg-gray-700 transition">
-                  Download
-                </Button>
               </div>
             </>
           )}
