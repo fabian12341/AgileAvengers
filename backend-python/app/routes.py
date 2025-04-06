@@ -79,35 +79,25 @@ def get_calls_with_users():
 def create_report_from_calls():
     try:
         data = request.get_json()
-        print("Datos recibidos:", data)
-
         call_ids = data.get("call_ids")
-        if not call_ids or not isinstance(call_ids, list):
-            return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
 
-        calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
-        print("Llamadas encontradas:", [call.id_call for call in calls])
+        if not call_ids or not isinstance(call_ids, list) or len(call_ids) != 1:
+            return jsonify({"error": "Debes enviar exactamente un call_id"}), 400
 
-        texts = []
-        for call in calls:
-            print(f"Transcript para llamada {call.id_call}:", call.transcript)
-            if call.transcript and call.transcript.text:
-                texts.append(call.transcript.text)
+        call = Call.query.get(call_ids[0])
+        if not call:
+            return jsonify({"error": "La llamada no existe"}), 404
 
-        if not texts:
-            return jsonify({"error": "Ninguna llamada tiene transcript"}), 400
+        if not call.transcript or not call.transcript.text:
+            return jsonify({"error": "La llamada no tiene transcript"}), 400
 
-        full_text = " ".join(texts)
-        sentences = full_text.split(".")
+        # Generar resumen
+        sentences = call.transcript.text.split(".")
         summary = ". ".join(sentences[:3]).strip() + "."
 
-        report = Report(summary=summary)
+        # Crear reporte
+        report = Report(summary=summary, id_call=call.id_call)
         db.session.add(report)
-        db.session.flush()
-
-        for call in calls:
-            call.report_id = report.id_report
-
         db.session.commit()
 
         return jsonify({
@@ -117,8 +107,5 @@ def create_report_from_calls():
         }), 201
 
     except Exception as e:
-        print("🔥 Error inesperado:", str(e))
+        print("🔥 Error:", str(e))
         return jsonify({"error": "Error interno del servidor"}), 500
-
-
-
