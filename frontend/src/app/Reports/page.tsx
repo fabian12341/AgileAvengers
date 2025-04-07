@@ -1,27 +1,25 @@
-// src/app/reports/page.tsx
 "use client";
 import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
 import { useCallsData } from "../hooks/useCallData";
-import ReportModal from "../components/ReportModal";
+import { useReports } from "../hooks/useReportsData";
 
 const ReportsPage = () => {
   const callsData = useCallsData();
+  const reports = useReports();
   const clients = Array.from(new Set(callsData.map(call => call.name)));
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedClient, setSelectedClient] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [reports, setReports] = useState<any[]>([]);
-  const [selectedReport, setSelectedReport] = useState<any | null>(null);
 
   const generateReport = async () => {
     const filteredCallIds = callsData
       .filter(call => {
         const matchesClient = selectedClient === "" || call.name === selectedClient;
-        const callDate = new Date(call.date + "T00:00:00");
+        const callDate = new Date(call.date);
         const matchesDate = (!startDate || callDate >= new Date(startDate)) &&
                             (!endDate || callDate <= new Date(endDate));
         return matchesClient && matchesDate;
@@ -46,16 +44,30 @@ const ReportsPage = () => {
       });
 
       const data = await res.json();
-      if (Array.isArray(data.reports)) {
-        setReports(data.reports);
-      } else if (data.id_report) {
-        setReports([{ ...data }]);
-      }
+      console.log("Reporte generado:", data);
+      alert("Reporte generado correctamente. ID(s): " + data.reports.map((r: any) => r.id_report).join(", "));
     } catch (error) {
       console.error("Error al generar el reporte:", error);
       alert("Error al generar el reporte.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const deleteReport = async (id: number) => {
+    const confirmed = window.confirm("¿Estás seguro de que quieres eliminar este reporte?");
+    if (!confirmed) return;
+
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
+        },
+      });
+      window.location.reload();
+    } catch (err) {
+      console.error("Error al eliminar el reporte:", err);
     }
   };
 
@@ -115,28 +127,25 @@ const ReportsPage = () => {
             </>
           )}
 
-          {reports.length > 0 && (
-            <div className="mt-6 space-y-4">
-              {reports.map((report, index) => (
-                <div
-                  key={index}
-                  onClick={() => setSelectedReport(report)}
-                  className="cursor-pointer p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-700 transition"
+          <div className="mt-10">
+            <h2 className="text-xl font-semibold mb-4">Reportes generados</h2>
+            {reports.map(report => (
+              <div key={report.id_report} className="bg-gray-800 p-4 rounded-md mb-4">
+                <p className="text-white font-bold">Reporte de llamada de {report.call.date}</p>
+                <p className="text-gray-400 text-sm mb-2">Cliente ID: {report.call.client} — Agente: {report.call.agent}</p>
+                <p className="text-white text-sm mb-2">{report.summary}</p>
+                <button
+                  onClick={() => deleteReport(report.id_report)}
+                  className="text-red-400 hover:text-red-200 text-sm"
                 >
-                  📄 Reporte de llamada del {report.date || 'día desconocido'}
-                </div>
-              ))}
-            </div>
-          )}
+                  Eliminar reporte
+                </button>
+              </div>
+            ))}
+          </div>
+
         </div>
       </main>
-
-      {selectedReport && (
-        <ReportModal
-          report={selectedReport}
-          onClose={() => setSelectedReport(null)}
-        />
-      )}
     </>
   );
 };

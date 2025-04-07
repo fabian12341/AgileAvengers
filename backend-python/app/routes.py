@@ -150,3 +150,14 @@ def list_reports():
             } if r.call else None
         } for r in reports
     ])
+
+@main.route('/reports/<int:report_id>', methods=['DELETE'])
+def delete_report(report_id):
+    require_api_key()
+    report = Report.query.get(report_id)
+    if not report:
+        return jsonify({"error": "Reporte no encontrado"}), 404
+
+    db.session.delete(report)
+    db.session.commit()
+    return jsonify({"message": "Reporte eliminado correctamente"}), 200

@@ -1,17 +1,18 @@
-// src/app/hooks/useReportsData.ts
+// src/app/hooks/useReports.ts
 import { useState, useEffect } from "react";
 
 export interface Report {
   id_report: number;
   summary: string;
-  calls: {
+  call: {
     id_call: number;
     date: string;
-    client: number; // o el nombre si lo mapeas
-  }[];
+    client: number;
+    agent: string;
+  };
 }
 
-export const useReportsData = () => {
+export const useReports = () => {
   const [reports, setReports] = useState<Report[]>([]);
 
   useEffect(() => {
@@ -20,9 +21,9 @@ export const useReportsData = () => {
         "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
       },
     })
-      .then((res) => res.json())
-      .then(setReports)
-      .catch((err) => console.error("Error al obtener reportes:", err));
+      .then(res => res.json())
+      .then(data => setReports(data))
+      .catch(err => console.error("Error al cargar reportes:", err));
   }, []);
 
   return reports;
