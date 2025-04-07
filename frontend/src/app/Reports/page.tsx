@@ -7,7 +7,7 @@ import { useReports } from "../hooks/useReportsData";
 
 const ReportsPage = () => {
   const callsData = useCallsData();
-  const reports = useReports();
+  const { reports, deleteReport } = useReports(); // ← ahora usamos deleteReport del hook
   const clients = Array.from(new Set(callsData.map(call => call.name)));
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -46,28 +46,12 @@ const ReportsPage = () => {
       const data = await res.json();
       console.log("Reporte generado:", data);
       alert("Reporte generado correctamente. ID(s): " + data.reports.map((r: any) => r.id_report).join(", "));
+      window.location.reload(); // o mejor, revalidar reports si lo manejas con SWR o algo similar
     } catch (error) {
       console.error("Error al generar el reporte:", error);
       alert("Error al generar el reporte.");
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const deleteReport = async (id: number) => {
-    const confirmed = window.confirm("¿Estás seguro de que quieres eliminar este reporte?");
-    if (!confirmed) return;
-
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`, {
-        method: "DELETE",
-        headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
-        },
-      });
-      window.location.reload();
-    } catch (err) {
-      console.error("Error al eliminar el reporte:", err);
     }
   };
 
@@ -143,7 +127,6 @@ const ReportsPage = () => {
               </div>
             ))}
           </div>
-
         </div>
       </main>
     </>

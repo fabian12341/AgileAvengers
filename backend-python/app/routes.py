@@ -76,17 +76,14 @@ def get_calls_with_users():
 
 @main.route('/reports/from-calls', methods=['POST'])
 def create_reports_from_calls():
-    print("🚀 Endpoint /reports/from-calls alcanzado")
     try:
         data = request.get_json()
-        print("📥 Datos recibidos:", data)
 
         call_ids = data.get("call_ids")
         if not call_ids or not isinstance(call_ids, list):
             return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
 
         calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
-        print(f"📞 Llamadas encontradas: {[c.id_call for c in calls]}")
 
         if len(calls) != len(call_ids):
             return jsonify({"error": "Una o más llamadas no existen"}), 404
@@ -94,12 +91,10 @@ def create_reports_from_calls():
         created_reports = []
 
         for call in calls:
-            print(f"🔍 Procesando llamada {call.id_call}")
 
             # ✅ Verifica si ya hay un reporte creado para esta llamada
             existing = Report.query.filter_by(id_call=call.id_call).first()
             if existing:
-                print(f"⚠️ Ya existe un reporte para call_id {call.id_call}, omitiendo...")
                 continue
 
             if call.transcript and call.transcript.text:
