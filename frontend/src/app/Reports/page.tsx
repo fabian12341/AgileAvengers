@@ -21,7 +21,7 @@ const ReportsPage = () => {
     const filteredCallIds = callsData
       .filter(call => {
         const matchesClient = selectedClient === "" || call.name === selectedClient;
-        const callDate = new Date(call.date);
+        const callDate = new Date(call.date + "T00:00:00");
         const matchesDate = (!startDate || callDate >= new Date(startDate)) &&
                             (!endDate || callDate <= new Date(endDate));
         return matchesClient && matchesDate;

@@ -80,7 +80,6 @@ def create_reports_from_calls():
     try:
         data = request.get_json()
         print("📥 Datos recibidos:", data)
-        
 
         call_ids = data.get("call_ids")
         if not call_ids or not isinstance(call_ids, list):
@@ -96,6 +95,13 @@ def create_reports_from_calls():
 
         for call in calls:
             print(f"🔍 Procesando llamada {call.id_call}")
+
+            # ✅ Verifica si ya hay un reporte creado para esta llamada
+            existing = Report.query.filter_by(id_call=call.id_call).first()
+            if existing:
+                print(f"⚠️ Ya existe un reporte para call_id {call.id_call}, omitiendo...")
+                continue
+
             if call.transcript and call.transcript.text:
                 text = call.transcript.text
                 sentences = text.split(".")
@@ -114,7 +120,7 @@ def create_reports_from_calls():
                 print(f"⚠️ Llamada {call.id_call} no tiene transcript")
 
         if not created_reports:
-            return jsonify({"error": "Ninguna llamada tenía transcript"}), 400
+            return jsonify({"error": "Ninguna llamada tenía transcript o ya tiene reporte"}), 400
 
         db.session.commit()
 
@@ -128,9 +134,6 @@ def create_reports_from_calls():
         traceback.print_exc()
         print("🔥 Error al generar reportes:", str(e))
         return jsonify({"error": "Error interno del servidor"}), 500
-
-
-
 
 @main.route('/reports', methods=['GET'])
 def list_reports():
