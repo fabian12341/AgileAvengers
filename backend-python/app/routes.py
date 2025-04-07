@@ -125,7 +125,7 @@ def create_reports_from_calls():
 
     except Exception as e:
         import traceback
-        traceback.print_exc()  # 🔥 Esto imprime la traza completa
+        traceback.print_exc()
         print("🔥 Error al generar reportes:", str(e))
         return jsonify({"error": "Error interno del servidor"}), 500
 
