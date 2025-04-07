@@ -36,7 +36,7 @@ const Dashboard = () => {
         <Card className="bg-gray-800 p-4 rounded-lg shadow-md">
           <CardContent>
             <h3 className="text-lg font-semibold text-white">
-              Positivity Score
+              Your Positivity Score
             </h3>
             <p className="text-2xl text-white">86</p>
           </CardContent>
