@@ -74,26 +74,28 @@ def get_calls_with_users():
         print("🔥 Error en /calls/users:", str(e))
         return jsonify({"error": "Error interno en /calls/users"}), 500
 
-
 @main.route('/reports/from-calls', methods=['POST'])
 def create_reports_from_calls():
+    print("🚀 Endpoint /reports/from-calls alcanzado")
     try:
         data = request.get_json()
-        call_ids = data.get("call_ids")
-        print("📥 call_ids recibidos:", call_ids)
+        print("📥 Datos recibidos:", data)
+        
 
+        call_ids = data.get("call_ids")
         if not call_ids or not isinstance(call_ids, list):
             return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
 
         calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
-        print("🔎 Calls encontradas:", [c.id_call for c in calls])
+        print(f"📞 Llamadas encontradas: {[c.id_call for c in calls]}")
+
         if len(calls) != len(call_ids):
             return jsonify({"error": "Una o más llamadas no existen"}), 404
 
         created_reports = []
 
         for call in calls:
-            print(f"📞 Transcript de llamada {call.id_call}:", call.transcript.text if call.transcript else "Sin transcript")
+            print(f"🔍 Procesando llamada {call.id_call}")
             if call.transcript and call.transcript.text:
                 text = call.transcript.text
                 sentences = text.split(".")
@@ -108,11 +110,13 @@ def create_reports_from_calls():
                     "summary": summary,
                     "id_call": call.id_call
                 })
-
-        db.session.commit()
+            else:
+                print(f"⚠️ Llamada {call.id_call} no tiene transcript")
 
         if not created_reports:
             return jsonify({"error": "Ninguna llamada tenía transcript"}), 400
+
+        db.session.commit()
 
         return jsonify({
             "message": "Reportes generados exitosamente",
@@ -121,9 +125,10 @@ def create_reports_from_calls():
 
     except Exception as e:
         import traceback
-        print("🔥 Error al generar reportes:", str(e))
+        print("🔥 Error inesperado:", str(e))
         traceback.print_exc()
         return jsonify({"error": "Error interno del servidor"}), 500
+
 
 
 @main.route('/reports', methods=['GET'])
