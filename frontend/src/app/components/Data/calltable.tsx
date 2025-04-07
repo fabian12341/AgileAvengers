@@ -10,6 +10,7 @@ export interface Call {
   agent: string;
   sentimentScore: number;
   transcript: { speaker: string; message: string }[];
+  hasReport: boolean;
 }
 
 const CallTable: React.FC = () => {
@@ -32,18 +33,15 @@ const CallTable: React.FC = () => {
           id: call.id_call,
           name: call.user?.name || "Desconocido",
           date: call.date.split(" ")[0],
-          duration: `${Math.floor(call.duration / 60)}:${(call.duration % 60)
-            .toString()
-            .padStart(2, "0")}`,
+          duration: `${Math.floor(call.duration / 60)}:${(call.duration % 60).toString().padStart(2, "0")}`,
           agent: call.user?.role || "Sin rol",
           sentimentScore: 80,
+          hasReport: !!call.report,
           transcript: call.transcript?.text
-            ? [
-                {
-                  speaker: call.user?.name || "Agente",
-                  message: call.transcript.text,
-                },
-              ]
+            ? [{
+                speaker: call.user?.name || "Agente",
+                message: call.transcript.text,
+              }]
             : [],
         }));
         setCallsData(calls);
@@ -61,8 +59,7 @@ const CallTable: React.FC = () => {
   const filteredCalls = callsData.filter((call) => {
     return (
       (searchId === "" || call.id.toString().includes(searchId)) &&
-      (searchClient === "" ||
-        call.name.toLowerCase().includes(searchClient.toLowerCase())) &&
+      (searchClient === "" || call.name.toLowerCase().includes(searchClient.toLowerCase())) &&
       (searchDate === "" || call.date === searchDate)
     );
   });
@@ -100,18 +97,14 @@ const CallTable: React.FC = () => {
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white uppercase">
-                      {entry.speaker}
-                    </p>
+                    <p className="text-sm font-semibold text-white uppercase">{entry.speaker}</p>
                     <p className="text-sm text-gray-300">{entry.message}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-300">
-              Aquí iría el reporte de la llamada...
-            </p>
+            <p className="text-gray-300">Aquí iría el reporte de la llamada...</p>
           )}
         </div>
       )}
