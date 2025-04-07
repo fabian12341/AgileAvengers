@@ -10,6 +10,10 @@ export interface Call {
   agent: string;
   sentimentScore: number;
   transcript: { speaker: string; message: string }[];
+  report?: {
+    id_report: number;
+    summary: string;
+  } | null;
 }
 
 const CallTable: React.FC = () => {
@@ -45,6 +49,7 @@ const CallTable: React.FC = () => {
                 },
               ]
             : [],
+          report: call.report || null,
         }));
         setCallsData(calls);
       })
@@ -110,7 +115,7 @@ const CallTable: React.FC = () => {
             </div>
           ) : (
             <p className="text-gray-300">
-              Aquí iría el reporte de la llamada...
+              {selectedCall.report?.summary ?? "No hay reporte disponible."}
             </p>
           )}
         </div>

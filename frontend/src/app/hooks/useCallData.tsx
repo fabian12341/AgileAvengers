@@ -9,6 +9,7 @@ export interface Call {
   agent: string;
   sentimentScore: number;
   transcript: { speaker: string; message: string }[];
+  reportSummary?: string;
 }
 
 export const useCallsData = () => {
@@ -32,6 +33,7 @@ export const useCallsData = () => {
           transcript: call.transcript?.text
             ? [{ speaker: call.user?.name || "Agente", message: call.transcript.text }]
             : [],
+          reportSummary: call.report?.summary || undefined,
         }));
         setCallsData(calls);
       })
