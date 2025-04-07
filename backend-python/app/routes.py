@@ -46,7 +46,7 @@ def get_calls_with_users():
         for call in calls:
             user = call.user
             transcript = call.transcript
-            report = call.report
+            report = call.report  # gracias a uselist=False, esto es un objeto, no lista
 
             response.append({
                 "id_call": call.id_call,
@@ -78,6 +78,7 @@ def get_calls_with_users():
     except Exception as e:
         print("🔥 Error en /calls/users:", str(e))
         return jsonify({"error": "Error interno en /calls/users"}), 500
+
 
 
 @main.route('/reports/from-calls', methods=['POST'])
