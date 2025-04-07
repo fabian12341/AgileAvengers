@@ -80,17 +80,20 @@ def create_reports_from_calls():
     try:
         data = request.get_json()
         call_ids = data.get("call_ids")
+        print("📥 call_ids recibidos:", call_ids)
 
         if not call_ids or not isinstance(call_ids, list):
             return jsonify({"error": "Debes enviar una lista de call_ids"}), 400
 
         calls = Call.query.filter(Call.id_call.in_(call_ids)).all()
+        print("🔎 Calls encontradas:", [c.id_call for c in calls])
         if len(calls) != len(call_ids):
             return jsonify({"error": "Una o más llamadas no existen"}), 404
 
         created_reports = []
 
         for call in calls:
+            print(f"📞 Transcript de llamada {call.id_call}:", call.transcript.text if call.transcript else "Sin transcript")
             if call.transcript and call.transcript.text:
                 text = call.transcript.text
                 sentences = text.split(".")
@@ -117,8 +120,11 @@ def create_reports_from_calls():
         }), 201
 
     except Exception as e:
+        import traceback
         print("🔥 Error al generar reportes:", str(e))
+        traceback.print_exc()
         return jsonify({"error": "Error interno del servidor"}), 500
+
 
 @main.route('/reports', methods=['GET'])
 def list_reports():
