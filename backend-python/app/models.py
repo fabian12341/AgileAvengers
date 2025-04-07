@@ -21,6 +21,7 @@ class Call(db.Model):
     id_emotions = db.Column(db.Integer)
 
     transcript = db.relationship('Transcript', uselist=False, backref='call', lazy=True)
+    report = db.relationship('Report', uselist=False, backref='call', lazy=True)
 
 
 class Transcript(db.Model):
@@ -38,5 +39,5 @@ class Report(db.Model):
     summary = db.Column(db.Text)
 
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'), unique=True)
-    call = db.relationship('Call', backref='report', uselist=False)
+
 
