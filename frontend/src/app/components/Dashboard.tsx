@@ -36,7 +36,7 @@ const Dashboard = () => {
         <Card className="bg-gray-800 p-4 rounded-lg shadow-md">
           <CardContent>
             <h3 className="text-lg font-semibold text-white">
-              Sentiment Score
+              Positivity Score
             </h3>
             <p className="text-2xl text-white">86</p>
           </CardContent>
@@ -53,11 +53,11 @@ const Dashboard = () => {
 
       {/* Sección de gráficos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        {/* Sentiment Score Over Time */}
+        {/* Positivity Score Over Time */}
         <Card className="bg-gray-800 p-4 rounded-lg shadow-md">
           <CardContent>
             <h3 className="text-lg font-semibold text-white">
-              Sentiment Score Over Time
+              Positivity Score Over Time
             </h3>
             <div className="mt-4 space-y-2">
               {sentimentData.map((data, index) => (
@@ -67,6 +67,9 @@ const Dashboard = () => {
                     className="h-3 bg-blue-500 rounded"
                     style={{ width: `${data.score}%` }}
                   ></div>
+                   <span className="text-sm font-semibold text-white mb-2 ml-1">
+                    {`${data.score}%`}
+                  </span>
                 </div>
               ))}
             </div>
