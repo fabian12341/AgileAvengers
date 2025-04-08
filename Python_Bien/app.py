@@ -12,6 +12,10 @@ warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
+@app.route("/hello", methods=["GET"])
+def hello():
+    return jsonify({"message": "Hello, World!"})
+
 @app.route("/analyze-call", methods=["POST"])
 def analyze_call():
     data = request.json  # Expecting JSON input with audio file path
