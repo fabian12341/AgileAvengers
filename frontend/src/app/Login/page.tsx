@@ -3,14 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaUser, FaLock } from "react-icons/fa";
+import { useLogin } from "../hooks/useLogin"; // Import the custom hook
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { login, error, loading } = useLogin(); // Use the hook
   const router = useRouter();
 
-  const handleLogin = () => {
-    router.push("/Home");
+  const handleLogin = async () => {
+    try {
+      await login(username, password); // Call the login function from the hook
+      router.push("/Home"); // Redirect to the Home page on successful login
+    } catch (err) {
+      console.error("Login failed:", err); // Error is already handled in the hook
+    }
   };
 
   return (
@@ -19,6 +26,9 @@ export default function Login() {
         <h1 className="text-white text-3xl font-semibold mb-6 text-center">
           NEORIS
         </h1>
+        {error && (
+          <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
+        )}
         <div className="mb-4">
           <label className="text-gray-400 text-sm">Username</label>
           <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
@@ -57,8 +67,9 @@ export default function Login() {
         <button
           className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition duration-300"
           onClick={handleLogin}
+          disabled={loading} // Disable button while loading
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </div>
     </div>

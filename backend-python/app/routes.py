@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, abort
+from werkzeug.security import check_password_hash
 import os
 from .models import Call, User, Report
 from . import db
@@ -35,6 +36,35 @@ def get_users():
             "role": u.role
         } for u in users
     ])
+
+@main.route('/login', methods=['POST'])
+def post_login():
+    require_api_key()
+    
+    # Get email and password from the request body
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    # Validate input
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    # Fetch user from the database by email
+    user = User.query.filter_by(email=email).first()
+
+    # Check if user exists and password is correct
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"error": "Invalid email or password"}), 401
+
+    # If credentials are valid, return a success response
+    return jsonify({
+        "message": "Login successful",
+        "user": {
+            "email": user.email,
+            "role": user.role
+        }
+    }), 200
 
 @main.route('/calls/users')
 def get_calls_with_users():
