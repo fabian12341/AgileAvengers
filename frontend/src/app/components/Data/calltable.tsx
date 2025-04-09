@@ -83,22 +83,57 @@ const CallTable: React.FC = () => {
         }))}
       />
 
-      {/* Solo popup para reporte */}
-      {selectedCall && view === "report" && (
+      {/* Popup de TRANSCRIPCIÓN */}
+      {selectedCall && view === "transcription" && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
           onClick={() => setView("none")}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-gray-900 text-white p-6 rounded-md max-w-lg w-full shadow-lg border border-white"
+            className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl"
           >
-            <h2 className="text-xl font-bold mb-4">Reporte</h2>
-            {selectedCall.report?.summary ? (
-              <p className="text-sm text-gray-200">{selectedCall.report.summary}</p>
+            <h2 className="text-lg font-bold mb-3">Transcript</h2>
+            {selectedCall.transcript.length > 0 ? (
+              <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
+                {selectedCall.transcript.map((entry, index) => (
+                  <div key={index}>
+                    <p className="text-sm font-semibold">{entry.speaker}</p>
+                    <p className="text-sm text-gray-300">{entry.message}</p>
+                  </div>
+                ))}
+              </div>
             ) : (
-              <p className="text-sm text-gray-400">No hay reporte disponible.</p>
+              <p className="text-sm text-gray-400">No hay transcripción disponible.</p>
             )}
+            <button
+              onClick={() => setView("none")}
+              className="mt-4 text-blue-400 hover:underline"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Popup de REPORTE */}
+      {selectedCall && view === "report" && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
+          onClick={() => setView("none")}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl"
+          >
+            <h2 className="text-lg font-bold mb-3">Reporte detallado</h2>
+            <p><strong>Fecha:</strong> {selectedCall.date}</p>
+            <p><strong>Cliente ID:</strong> {selectedCall.id}</p>
+            <p><strong>Agente:</strong> {selectedCall.name}</p>
+            <p className="mt-2">
+              <strong>Resumen:</strong><br />
+              {selectedCall.report?.summary || "No hay resumen disponible."}
+            </p>
             <button
               onClick={() => setView("none")}
               className="mt-4 text-blue-400 hover:underline"

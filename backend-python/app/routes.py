@@ -1,7 +1,11 @@
 from flask import Blueprint, jsonify, request, abort
+from mutagen.mp3 import MP3
+from werkzeug.utils import secure_filename
 import os
 from .models import Call, User, Report, Transcript
 from . import db
+from datetime import datetime
+import tempfile
 
 main = Blueprint('main', __name__)
 
@@ -164,15 +168,9 @@ def delete_report(report_id):
     db.session.commit()
     return jsonify({"message": "Reporte eliminado correctamente"}), 200
 
-from flask import request, jsonify
-from . import db
-from .models import Call, Transcript, Report, User
-from datetime import datetime
-
 @main.route('/upload-call', methods=['POST'])
 def upload_call():
     try:
-        # Validar API KEY
         api_key = request.headers.get("X-API-KEY")
         if api_key != os.getenv("API_KEY"):
             return jsonify({"error": "API key inválida"}), 401
@@ -181,27 +179,35 @@ def upload_call():
         client = request.form.get("client")
         agent = request.form.get("agent")
         project = request.form.get("project")
-        date_str = request.form.get("date")  # formato: YYYY-MM-DD
-        time_str = request.form.get("time")  # formato: HH:MM
+        date_str = request.form.get("date")
+        time_str = request.form.get("time")
 
         if not all([file, client, agent, date_str, time_str]):
             return jsonify({"error": "Faltan campos obligatorios"}), 400
 
-        # Convertir fecha y hora a datetime
+        # 🔍 Obtener duración real del archivo mp3
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+            filename = secure_filename(file.filename)
+            tmp.write(file.read())
+            tmp.flush()
+            audio = MP3(tmp.name)
+            duration_seconds = int(audio.info.length)
+
+        # 🕒 Convertir fecha y hora
         datetime_str = f"{date_str} {time_str}:00"
         date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
 
-        # Buscar o crear user
+        # 👤 Buscar o crear user
         user = User.query.filter_by(name=agent).first()
         if not user:
             user = User(name=agent, email=f"{agent.lower()}@example.com", role="Agent")
             db.session.add(user)
             db.session.flush()
 
-        # Crear Call
+        # 📞 Crear llamada
         call = Call(
             date=date_obj,
-            duration=300,
+            duration=duration_seconds,
             silence_percentage=10,
             id_user=user.id_user,
             id_client=int(client) if client.isdigit() else 1,
@@ -210,7 +216,7 @@ def upload_call():
         db.session.add(call)
         db.session.flush()
 
-        # Generar transcript básico
+        # 📝 Crear transcript
         transcript = Transcript(
             id_call=call.id_call,
             text="Esto es una transcripción de prueba generada automáticamente.",
@@ -219,12 +225,9 @@ def upload_call():
         )
         db.session.add(transcript)
 
-        # Crear resumen
+        # 📄 Crear reporte
         summary = transcript.text.split(".")[0].strip() + "."
-        report = Report(
-            id_call=call.id_call,
-            summary=summary
-        )
+        report = Report(id_call=call.id_call, summary=summary)
         db.session.add(report)
 
         db.session.commit()
@@ -232,6 +235,7 @@ def upload_call():
         return jsonify({
             "message": "Llamada, transcript y reporte creados exitosamente",
             "call_id": call.id_call,
+            "duration_seconds": duration_seconds,
             "report_summary": summary
         }), 201
 
