@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, abort
 import os
-from .models import Call, User, Report
+from .models import Call, User, Report, Transcript
 from . import db
 
 main = Blueprint('main', __name__)
@@ -163,3 +163,66 @@ def delete_report(report_id):
     db.session.delete(report)
     db.session.commit()
     return jsonify({"message": "Reporte eliminado correctamente"}), 200
+
+@main.route('/upload-call', methods=['POST'])
+def upload_call():
+    require_api_key()
+    try:
+        data = request.get_json()
+
+        # Extrae los datos necesarios
+        agent_name = data.get("agent")
+        client_id = data.get("client_id")
+        date = data.get("date")
+        duration = data.get("duration", 300)
+        transcript_text = data.get("transcript")
+
+        # Verifica si el agente existe
+        user = User.query.filter_by(name=agent_name).first()
+        if not user:
+            return jsonify({"error": "Agente no encontrado"}), 404
+
+        # Crea la llamada
+        new_call = Call(
+            id_user=user.id_user,
+            id_client=client_id,
+            id_emotions=1,
+            duration=duration,
+            date=date,
+            silence_percentage=10
+        )
+        db.session.add(new_call)
+        db.session.flush()
+
+        # Crea el transcript
+        new_transcript = Transcript(
+            id_call=new_call.id_call,
+            text=transcript_text,
+            language="es"
+        )
+        db.session.add(new_transcript)
+
+        # Crea el reporte automático
+        resumen = transcript_text.split(".")[:3]
+        summary = ". ".join([s.strip() for s in resumen if s]).strip() + "."
+
+        new_report = Report(
+            id_call=new_call.id_call,
+            summary=summary,
+            path="no_path"
+        )
+        db.session.add(new_report)
+
+        db.session.commit()
+
+        return jsonify({
+            "message": "Llamada, transcript y reporte creados exitosamente",
+            "call_id": new_call.id_call,
+            "report_id": new_report.id_report
+        }), 201
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
