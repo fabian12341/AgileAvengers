@@ -214,7 +214,8 @@ def upload_call():
         transcript = Transcript(
             id_call=call.id_call,
             text="Esto es una transcripción de prueba generada automáticamente.",
-            language="es"
+            language="es",
+            num_speakers=1
         )
         db.session.add(transcript)
 
