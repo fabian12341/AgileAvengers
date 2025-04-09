@@ -30,6 +30,7 @@ class Transcript(db.Model):
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'))
     text = db.Column(db.Text)
     language = db.Column(db.String(10))
+    num_speakers = db.Column(db.Integer)
 
 
 class Report(db.Model):

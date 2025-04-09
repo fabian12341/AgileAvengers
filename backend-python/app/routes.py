@@ -99,7 +99,7 @@ def create_reports_from_calls():
 
         for call in calls:
 
-            # ✅ Verifica si ya hay un reporte creado para esta llamada
+            # Verifica si ya hay un reporte creado para esta llamada
             existing = Report.query.filter_by(id_call=call.id_call).first()
             if existing:
                 continue
@@ -119,7 +119,7 @@ def create_reports_from_calls():
                     "id_call": call.id_call
                 })
             else:
-                print(f"⚠️ Llamada {call.id_call} no tiene transcript")
+                print(f"Llamada {call.id_call} no tiene transcript")
 
         if not created_reports:
             return jsonify({"error": "Ninguna llamada tenía transcript o ya tiene reporte"}), 400
