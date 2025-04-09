@@ -15,6 +15,13 @@ export const useLogin = () => {
     setLoading(true);
     setError(null);
 
+    // Validate input on the frontend
+    if (!email || !password) {
+      setError("Email and password are required");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
