@@ -164,61 +164,74 @@ def delete_report(report_id):
     db.session.commit()
     return jsonify({"message": "Reporte eliminado correctamente"}), 200
 
+from flask import request, jsonify
+from . import db
+from .models import Call, Transcript, Report, User
+from datetime import datetime
+
 @main.route('/upload-call', methods=['POST'])
 def upload_call():
-    require_api_key()
     try:
-        data = request.get_json()
+        # Validar API KEY
+        api_key = request.headers.get("X-API-KEY")
+        if api_key != os.getenv("API_KEY"):
+            return jsonify({"error": "API key inválida"}), 401
 
-        # Extrae los datos necesarios
-        agent_name = data.get("agent")
-        client_id = data.get("client_id")
-        date = data.get("date")
-        duration = data.get("duration", 300)
-        transcript_text = data.get("transcript")
+        file = request.files.get("file")
+        client = request.form.get("client")
+        agent = request.form.get("agent")
+        project = request.form.get("project")
+        date_str = request.form.get("date")  # formato: YYYY-MM-DD
+        time_str = request.form.get("time")  # formato: HH:MM
 
-        # Verifica si el agente existe
-        user = User.query.filter_by(name=agent_name).first()
+        if not all([file, client, agent, date_str, time_str]):
+            return jsonify({"error": "Faltan campos obligatorios"}), 400
+
+        # Convertir fecha y hora a datetime
+        datetime_str = f"{date_str} {time_str}:00"
+        date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+
+        # Buscar o crear user
+        user = User.query.filter_by(name=agent).first()
         if not user:
-            return jsonify({"error": "Agente no encontrado"}), 404
+            user = User(name=agent, email=f"{agent.lower()}@example.com", role="Agent")
+            db.session.add(user)
+            db.session.flush()
 
-        # Crea la llamada
-        new_call = Call(
+        # Crear Call
+        call = Call(
+            date=date_obj,
+            duration=300,
+            silence_percentage=10,
             id_user=user.id_user,
-            id_client=client_id,
-            id_emotions=1,
-            duration=duration,
-            date=date,
-            silence_percentage=10
+            id_client=int(client) if client.isdigit() else 1,
+            id_emotions=1
         )
-        db.session.add(new_call)
+        db.session.add(call)
         db.session.flush()
 
-        # Crea el transcript
-        new_transcript = Transcript(
-            id_call=new_call.id_call,
-            text=transcript_text,
+        # Generar transcript básico
+        transcript = Transcript(
+            id_call=call.id_call,
+            text="Esto es una transcripción de prueba generada automáticamente.",
             language="es"
         )
-        db.session.add(new_transcript)
+        db.session.add(transcript)
 
-        # Crea el reporte automático
-        resumen = transcript_text.split(".")[:3]
-        summary = ". ".join([s.strip() for s in resumen if s]).strip() + "."
-
-        new_report = Report(
-            id_call=new_call.id_call,
-            summary=summary,
-            path="no_path"
+        # Crear resumen
+        summary = transcript.text.split(".")[0].strip() + "."
+        report = Report(
+            id_call=call.id_call,
+            summary=summary
         )
-        db.session.add(new_report)
+        db.session.add(report)
 
         db.session.commit()
 
         return jsonify({
             "message": "Llamada, transcript y reporte creados exitosamente",
-            "call_id": new_call.id_call,
-            "report_id": new_report.id_report
+            "call_id": call.id_call,
+            "report_summary": summary
         }), 201
 
     except Exception as e:
