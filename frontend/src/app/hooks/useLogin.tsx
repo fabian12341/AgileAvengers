@@ -11,27 +11,23 @@ export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
-    // Validate input on the frontend
     if (!email || !password) {
       setError("Email and password are required");
       setLoading(false);
-      return;
+      return false;
     }
 
-    // Validate environment variables
     if (!process.env.NEXT_PUBLIC_API_URL || !process.env.NEXT_PUBLIC_API_KEY) {
       setError("API configuration is missing");
       setLoading(false);
-      return;
+      return false;
     }
 
     try {
-      console.log("Sending login request to:", process.env.NEXT_PUBLIC_API_URL);
-
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         headers: {
@@ -41,23 +37,22 @@ export const useLogin = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Error response:", errorData);
-        throw new Error(errorData.error || "Login failed");
+        setError(errorData.error || "Login failed");
+        setLoading(false);
+        return false;
       }
 
       const data = await response.json();
-      console.log("Login successful, user data:", data.user);
-      setUser(data.user); // Assuming the backend returns a `user` object
+      setUser(data.user);
+      setLoading(false);
+      return true;
     } catch (err) {
-      console.error("Login error:", err);
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
       setUser(null);
-    } finally {
       setLoading(false);
+      return false;
     }
   };
 

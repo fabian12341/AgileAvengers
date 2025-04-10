@@ -13,33 +13,28 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    // Validate input fields
     if (!email || !password) {
-      setFormError("Email and password are required."); // Set error if fields are empty
+      setFormError("Email and password are required.");
       return;
     }
   
-    setFormError(""); // Clear form error if validation passes
+    setFormError("");
   
     try {
-      // Attempt to log in with the provided credentials
-      await login(email, password);
+      const success = await login(email, password);
   
-      // Check if there was an error during login
-      if (error) {
+      if (!success) {
         setFormError("Invalid email or password. Please try again.");
         return;
       }
   
-      // If login is successful, redirect to the Home page
       router.push("/Home");
     } catch (err) {
-      // If login fails, display an error message
       setFormError("An unexpected error occurred. Please try again.");
       console.error("Login failed:", err);
     }
   };
-
+  
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
       <div className="w-full max-w-md p-6 sm:p-8 rounded-xl bg-gray-800 shadow-lg">
