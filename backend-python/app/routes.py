@@ -1,8 +1,12 @@
 from flask import Blueprint, jsonify, request, abort
 from werkzeug.security import check_password_hash
+from mutagen.mp3 import MP3
+from werkzeug.utils import secure_filename
 import os
-from .models import Call, User, Report
+from .models import Call, User, Report, Transcript
 from . import db
+from datetime import datetime
+import tempfile
 
 main = Blueprint('main', __name__)
 
@@ -129,7 +133,7 @@ def create_reports_from_calls():
 
         for call in calls:
 
-            # ✅ Verifica si ya hay un reporte creado para esta llamada
+            # Verifica si ya hay un reporte creado para esta llamada
             existing = Report.query.filter_by(id_call=call.id_call).first()
             if existing:
                 continue
@@ -149,7 +153,7 @@ def create_reports_from_calls():
                     "id_call": call.id_call
                 })
             else:
-                print(f"⚠️ Llamada {call.id_call} no tiene transcript")
+                print(f"Llamada {call.id_call} no tiene transcript")
 
         if not created_reports:
             return jsonify({"error": "Ninguna llamada tenía transcript o ya tiene reporte"}), 400
@@ -193,3 +197,80 @@ def delete_report(report_id):
     db.session.delete(report)
     db.session.commit()
     return jsonify({"message": "Reporte eliminado correctamente"}), 200
+
+@main.route('/upload-call', methods=['POST'])
+def upload_call():
+    try:
+        api_key = request.headers.get("X-API-KEY")
+        if api_key != os.getenv("API_KEY"):
+            return jsonify({"error": "API key inválida"}), 401
+
+        file = request.files.get("file")
+        client = request.form.get("client")
+        agent = request.form.get("agent")
+        project = request.form.get("project")
+        date_str = request.form.get("date")
+        time_str = request.form.get("time")
+
+        if not all([file, client, agent, date_str, time_str]):
+            return jsonify({"error": "Faltan campos obligatorios"}), 400
+
+        # 🔍 Obtener duración real del archivo mp3
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+            filename = secure_filename(file.filename)
+            tmp.write(file.read())
+            tmp.flush()
+            audio = MP3(tmp.name)
+            duration_seconds = int(audio.info.length)
+
+        # 🕒 Convertir fecha y hora
+        datetime_str = f"{date_str} {time_str}:00"
+        date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+
+        # 👤 Buscar o crear user
+        user = User.query.filter_by(name=agent).first()
+        if not user:
+            user = User(name=agent, email=f"{agent.lower()}@example.com", role="Agent")
+            db.session.add(user)
+            db.session.flush()
+
+        # 📞 Crear llamada
+        call = Call(
+            date=date_obj,
+            duration=duration_seconds,
+            silence_percentage=10,
+            id_user=user.id_user,
+            id_client=int(client) if client.isdigit() else 1,
+            id_emotions=1
+        )
+        db.session.add(call)
+        db.session.flush()
+
+        # 📝 Crear transcript
+        transcript = Transcript(
+            id_call=call.id_call,
+            text="Esto es una transcripción de prueba generada automáticamente.",
+            language="es",
+            num_speakers=1
+        )
+        db.session.add(transcript)
+
+        # 📄 Crear reporte
+        summary = transcript.text.split(".")[0].strip() + "."
+        report = Report(id_call=call.id_call, summary=summary)
+        db.session.add(report)
+
+        db.session.commit()
+
+        return jsonify({
+            "message": "Llamada, transcript y reporte creados exitosamente",
+            "call_id": call.id_call,
+            "duration_seconds": duration_seconds,
+            "report_summary": summary
+        }), 201
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
