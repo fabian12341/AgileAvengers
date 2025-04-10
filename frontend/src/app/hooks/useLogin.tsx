@@ -39,14 +39,14 @@ const login = async (email: string, password: string): Promise<boolean> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      setError(errorData.error || "Invalid email or password");
+      setError(errorData.error || "Invalid email or password 1");
       setLoading(false);
       return false;
     }
 
     const data = await response.json();
     if (!data.user || !data.user.email) {
-      setError("Invalid email or password");
+      setError("Invalid email or password 2");
       setLoading(false);
       return false;
     }
