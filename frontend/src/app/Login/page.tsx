@@ -6,17 +6,31 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { useLogin } from "../hooks/useLogin"; // Import the custom hook
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState(""); // State for validation errors
   const { login, error, loading } = useLogin(); // Use the hook
   const router = useRouter();
 
   const handleLogin = async () => {
+    // Validate input fields
+    if (!email || !password) {
+      setFormError("Email and password are required."); // Set error if fields are empty
+      return;
+    }
+
+    setFormError(""); // Clear form error if validation passes
+
     try {
-      await login(username, password); // Call the login function from the hook
-      router.push("/Home"); // Redirect to the Home page on successful login
+      // Attempt to log in with the provided credentials
+      await login(email, password);
+
+      // If login is successful, redirect to the Home page
+      router.push("/Home");
     } catch (err) {
-      console.error("Login failed:", err); // Error is already handled in the hook
+      // If login fails, display an error message
+      setFormError("Invalid email or password. Please try again.");
+      console.error("Login failed:", err);
     }
   };
 
@@ -26,11 +40,16 @@ export default function Login() {
         <h1 className="text-white text-3xl font-semibold mb-6 text-center">
           NEORIS
         </h1>
+        {/* Display form validation error */}
+        {formError && (
+          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
+        )}
+        {/* Display login error */}
         {error && (
           <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
         )}
         <div className="mb-4">
-          <label className="text-gray-400 text-sm">Username</label>
+          <label className="text-gray-400 text-sm">Email</label>
           <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
             <span className="text-gray-400">
               <FaUser size={20} />
@@ -38,9 +57,9 @@ export default function Login() {
             <input
               type="text"
               className="bg-transparent border-none outline-none text-white w-full ml-2"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
             />
           </div>
         </div>

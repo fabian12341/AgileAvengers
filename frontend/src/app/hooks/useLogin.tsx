@@ -22,25 +22,39 @@ export const useLogin = () => {
       return;
     }
 
+    // Validate environment variables
+    if (!process.env.NEXT_PUBLIC_API_URL || !process.env.NEXT_PUBLIC_API_KEY) {
+      setError("API configuration is missing");
+      setLoading(false);
+      return;
+    }
+
     try {
+      console.log("Sending login request to:", process.env.NEXT_PUBLIC_API_URL);
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
         },
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Error response:", errorData);
         throw new Error(errorData.error || "Login failed");
       }
 
       const data = await response.json();
+      console.log("Login successful, user data:", data.user);
       setUser(data.user); // Assuming the backend returns a `user` object
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Login error:", err);
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
       setUser(null);
     } finally {
       setLoading(false);
