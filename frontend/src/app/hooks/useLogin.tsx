@@ -45,7 +45,7 @@ const login = async (email: string, password: string): Promise<boolean> => {
     }
 
     const data = await response.json();
-    if (!data.user || !data.user.email || !data.user.password) {
+    if (!data.user || !data.user.email) {
       setError("Invalid email or password");
       setLoading(false);
       return false;
