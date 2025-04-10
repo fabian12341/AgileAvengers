@@ -18,18 +18,24 @@ export default function Login() {
       setFormError("Email and password are required."); // Set error if fields are empty
       return;
     }
-
+  
     setFormError(""); // Clear form error if validation passes
-
+  
     try {
       // Attempt to log in with the provided credentials
       await login(email, password);
-
+  
+      // Check if there was an error during login
+      if (error) {
+        setFormError("Invalid email or password. Please try again.");
+        return;
+      }
+  
       // If login is successful, redirect to the Home page
       router.push("/Home");
     } catch (err) {
       // If login fails, display an error message
-      setFormError("Invalid email or password. Please try again.");
+      setFormError("An unexpected error occurred. Please try again.");
       console.error("Login failed:", err);
     }
   };
