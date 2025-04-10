@@ -6,6 +6,7 @@ class User(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
     role = db.Column(db.String(50))
+    password = db.Column(db.String(100))
 
     calls = db.relationship('Call', backref='user', lazy=True)
 
