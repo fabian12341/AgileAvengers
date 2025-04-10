@@ -6,6 +6,7 @@ class User(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
     role = db.Column(db.String(50))
+    password = db.Column(db.String(100))
 
     calls = db.relationship('Call', backref='user', lazy=True)
 
@@ -30,6 +31,7 @@ class Transcript(db.Model):
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'))
     text = db.Column(db.Text)
     language = db.Column(db.String(10))
+    num_speakers = db.Column(db.Integer)
 
 
 class Report(db.Model):
@@ -37,7 +39,6 @@ class Report(db.Model):
     id_report = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(255), default="no_path")
     summary = db.Column(db.Text)
-
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'), unique=True)
 
 
