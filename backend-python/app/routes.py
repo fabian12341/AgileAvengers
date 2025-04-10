@@ -54,8 +54,8 @@ def post_login():
     user = User.query.filter_by(email=email).first()
 
     # Check if user exists and password is correct
-    if not user or not user.password != password:
-        return jsonify({"error": "Invalid email or password route error"}), 401
+    if not user or user.password != password:
+        return jsonify({"error": "Invalid email or password route error", }), 401
 
     # If credentials are valid, return a success response
     return jsonify({
