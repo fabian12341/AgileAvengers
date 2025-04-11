@@ -3,30 +3,32 @@ import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
 import { useCallsData } from "../hooks/useCallData";
-import { useReports } from "../hooks/useReportsData";
+import { useReports, Report } from "../hooks/useReportsData";
 
 const ReportsPage = () => {
   const callsData = useCallsData();
   const { reports, deleteReport } = useReports();
 
-  const clients = Array.from(new Set(callsData.map(call => call.name)));
+  const clients = Array.from(new Set(callsData.map((call) => call.name)));
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedClient, setSelectedClient] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
   const generateReport = async () => {
     const filteredCallIds = callsData
-      .filter(call => {
-        const matchesClient = selectedClient === "" || call.name === selectedClient;
+      .filter((call) => {
+        const matchesClient =
+          selectedClient === "" || call.name === selectedClient;
         const callDate = new Date(call.date);
-        const matchesDate = (!startDate || callDate >= new Date(startDate)) &&
-                            (!endDate || callDate <= new Date(endDate));
+        const matchesDate =
+          (!startDate || callDate >= new Date(startDate)) &&
+          (!endDate || callDate <= new Date(endDate));
         return matchesClient && matchesDate;
       })
-      .map(call => call.id);
+      .map((call) => call.id);
 
     if (filteredCallIds.length === 0) {
       alert("No se encontraron llamadas para generar el reporte.");
@@ -36,14 +38,17 @@ const ReportsPage = () => {
     setIsGenerating(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/from-calls`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || ""
-        },
-        body: JSON.stringify({ call_ids: filteredCallIds })
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/reports/from-calls`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
+          },
+          body: JSON.stringify({ call_ids: filteredCallIds }),
+        }
+      );
 
       await res.json();
       alert("Reporte generado correctamente.");
@@ -63,7 +68,8 @@ const ReportsPage = () => {
         <div className="w-full max-w-4xl">
           <h1 className="text-2xl font-bold mb-2">Generate report</h1>
           <p className="text-gray-400 mb-4">
-            Please fill out the following information to generate a report for a group of calls.
+            Please fill out the following information to generate a report for a
+            group of calls.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
@@ -120,8 +126,12 @@ const ReportsPage = () => {
                 className="bg-gray-800 p-4 rounded-md mb-4 cursor-pointer hover:bg-gray-700"
                 onClick={() => setSelectedReport(report)}
               >
-                <p className="text-white font-bold">Reporte #{index + 1} — {report.call.date}</p>
-                <p className="text-gray-400 text-sm mb-2">Cliente ID: {report.call.client} — Agente: {report.call.agent}</p>
+                <p className="text-white font-bold">
+                  Reporte #{index + 1} — {report.call.date}
+                </p>
+                <p className="text-gray-400 text-sm mb-2">
+                  Cliente ID: {report.call.client} — Agente: {report.call.agent}
+                </p>
                 <p className="text-white text-sm mb-2">{report.summary}</p>
                 <button
                   onClick={(e) => {
@@ -145,12 +155,24 @@ const ReportsPage = () => {
                 className="bg-gray-900 p-6 rounded-lg border border-white/20 shadow-2xl max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-lg font-semibold mb-4">Reporte detallado</h3>
-                <p><strong>Fecha:</strong> {selectedReport.call.date}</p>
-                <p><strong>Cliente ID:</strong> {selectedReport.call.client}</p>
-                <p><strong>Agente:</strong> {selectedReport.call.agent}</p>
-                <p className="mt-4"><strong>Resumen:</strong></p>
-                <p className="text-sm text-gray-300">{selectedReport.summary}</p>
+                <h3 className="text-lg font-semibold mb-4">
+                  Reporte detallado
+                </h3>
+                <p>
+                  <strong>Fecha:</strong> {selectedReport.call.date}
+                </p>
+                <p>
+                  <strong>Cliente ID:</strong> {selectedReport.call.client}
+                </p>
+                <p>
+                  <strong>Agente:</strong> {selectedReport.call.agent}
+                </p>
+                <p className="mt-4">
+                  <strong>Resumen:</strong>
+                </p>
+                <p className="text-sm text-gray-300">
+                  {selectedReport.summary}
+                </p>
                 <button
                   onClick={() => setSelectedReport(null)}
                   className="mt-4 text-sm text-blue-400 hover:underline"
