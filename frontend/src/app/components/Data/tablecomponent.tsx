@@ -7,7 +7,7 @@ import {
   TableBody,
   TableCell,
 } from "./table";
-import { EyeIcon, FileTextIcon } from "lucide-react";
+import { EyeIcon } from "lucide-react";
 
 interface Call {
   id: number;

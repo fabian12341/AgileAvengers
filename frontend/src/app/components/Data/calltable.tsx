@@ -17,6 +17,24 @@ export interface Call {
   } | null;
 }
 
+// Define el tipo para los datos crudos de la API
+interface RawCall {
+  id_call: number;
+  user?: {
+    name: string;
+    role: string;
+  };
+  date: string;
+  duration: number;
+  transcript?: {
+    text: string;
+  };
+  report?: {
+    id_report: number;
+    summary: string;
+  } | null;
+}
+
 const CallTable: React.FC = () => {
   const [callsData, setCallsData] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
@@ -33,15 +51,22 @@ const CallTable: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const calls: Call[] = data.map((call: any) => ({
+        const calls: Call[] = data.map((call: RawCall) => ({
           id: call.id_call,
           name: call.user?.name || "Desconocido",
           date: call.date.split(" ")[0],
-          duration: `${Math.floor(call.duration / 60)}:${(call.duration % 60).toString().padStart(2, "0")}`,
+          duration: `${Math.floor(call.duration / 60)}:${(call.duration % 60)
+            .toString()
+            .padStart(2, "0")}`,
           agent: call.user?.role || "Sin rol",
           sentimentScore: 80,
           transcript: call.transcript?.text
-            ? [{ speaker: call.user?.name || "Agente", message: call.transcript.text }]
+            ? [
+                {
+                  speaker: call.user?.name || "Agente",
+                  message: call.transcript.text,
+                },
+              ]
             : [],
           report: call.report || null,
         }));
@@ -60,7 +85,8 @@ const CallTable: React.FC = () => {
   const filteredCalls = callsData.filter((call) => {
     return (
       (searchId === "" || call.id.toString().includes(searchId)) &&
-      (searchClient === "" || call.name.toLowerCase().includes(searchClient.toLowerCase())) &&
+      (searchClient === "" ||
+        call.name.toLowerCase().includes(searchClient.toLowerCase())) &&
       (searchDate === "" || call.date === searchDate)
     );
   });
@@ -104,7 +130,9 @@ const CallTable: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No hay transcripción disponible.</p>
+              <p className="text-sm text-gray-400">
+                No hay transcripción disponible.
+              </p>
             )}
             <button
               onClick={() => setView("none")}
@@ -127,11 +155,18 @@ const CallTable: React.FC = () => {
             className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl"
           >
             <h2 className="text-lg font-bold mb-3">Reporte detallado</h2>
-            <p><strong>Fecha:</strong> {selectedCall.date}</p>
-            <p><strong>Cliente ID:</strong> {selectedCall.id}</p>
-            <p><strong>Agente:</strong> {selectedCall.name}</p>
+            <p>
+              <strong>Fecha:</strong> {selectedCall.date}
+            </p>
+            <p>
+              <strong>Cliente ID:</strong> {selectedCall.id}
+            </p>
+            <p>
+              <strong>Agente:</strong> {selectedCall.name}
+            </p>
             <p className="mt-2">
-              <strong>Resumen:</strong><br />
+              <strong>Resumen:</strong>
+              <br />
               {selectedCall.report?.summary || "No hay resumen disponible."}
             </p>
             <button
