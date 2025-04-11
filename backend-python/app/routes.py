@@ -201,10 +201,7 @@ def delete_report(report_id):
 @main.route('/upload-call', methods=['POST'])
 def upload_call():
     try:
-        api_key = request.headers.get("X-API-KEY")
-        if api_key != os.getenv("API_KEY"):
-            return jsonify({"error": "API key inválida"}), 401
-
+        require_api_key()
         file = request.files.get("file")
         client = request.form.get("client")
         agent = request.form.get("agent")
