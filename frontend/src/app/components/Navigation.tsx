@@ -41,12 +41,20 @@ const Navigation = () => {
             Reports
           </Button>
         </Link>
-        <UserCircle size={24} className="text-white" />
+        <UserCircle
+          size={24}
+          className="text-white"
+          data-testid="user-circle"
+        />
       </div>
 
       {/* Mobile Menu Button */}
-      <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-        <Menu size={24} className="text-white" />
+      <button
+        className="md:hidden"
+        onClick={() => setIsOpen(!isOpen)}
+        data-testid="menu-button"
+      >
+        <Menu size={24} className="text-white" data-testid="menu-icon" />
       </button>
 
       {/* Mobile Menu */}
@@ -67,7 +75,11 @@ const Navigation = () => {
               Reports
             </Button>
           </Link>
-          <UserCircle size={24} className="text-white mx-auto mt-2" />
+          <UserCircle
+            size={24}
+            className="text-white mx-auto mt-2"
+            data-testid="user-circle-mobile"
+          />
         </div>
       )}
     </nav>
