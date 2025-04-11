@@ -6,7 +6,7 @@ import Dashboard from "../components/Dashboard";
 
 const Home: React.FC = () => {
   return (
-    <div className="bg-gray-950 text-white min-h-screen p-6">
+    <div className="bg-gray-900 text-white min-h-screen ">
       <Navigation />
       <Dashboard />
     </div>
