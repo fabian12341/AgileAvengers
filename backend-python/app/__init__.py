@@ -11,7 +11,7 @@ load_dotenv(dotenv_path)
 def create_app(testing=False):
     app = Flask(__name__)
     
-    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization", "X-API-KEY"])
+    CORS(app, supports_credentials=True)
 
     if testing:
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
