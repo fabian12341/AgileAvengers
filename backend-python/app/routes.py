@@ -345,7 +345,6 @@ def upload_call():
 
         # 📜 Transcripción
         transcript_text = " ".join([s["text"] for s in result["transcript"]])
-        print("Respuesta de VM:", result)
         transcript = Transcript(
             id_call=call.id_call,
             text=transcript_text,
