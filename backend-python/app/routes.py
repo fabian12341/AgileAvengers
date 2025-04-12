@@ -3,10 +3,10 @@ from werkzeug.security import check_password_hash
 from mutagen.mp3 import MP3
 from werkzeug.utils import secure_filename
 import os
-from .models import Call, User, Report, Transcript
+from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, Voice, Suggestion
 from . import db
 from datetime import datetime
-import tempfile
+import requests
 
 main = Blueprint('main', __name__)
 
@@ -75,12 +75,46 @@ def get_calls_with_users():
     require_api_key()
     try:
         calls = Call.query.all()
-
         response = []
+
         for call in calls:
             user = call.user
             transcript = call.transcript
-            report = call.report  # gracias a uselist=False, esto es un objeto, no lista
+            report = call.report
+
+            # Buscar speaker analysis
+            speakers = SpeakerAnalysis.query.filter_by(id_call=call.id_call).all()
+            speaker_data = []
+            for speaker in speakers:
+                emotion = speaker.id_emotions and Emotions.query.get(speaker.id_emotions)
+                voice = Voice.query.filter_by(id_speaker_analysis=speaker.id_speaker_analysis).first()
+                speaker_data.append({
+                    "role": speaker.role,
+                    "emotions": {
+                        "happiness": emotion.happiness if emotion else None,
+                        "sadness": emotion.sadness if emotion else None,
+                        "anger": emotion.anger if emotion else None,
+                        "neutrality": emotion.neutrality if emotion else None,
+                        "text_sentiment": emotion.text_sentiment if emotion else None,
+                        "text_sentiment_score": emotion.text_sentiment_score if emotion else None
+                    },
+                    "voice": {
+                        "pitch": voice.pitch if voice else None,
+                        "pitch_std_dev": voice.pitch_std_dev if voice else None,
+                        "loudness": voice.loudness if voice else None,
+                        "zcr": voice.zcr if voice else None,
+                        "hnr": voice.hnr if voice else None,
+                        "tempo": voice.tempo if voice else None
+                    }
+                })
+
+            # Emotions generales (originales de la llamada)
+            general_emotions = Emotions.query.get(call.id_emotions) if call.id_emotions else None
+
+            # Sugerencias
+            suggestions = []
+            if report:
+                suggestions = [s.suggestion for s in Suggestion.query.filter_by(id_report=report.id_report).all()]
 
             response.append({
                 "id_call": call.id_call,
@@ -103,7 +137,10 @@ def get_calls_with_users():
                 } if transcript else None,
                 "report": {
                     "id_report": report.id_report,
-                    "summary": report.summary
+                    "summary": report.summary,
+                    "overall_emotion": general_emotions.overall_sentiment_score if general_emotions else None,
+                    "suggestions": suggestions,
+                    "speakers": speaker_data
                 } if report else None
             })
 
@@ -112,6 +149,7 @@ def get_calls_with_users():
     except Exception as e:
         print("🔥 Error en /calls/users:", str(e))
         return jsonify({"error": "Error interno en /calls/users"}), 500
+
 
 
 
@@ -212,62 +250,111 @@ def upload_call():
         if not all([file, client, agent, date_str, time_str]):
             return jsonify({"error": "Faltan campos obligatorios"}), 400
 
-        # 🔍 Obtener duración real del archivo mp3
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-            filename = secure_filename(file.filename)
-            tmp.write(file.read())
-            tmp.flush()
-            audio = MP3(tmp.name)
-            duration_seconds = int(audio.info.length)
-
-        # 🕒 Convertir fecha y hora
-        datetime_str = f"{date_str} {time_str}:00"
-        date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
-
-        # 👤 Buscar o crear user
         user = User.query.filter_by(name=agent).first()
         if not user:
-            user = User(name=agent, email=f"{agent.lower()}@example.com", role="Agent")
-            db.session.add(user)
-            db.session.flush()
+            return jsonify({"error": "El agente no existe"}), 404
+
+        datetime_str = f"{date_str} {time_str}:00"
+
+        # 🛰️ Enviar a VM
+        files = {
+            "audio": (file.filename, file.stream, file.mimetype)
+        }
+        data = {
+            "client": client,
+            "agent": agent,
+            "language": "es",
+            "num_speakers": 2,
+            "datetime": datetime_str
+        }
+        vm_response = requests.post("http://140.84.182.253:5000/analyze-call", files=files, data=data)
+        if vm_response.status_code != 200:
+            return jsonify({"error": "Error al procesar con la VM"}), 500
+
+        result = vm_response.json()
+
+        # 🎭 Insertar emociones
+        emotions_overall = Emotions(**result["emotions"]["original"], text_sentiment=result["text_emotion"]["original"]["sentiment"], text_sentiment_score=result["text_emotion"]["original"]["score"], overall_sentiment_score=result["overall_emotion"])
+        emotions_agent = Emotions(**result["emotions"]["AGENT"], text_sentiment=result["text_emotion"]["AGENT"]["sentiment"], text_sentiment_score=result["text_emotion"]["AGENT"]["score"], overall_sentiment_score=None)
+        emotions_client = Emotions(**result["emotions"]["CLIENT"], text_sentiment=result["text_emotion"]["CLIENT"]["sentiment"], text_sentiment_score=result["text_emotion"]["CLIENT"]["score"], overall_sentiment_score=None)
+        db.session.add_all([emotions_overall, emotions_agent, emotions_client])
+        db.session.flush()
 
         # 📞 Crear llamada
         call = Call(
-            date=date_obj,
-            duration=duration_seconds,
-            silence_percentage=10,
+            date=datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S"),
+            duration=int(result["call_duration"]),
+            silence_percentage=result["silence_percentage"],
             id_user=user.id_user,
             id_client=int(client) if client.isdigit() else 1,
-            id_emotions=1
+            id_emotions=emotions_overall.id_emotions
         )
         db.session.add(call)
         db.session.flush()
 
-        # 📝 Crear transcript
+        # 🎤 Speaker analysis
+        speaker_agent = SpeakerAnalysis(role="Agent", id_call=call.id_call, id_emotions=emotions_agent.id_emotions)
+        speaker_client = SpeakerAnalysis(role="Client", id_call=call.id_call, id_emotions=emotions_client.id_emotions)
+        db.session.add_all([speaker_agent, speaker_client])
+        db.session.flush()
+
+        # 🔊 Voice features
+        voice_agent = result["voice_features"]["AGENT"]
+        voice_client = result["voice_features"]["CLIENT"]
+        voice1 = Voice(**{
+            "pitch": voice_agent["Pitch Mean"],
+            "pitch_std_dev": voice_agent["Pitch Std Dev"],
+            "loudness": voice_agent["Loudness (RMS Energy)"],
+            "zcr": voice_agent["Zero-Crossing Rate"],
+            "hnr": voice_agent["Harmonics-to-Noise Ratio"],
+            "tempo": voice_agent["Tempo (BPM)"],
+            "id_speaker_analysis": speaker_agent.id_speaker_analysis
+        })
+        voice2 = Voice(**{
+            "pitch": voice_client["Pitch Mean"],
+            "pitch_std_dev": voice_client["Pitch Std Dev"],
+            "loudness": voice_client["Loudness (RMS Energy)"],
+            "zcr": voice_client["Zero-Crossing Rate"],
+            "hnr": voice_client["Harmonics-to-Noise Ratio"],
+            "tempo": voice_client["Tempo (BPM)"],
+            "id_speaker_analysis": speaker_client.id_speaker_analysis
+        })
+        db.session.add_all([voice1, voice2])
+
+        # 📜 Transcripción
+        transcript_text = " ".join([s["text"] for s in result["transcript"]])
         transcript = Transcript(
             id_call=call.id_call,
-            text="Esto es una transcripción de prueba generada automáticamente.",
-            language="es",
-            num_speakers=1
+            text=transcript_text,
+            language=result["language"],
+            num_speakers=result["num_speakers"]
         )
         db.session.add(transcript)
 
-        # 📄 Crear reporte
-        summary = transcript.text.split(".")[0].strip() + "."
-        report = Report(id_call=call.id_call, summary=summary)
+        # 📄 Reporte
+        report = Report(
+            id_call=call.id_call,
+            summary=result["summary"],
+            path="no_path"
+        )
         db.session.add(report)
+        db.session.flush()
+
+        # 💡 Sugerencias
+        for s in result["suggestions"]:
+            for _, value in s.items():
+                db.session.add(Suggestion(suggestion=value, id_report=report.id_report))
 
         db.session.commit()
 
         return jsonify({
-            "message": "Llamada, transcript y reporte creados exitosamente",
-            "call_id": call.id_call,
-            "duration_seconds": duration_seconds,
-            "report_summary": summary
+            "message": "Llamada y análisis guardados correctamente",
+            "id_call": call.id_call,
+            "id_report": report.id_report
         }), 201
 
     except Exception as e:
         import traceback
         traceback.print_exc()
+        db.session.rollback()
         return jsonify({"error": str(e)}), 500
-

@@ -14,24 +14,28 @@ export interface Call {
   report?: {
     id_report: number;
     summary: string;
-  } | null;
-}
-
-// Define el tipo para los datos crudos de la API
-interface RawCall {
-  id_call: number;
-  user?: {
-    name: string;
-    role: string;
-  };
-  date: string;
-  duration: number;
-  transcript?: {
-    text: string;
-  };
-  report?: {
-    id_report: number;
-    summary: string;
+    overall_emotion?: number;
+    silence_percentage?: number;
+    suggestions?: string[];
+    speakers?: {
+      role: string;
+      emotions: {
+        happiness: number;
+        sadness: number;
+        anger: number;
+        neutrality: number;
+        text_sentiment: string;
+        text_sentiment_score: number;
+      };
+      voice: {
+        pitch: number;
+        pitch_std_dev: number;
+        loudness: number;
+        zcr: number;
+        hnr: number;
+        tempo: number;
+      };
+    }[];
   } | null;
 }
 
@@ -51,7 +55,7 @@ const CallTable: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const calls: Call[] = data.map((call: RawCall) => ({
+        const calls: Call[] = data.map((call: any) => ({
           id: call.id_call,
           name: call.user?.name || "Desconocido",
           date: call.date.split(" ")[0],
@@ -152,23 +156,58 @@ const CallTable: React.FC = () => {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl"
+            className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-2xl w-full shadow-xl overflow-y-auto max-h-[90vh]"
           >
             <h2 className="text-lg font-bold mb-3">Reporte detallado</h2>
-            <p>
-              <strong>Fecha:</strong> {selectedCall.date}
-            </p>
-            <p>
-              <strong>Cliente ID:</strong> {selectedCall.id}
-            </p>
-            <p>
-              <strong>Agente:</strong> {selectedCall.name}
-            </p>
-            <p className="mt-2">
-              <strong>Resumen:</strong>
-              <br />
-              {selectedCall.report?.summary || "No hay resumen disponible."}
-            </p>
+            <p><strong>Fecha:</strong> {selectedCall.date}</p>
+            <p><strong>Cliente ID:</strong> {selectedCall.id}</p>
+            <p><strong>Agente:</strong> {selectedCall.name}</p>
+            <p className="mt-2"><strong>Resumen:</strong><br />{selectedCall.report?.summary}</p>
+
+            {selectedCall.report?.overall_emotion !== undefined && (
+              <p className="mt-2">
+                <strong>Overall Emotion Score:</strong> {selectedCall.report.overall_emotion.toFixed(2)}
+              </p>
+            )}
+
+            {selectedCall.report?.silence_percentage !== undefined && (
+              <p>
+                <strong>Silence %:</strong> {selectedCall.report.silence_percentage.toFixed(2)}%
+              </p>
+            )}
+
+            {selectedCall.report?.speakers && selectedCall.report.speakers.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-md font-semibold mb-1">Análisis por hablante:</h3>
+                {selectedCall.report.speakers.map((speaker, index) => (
+                  <div key={index} className="mb-2 border-t border-gray-700 pt-2">
+                    <p className="text-sm text-gray-300 mb-1"><strong>{speaker.role}</strong></p>
+                    <p className="text-sm">
+                      <strong>Emociones:</strong><br />
+                      Felicidad: {speaker.emotions.happiness.toFixed(2)} | Tristeza: {speaker.emotions.sadness.toFixed(2)} | Ira: {speaker.emotions.anger.toFixed(2)} | Neutralidad: {speaker.emotions.neutrality.toFixed(2)}<br />
+                      Sentimiento de texto: {speaker.emotions.text_sentiment} ({speaker.emotions.text_sentiment_score.toFixed(2)})
+                    </p>
+                    <p className="text-sm mt-1">
+                      <strong>Voz:</strong><br />
+                      Pitch: {speaker.voice.pitch.toFixed(2)} Hz | Tempo: {speaker.voice.tempo.toFixed(2)} BPM<br />
+                      Volumen: {speaker.voice.loudness.toFixed(4)} | ZCR: {speaker.voice.zcr.toFixed(4)} | HNR: {speaker.voice.hnr.toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedCall.report?.suggestions && selectedCall.report.suggestions.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-md font-semibold mb-1">Sugerencias:</h3>
+                <ul className="list-disc list-inside text-sm text-gray-300">
+                  {selectedCall.report.suggestions.map((sug, idx) => (
+                    <li key={idx}>{sug}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <button
               onClick={() => setView("none")}
               className="mt-4 text-blue-400 hover:underline"
