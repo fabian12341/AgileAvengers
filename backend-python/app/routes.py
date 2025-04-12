@@ -269,16 +269,21 @@ def upload_call():
         date_str = request.form.get("date")
         time_str = request.form.get("time")
 
+        print("📝 Form received:", client, agent, project, date_str, time_str)
+
         if not all([file, client, agent, date_str, time_str]):
+            print("Missing fields")
             return jsonify({"error": "Faltan campos obligatorios"}), 400
 
         user = User.query.filter_by(name=agent).first()
         if not user:
+            print("Agente no existe:", agent)
             return jsonify({"error": "El agente no existe"}), 404
 
         datetime_str = f"{date_str} {time_str}:00"
+        print("🕒 Datetime:", datetime_str)
 
-        # 🛰️ Enviar a VM
+        #Enviar a VM
         files = {
             "audio": (file.filename, file.stream, file.mimetype)
         }
@@ -289,20 +294,25 @@ def upload_call():
             "num_speakers": 2,
             "datetime": datetime_str
         }
+        print("🚀 Enviando a VM...")
         vm_response = requests.post("http://140.84.182.253:5000/analyze-call", files=files, data=data)
+        print("📬 Respuesta VM Status:", vm_response.status_code)
+
         if vm_response.status_code != 200:
+            print("Error desde VM:", vm_response.text)
             return jsonify({"error": "Error al procesar con la VM"}), 500
 
         result = vm_response.json()
+        print("✅ Resultado de la VM recibido.")
 
-        # 🎭 Insertar emociones
+        #Insertar emociones
         emotions_overall = Emotions(**result["emotions"]["original"], text_sentiment=result["text_emotion"]["original"]["sentiment"], text_sentiment_score=result["text_emotion"]["original"]["score"], overall_sentiment_score=result["overall_emotion"])
         emotions_agent = Emotions(**result["emotions"]["AGENT"], text_sentiment=result["text_emotion"]["AGENT"]["sentiment"], text_sentiment_score=result["text_emotion"]["AGENT"]["score"], overall_sentiment_score=None)
         emotions_client = Emotions(**result["emotions"]["CLIENT"], text_sentiment=result["text_emotion"]["CLIENT"]["sentiment"], text_sentiment_score=result["text_emotion"]["CLIENT"]["score"], overall_sentiment_score=None)
         db.session.add_all([emotions_overall, emotions_agent, emotions_client])
         db.session.flush()
 
-        # 📞 Crear llamada
+        #Crear llamada
         call = Call(
             date=datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S"),
             duration=int(result["call_duration"]),
@@ -313,6 +323,7 @@ def upload_call():
         )
         db.session.add(call)
         db.session.flush()
+        print("📞 Llamada creada con ID:", call.id_call)
 
         # 🎤 Speaker analysis
         speaker_agent = SpeakerAnalysis(role="Agent", id_call=call.id_call, id_emotions=emotions_agent.id_emotions)
@@ -368,6 +379,7 @@ def upload_call():
                 db.session.add(Suggestion(suggestion=value, id_report=report.id_report))
 
         db.session.commit()
+        print("Llamada y análisis guardados correctamente.")
 
         return jsonify({
             "message": "Llamada y análisis guardados correctamente",
@@ -379,4 +391,5 @@ def upload_call():
         import traceback
         traceback.print_exc()
         db.session.rollback()
+        print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
