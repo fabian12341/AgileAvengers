@@ -4,12 +4,14 @@ from config import Config
 from dotenv import load_dotenv
 import os
 from .routes import main
-
+from flask_cors import CORS
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path)
 
 def create_app(testing=False):
     app = Flask(__name__)
+    
+    CORS(app, supports_credentials=True)
 
     if testing:
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
