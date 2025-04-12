@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request, abort
-from werkzeug.security import check_password_hash
 from mutagen.mp3 import MP3
-from werkzeug.utils import secure_filename
+from sqlalchemy.orm import joinedload, subqueryload
 import os
 from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, Voice, Suggestion
 from . import db
@@ -74,20 +73,50 @@ def post_login():
 def get_calls_with_users():
     require_api_key()
     try:
-        calls = Call.query.all()
+        calls = Call.query.options(
+            joinedload(Call.user),
+            joinedload(Call.transcript),
+            joinedload(Call.report),
+        ).all()
+
+        # Preload todas las sugerencias y emociones en un solo query
+        all_reports = [c.report for c in calls if c.report]
+        report_ids = [r.id_report for r in all_reports]
+        suggestions_by_report = {}
+        if report_ids:
+            suggestions = Suggestion.query.filter(Suggestion.id_report.in_(report_ids)).all()
+            for s in suggestions:
+                suggestions_by_report.setdefault(s.id_report, []).append(s.suggestion)
+
+        speaker_analyses = SpeakerAnalysis.query.filter(
+            SpeakerAnalysis.id_call.in_([c.id_call for c in calls])
+        ).all()
+
+        voices = Voice.query.filter(
+            Voice.id_speaker_analysis.in_([s.id_speaker_analysis for s in speaker_analyses])
+        ).all()
+        voices_by_speaker = {v.id_speaker_analysis: v for v in voices}
+
+        emotion_ids = list(filter(None, [s.id_emotions for s in speaker_analyses] + [c.id_emotions for c in calls]))
+        emotions = Emotions.query.filter(Emotions.id_emotions.in_(emotion_ids)).all()
+        emotions_map = {e.id_emotions: e for e in emotions}
+
+        speakers_by_call = {}
+        for s in speaker_analyses:
+            speakers_by_call.setdefault(s.id_call, []).append(s)
+
         response = []
 
         for call in calls:
             user = call.user
             transcript = call.transcript
             report = call.report
+            general_emotions = emotions_map.get(call.id_emotions)
 
-            # Buscar speaker analysis
-            speakers = SpeakerAnalysis.query.filter_by(id_call=call.id_call).all()
             speaker_data = []
-            for speaker in speakers:
-                emotion = speaker.id_emotions and Emotions.query.get(speaker.id_emotions)
-                voice = Voice.query.filter_by(id_speaker_analysis=speaker.id_speaker_analysis).first()
+            for speaker in speakers_by_call.get(call.id_call, []):
+                emotion = emotions_map.get(speaker.id_emotions)
+                voice = voices_by_speaker.get(speaker.id_speaker_analysis)
                 speaker_data.append({
                     "role": speaker.role,
                     "emotions": {
@@ -107,14 +136,6 @@ def get_calls_with_users():
                         "tempo": voice.tempo if voice else None
                     }
                 })
-
-            # Emotions generales (originales de la llamada)
-            general_emotions = Emotions.query.get(call.id_emotions) if call.id_emotions else None
-
-            # Sugerencias
-            suggestions = []
-            if report:
-                suggestions = [s.suggestion for s in Suggestion.query.filter_by(id_report=report.id_report).all()]
 
             response.append({
                 "id_call": call.id_call,
@@ -139,7 +160,7 @@ def get_calls_with_users():
                     "id_report": report.id_report,
                     "summary": report.summary,
                     "overall_emotion": general_emotions.overall_sentiment_score if general_emotions else None,
-                    "suggestions": suggestions,
+                    "suggestions": suggestions_by_report.get(report.id_report, []),
                     "speakers": speaker_data
                 } if report else None
             })
@@ -147,7 +168,8 @@ def get_calls_with_users():
         return jsonify(response)
 
     except Exception as e:
-        print("🔥 Error en /calls/users:", str(e))
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": "Error interno en /calls/users"}), 500
 
 
