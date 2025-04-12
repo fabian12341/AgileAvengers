@@ -344,7 +344,7 @@ def upload_call():
         )
         db.session.add(call)
         db.session.flush()
-        print("📞 Llamada creada con ID:", call.id_call)
+        print("Llamada creada con ID:", call.id_call)
 
         # Speaker analysis
         speaker_agent = SpeakerAnalysis(role="Agent", id_call=call.id_call, id_emotions=emotions_agent.id_emotions)
