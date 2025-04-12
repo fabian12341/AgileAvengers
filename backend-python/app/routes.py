@@ -415,3 +415,16 @@ def upload_call():
         print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
 
+@main.route('/fix/reports', methods=['DELETE'])
+def delete_incomplete_reports():
+    require_api_key()
+    reports = Report.query.all()
+    deleted = 0
+
+    for report in reports:
+        if not report.call or not report.call.transcript:
+            db.session.delete(report)
+            deleted += 1
+
+    db.session.commit()
+    return jsonify({"message": f"Reportes eliminados: {deleted}"}), 200
