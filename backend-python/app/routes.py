@@ -283,7 +283,7 @@ def upload_call():
         datetime_str = f"{date_str} {time_str}:00"
         print("🕒 Datetime:", datetime_str)
 
-        #Enviar a VM
+        # Enviar a VM
         files = {
             "audio": (file.filename, file.stream, file.mimetype)
         }
@@ -305,14 +305,35 @@ def upload_call():
         result = vm_response.json()
         print("✅ Resultado de la VM recibido.")
 
-        #Insertar emociones
-        emotions_overall = Emotions(**result["emotions"]["original"], text_sentiment=result["text_emotion"]["original"]["sentiment"], text_sentiment_score=result["text_emotion"]["original"]["score"], overall_sentiment_score=result["overall_emotion"])
-        emotions_agent = Emotions(**result["emotions"]["AGENT"], text_sentiment=result["text_emotion"]["AGENT"]["sentiment"], text_sentiment_score=result["text_emotion"]["AGENT"]["score"], overall_sentiment_score=None)
-        emotions_client = Emotions(**result["emotions"]["CLIENT"], text_sentiment=result["text_emotion"]["CLIENT"]["sentiment"], text_sentiment_score=result["text_emotion"]["CLIENT"]["score"], overall_sentiment_score=None)
+        def map_emotions(e):
+            return {
+                "happiness": e.get("hap"),
+                "sadness": e.get("sad"),
+                "anger": e.get("ang"),
+                "neutrality": e.get("neu"),
+            }
+
+        # Insertar emociones
+        emotions_overall = Emotions(
+            **map_emotions(result["emotions"]["original"]),
+            text_sentiment=result["text_emotion"]["original"]["sentiment"],
+            text_sentiment_score=result["text_emotion"]["original"]["score"],
+            overall_sentiment_score=result["overall_emotion"]
+        )
+        emotions_agent = Emotions(
+            **map_emotions(result["emotions"]["AGENT"]),
+            text_sentiment=result["text_emotion"]["AGENT"]["sentiment"],
+            text_sentiment_score=result["text_emotion"]["AGENT"]["score"]
+        )
+        emotions_client = Emotions(
+            **map_emotions(result["emotions"]["CLIENT"]),
+            text_sentiment=result["text_emotion"]["CLIENT"]["sentiment"],
+            text_sentiment_score=result["text_emotion"]["CLIENT"]["score"]
+        )
         db.session.add_all([emotions_overall, emotions_agent, emotions_client])
         db.session.flush()
 
-        #Crear llamada
+        # Crear llamada
         call = Call(
             date=datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S"),
             duration=int(result["call_duration"]),
@@ -325,13 +346,13 @@ def upload_call():
         db.session.flush()
         print("📞 Llamada creada con ID:", call.id_call)
 
-        # 🎤 Speaker analysis
+        # Speaker analysis
         speaker_agent = SpeakerAnalysis(role="Agent", id_call=call.id_call, id_emotions=emotions_agent.id_emotions)
         speaker_client = SpeakerAnalysis(role="Client", id_call=call.id_call, id_emotions=emotions_client.id_emotions)
         db.session.add_all([speaker_agent, speaker_client])
         db.session.flush()
 
-        # 🔊 Voice features
+        # Voice features
         voice_agent = result["voice_features"]["AGENT"]
         voice_client = result["voice_features"]["CLIENT"]
         voice1 = Voice(**{
@@ -354,7 +375,7 @@ def upload_call():
         })
         db.session.add_all([voice1, voice2])
 
-        # 📜 Transcripción
+        # Transcripción
         transcript_text = " ".join([s["text"] for s in result["transcript"]])
         transcript = Transcript(
             id_call=call.id_call,
@@ -364,7 +385,7 @@ def upload_call():
         )
         db.session.add(transcript)
 
-        # 📄 Reporte
+        # Reporte
         report = Report(
             id_call=call.id_call,
             summary=result["summary"],
@@ -373,13 +394,13 @@ def upload_call():
         db.session.add(report)
         db.session.flush()
 
-        # 💡 Sugerencias
+        # Sugerencias
         for s in result["suggestions"]:
             for _, value in s.items():
                 db.session.add(Suggestion(suggestion=value, id_report=report.id_report))
 
         db.session.commit()
-        print("Llamada y análisis guardados correctamente.")
+        print("✅ Llamada y análisis guardados correctamente.")
 
         return jsonify({
             "message": "Llamada y análisis guardados correctamente",
@@ -393,3 +414,4 @@ def upload_call():
         db.session.rollback()
         print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
+
