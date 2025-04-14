@@ -268,8 +268,9 @@ def upload_call():
         project = request.form.get("project")
         date_str = request.form.get("date")
         time_str = request.form.get("time")
+        language = request.form.get("language")
 
-        print("📝 Form received:", client, agent, project, date_str, time_str)
+        print("Form received:", client, agent, project, date_str, time_str)
 
         if not all([file, client, agent, date_str, time_str]):
             print("Missing fields")
@@ -278,7 +279,7 @@ def upload_call():
         user = User.query.filter_by(name=agent).first()
         if not user:
             print("Agente no existe:", agent)
-            return jsonify({"error": "El agente no existe"}), 404
+            return jsonify({"error": "El agenSte no existe"}), 404
 
         datetime_str = f"{date_str} {time_str}:00"
         print("🕒 Datetime:", datetime_str)
@@ -290,11 +291,11 @@ def upload_call():
         data = {
             "client": client,
             "agent": agent,
-            "language": "es",
+            "language": language,
             "num_speakers": 2,
             "datetime": datetime_str
         }
-        print("🚀 Enviando a VM...")
+        print("Enviando a VM...")
         vm_response = requests.post("http://140.84.182.253:5000/analyze-call", files=files, data=data)
         print("📬 Respuesta VM Status:", vm_response.status_code)
 
@@ -303,7 +304,7 @@ def upload_call():
             return jsonify({"error": "Error al procesar con la VM"}), 500
 
         result = vm_response.json()
-        print("✅ Resultado de la VM recibido.")
+        print("Resultado de la VM recibido.")
 
         def map_emotions(e):
             return {
@@ -380,7 +381,7 @@ def upload_call():
         transcript = Transcript(
             id_call=call.id_call,
             text=transcript_text,
-            language=result["language"],
+            language=language,
             num_speakers=result["num_speakers"]
         )
         db.session.add(transcript)
@@ -400,7 +401,7 @@ def upload_call():
                 db.session.add(Suggestion(suggestion=value, id_report=report.id_report))
 
         db.session.commit()
-        print("✅ Llamada y análisis guardados correctamente.")
+        print("Llamada y análisis guardados correctamente.")
 
         return jsonify({
             "message": "Llamada y análisis guardados correctamente",
