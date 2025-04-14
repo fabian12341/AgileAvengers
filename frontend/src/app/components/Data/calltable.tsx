@@ -42,7 +42,7 @@ export interface Call {
 const safeFixed = (val: number | undefined | null, digits = 2) =>
   val != null ? val.toFixed(digits) : "N/A";
 
-const CallTable: React.FC = () => {
+const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
   const [callsData, setCallsData] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [view, setView] = useState<"none" | "report" | "transcription">("none");
@@ -82,7 +82,7 @@ const CallTable: React.FC = () => {
       .catch((error) => {
         console.error("Error al obtener las llamadas:", error);
       });
-  }, []);
+  }, [refresh]);
 
   const handleView = (call: Call, type: "transcription" | "report") => {
     setSelectedCall(call);

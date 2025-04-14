@@ -12,6 +12,7 @@ const UploadPage = () => {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [refreshFlag, setRefreshFlag] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +54,7 @@ const UploadPage = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Call uploaded and processed successfully!");
+        setRefreshFlag(prev => !prev); // 👉 recarga la tabla
       } else {
         console.error("Error:", data);
         alert(data.error || "Error uploading call.");
@@ -157,7 +159,7 @@ const UploadPage = () => {
         )}
 
         <div className="mb-6"></div>
-        <CallTable />
+        <CallTable refresh={refreshFlag} />
       </div>
     </div>
   );
