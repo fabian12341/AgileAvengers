@@ -39,6 +39,9 @@ export interface Call {
   } | null;
 }
 
+const safeFixed = (val: number | undefined | null, digits = 2) =>
+  val != null ? val.toFixed(digits) : "N/A";
+
 const CallTable: React.FC = () => {
   const [callsData, setCallsData] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
@@ -113,16 +116,9 @@ const CallTable: React.FC = () => {
         }))}
       />
 
-      {/* Popup de TRANSCRIPCIÓN */}
       {selectedCall && view === "transcription" && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
-          onClick={() => setView("none")}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl"
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30" onClick={() => setView("none")}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl">
             <h2 className="text-lg font-bold mb-3">Transcript</h2>
             {selectedCall.transcript.length > 0 ? (
               <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
@@ -134,30 +130,16 @@ const CallTable: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">
-                No hay transcripción disponible.
-              </p>
+              <p className="text-sm text-gray-400">No hay transcripción disponible.</p>
             )}
-            <button
-              onClick={() => setView("none")}
-              className="mt-4 text-blue-400 hover:underline"
-            >
-              Cerrar
-            </button>
+            <button onClick={() => setView("none")} className="mt-4 text-blue-400 hover:underline">Cerrar</button>
           </div>
         </div>
       )}
 
-      {/* Popup de REPORTE */}
       {selectedCall && view === "report" && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
-          onClick={() => setView("none")}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-2xl w-full shadow-xl overflow-y-auto max-h-[90vh]"
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30" onClick={() => setView("none")}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-2xl w-full shadow-xl overflow-y-auto max-h-[90vh]">
             <h2 className="text-lg font-bold mb-3">Reporte detallado</h2>
             <p><strong>Fecha:</strong> {selectedCall.date}</p>
             <p><strong>Cliente ID:</strong> {selectedCall.id}</p>
@@ -166,13 +148,13 @@ const CallTable: React.FC = () => {
 
             {selectedCall.report?.overall_emotion !== undefined && (
               <p className="mt-2">
-                <strong>Overall Emotion Score:</strong> {selectedCall.report.overall_emotion.toFixed(2)}
+                <strong>Overall Emotion Score:</strong> {safeFixed(selectedCall.report?.overall_emotion)}
               </p>
             )}
 
             {selectedCall.report?.silence_percentage !== undefined && (
               <p>
-                <strong>Silence %:</strong> {selectedCall.report.silence_percentage.toFixed(2)}%
+                <strong>Silence %:</strong> {safeFixed(selectedCall.report?.silence_percentage)}%
               </p>
             )}
 
@@ -184,13 +166,13 @@ const CallTable: React.FC = () => {
                     <p className="text-sm text-gray-300 mb-1"><strong>{speaker.role}</strong></p>
                     <p className="text-sm">
                       <strong>Emociones:</strong><br />
-                      Felicidad: {speaker.emotions.happiness.toFixed(2)} | Tristeza: {speaker.emotions.sadness.toFixed(2)} | Ira: {speaker.emotions.anger.toFixed(2)} | Neutralidad: {speaker.emotions.neutrality.toFixed(2)}<br />
-                      Sentimiento de texto: {speaker.emotions.text_sentiment} ({speaker.emotions.text_sentiment_score.toFixed(2)})
+                      Felicidad: {safeFixed(speaker.emotions.happiness)} | Tristeza: {safeFixed(speaker.emotions.sadness)} | Ira: {safeFixed(speaker.emotions.anger)} | Neutralidad: {safeFixed(speaker.emotions.neutrality)}<br />
+                      Sentimiento de texto: {speaker.emotions.text_sentiment} ({safeFixed(speaker.emotions.text_sentiment_score)})
                     </p>
                     <p className="text-sm mt-1">
                       <strong>Voz:</strong><br />
-                      Pitch: {speaker.voice.pitch.toFixed(2)} Hz | Tempo: {speaker.voice.tempo.toFixed(2)} BPM<br />
-                      Volumen: {speaker.voice.loudness.toFixed(4)} | ZCR: {speaker.voice.zcr.toFixed(4)} | HNR: {speaker.voice.hnr.toFixed(2)}
+                      Pitch: {safeFixed(speaker.voice.pitch)} Hz | Tempo: {safeFixed(speaker.voice.tempo)} BPM<br />
+                      Volumen: {safeFixed(speaker.voice.loudness, 4)} | ZCR: {safeFixed(speaker.voice.zcr, 4)} | HNR: {safeFixed(speaker.voice.hnr)}
                     </p>
                   </div>
                 ))}
@@ -208,12 +190,7 @@ const CallTable: React.FC = () => {
               </div>
             )}
 
-            <button
-              onClick={() => setView("none")}
-              className="mt-4 text-blue-400 hover:underline"
-            >
-              Cerrar
-            </button>
+            <button onClick={() => setView("none")} className="mt-4 text-blue-400 hover:underline">Cerrar</button>
           </div>
         </div>
       )}
