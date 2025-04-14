@@ -16,13 +16,18 @@ const UploadPage = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setFile(event.target.files[0]);
+      const selectedFile = event.target.files[0];
+      if (!selectedFile.name.toLowerCase().endsWith(".wav")) {
+        alert("Solo se permiten archivos .wav");
+        return;
+      }
+      setFile(selectedFile);
     }
   };
 
   const handleUpload = async () => {
     if (!file || !client || !agent || !date || !time) {
-      alert("Please fill out all fields and select a file.");
+      alert("Please fill out all fields and select a .wav file.");
       return;
     }
 
@@ -50,7 +55,7 @@ const UploadPage = () => {
         alert("Call uploaded and processed successfully!");
       } else {
         console.error("Error:", data);
-        alert("Error uploading call.");
+        alert(data.error || "Error uploading call.");
       }
     } catch (err) {
       console.error("Upload error:", err);
@@ -72,8 +77,8 @@ const UploadPage = () => {
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">Upload New Call</h1>
         <p className="text-gray-400 mb-4">
-          Fill in the fields and select the file you wish to upload to generate
-          a transcript and report. Supported format is mp3.
+          Fill in the fields and select a <strong>.wav</strong> file to upload and generate
+          a transcript and report.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
@@ -113,7 +118,7 @@ const UploadPage = () => {
           <div className="flex items-center justify-center sm:justify-start">
             <input
               type="file"
-              accept="audio/*,video/*"
+              accept=".wav"
               onChange={handleFileChange}
               className="hidden"
               ref={fileInputRef}
