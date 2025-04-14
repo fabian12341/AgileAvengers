@@ -11,8 +11,8 @@ const UploadPage = () => {
   const [project, setProject] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [language, setLanguage] = useState("es");
   const [isUploading, setIsUploading] = useState(false);
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +41,7 @@ const UploadPage = () => {
     formData.append("project", project);
     formData.append("date", date);
     formData.append("time", time);
+    formData.append("language", language);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-call`, {
@@ -54,7 +55,6 @@ const UploadPage = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Call uploaded and processed successfully!");
-        setRefreshFlag(prev => !prev); // 👉 recarga la tabla
       } else {
         console.error("Error:", data);
         alert(data.error || "Error uploading call.");
@@ -117,6 +117,14 @@ const UploadPage = () => {
             onChange={(e) => setTime(e.target.value)}
             className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
           />
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+          >
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
           <div className="flex items-center justify-center sm:justify-start">
             <input
               type="file"
@@ -159,7 +167,7 @@ const UploadPage = () => {
         )}
 
         <div className="mb-6"></div>
-        <CallTable refresh={refreshFlag} />
+        <CallTable refresh={false} />
       </div>
     </div>
   );
