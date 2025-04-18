@@ -7,4 +7,3 @@ CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "DELETE",
 
 if __name__ == '__main__':
     app.run(debug=True)
-    

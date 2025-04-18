@@ -67,14 +67,14 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
             .padStart(2, "0")}`,
           agent: call.user?.role || "Sin rol",
           sentimentScore: 80,
-          transcript: call.transcript?.text
-            ? [
-                {
-                  speaker: call.user?.name || "Agente",
-                  message: call.transcript.text,
-                },
-              ]
-            : [],
+          transcript: Array.isArray(call.transcript?.text)
+          ? call.transcript.text.map((entry: any) => ({
+              speaker: entry.speaker === "AGENT"
+                ? call.user?.name || "Agente"
+                : call.client || "Cliente",
+              message: entry.text
+            }))
+          : [],        
           report: call.report || null,
         }));
         setCallsData(calls);
@@ -121,11 +121,26 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
           <div onClick={(e) => e.stopPropagation()} className="bg-[#151D2A] border border-gray-500 text-white p-6 rounded-md max-w-md w-full shadow-xl">
             <h2 className="text-lg font-bold mb-3">Transcript</h2>
             {selectedCall.transcript.length > 0 ? (
-              <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
+              <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
                 {selectedCall.transcript.map((entry, index) => (
-                  <div key={index}>
-                    <p className="text-sm font-semibold">{entry.speaker}</p>
-                    <p className="text-sm text-gray-300">{entry.message}</p>
+                  <div
+                    key={index}
+                    className={`flex ${
+                      entry.speaker.toLowerCase().includes("client")
+                        ? "justify-start"
+                        : "justify-end"
+                    }`}
+                  >
+                    <div
+                      className={`px-4 py-2 rounded-lg max-w-[75%] shadow ${
+                        entry.speaker.toLowerCase().includes("client")
+                          ? "bg-gray-700 text-white"
+                          : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      <p className="text-xs text-gray-300 mb-1">{entry.speaker}</p>
+                      <p className="text-sm">{entry.message}</p>
+                    </div>
                   </div>
                 ))}
               </div>
