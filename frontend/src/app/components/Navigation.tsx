@@ -41,11 +41,13 @@ const Navigation = () => {
             Reports
           </Button>
         </Link>
-        <UserCircle
-          size={24}
-          className="text-white"
-          data-testid="user-circle"
-        />
+        <Link href="/User">
+          <UserCircle
+            size={24}
+            className="text-white mx-auto mt-2"
+            data-testid="user-circle-mobile"
+          />
+        </Link>
       </div>
 
       {/* Mobile Menu Button */}
@@ -75,11 +77,13 @@ const Navigation = () => {
               Reports
             </Button>
           </Link>
-          <UserCircle
-            size={24}
-            className="text-white mx-auto mt-2"
-            data-testid="user-circle-mobile"
-          />
+          <Link href="/User">
+            <UserCircle
+              size={24}
+              className="text-white mx-auto mt-2"
+              data-testid="user-circle-mobile"
+            />
+          </Link>
         </div>
       )}
     </nav>
