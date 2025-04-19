@@ -17,24 +17,24 @@ export default function Login() {
       setFormError("Email and password are required.");
       return;
     }
-  
+
     setFormError("");
-  
+
     try {
       const success = await login(email, password);
-  
+
       if (!success) {
         setFormError("Invalid email or password. Please try again. haha");
         return;
       }
-  
+
       router.push("/Home");
     } catch (err) {
       setFormError("An unexpected error occurred. Please try again.");
       console.error("Login failed:", err);
     }
   };
-  
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
       <div className="w-full max-w-md p-6 sm:p-8 rounded-xl bg-gray-800 shadow-lg">
@@ -43,7 +43,9 @@ export default function Login() {
         </h1>
         {/* Display form validation error */}
         {formError && (
-          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {formError}
+          </div>
         )}
         {/* Display login error */}
         {error && (
@@ -80,7 +82,10 @@ export default function Login() {
           </div>
         </div>
         <div className="text-right mb-4">
-          <a href="#" className="text-purple-400 text-sm">
+          <a
+            onClick={() => router.push("/ForgPwd")}
+            className="text-purple-400 text-sm cursor-pointer hover:underline"
+          >
             Forgot password?
           </a>
         </div>
