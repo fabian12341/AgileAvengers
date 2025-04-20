@@ -153,9 +153,9 @@ def get_calls_with_users():
                 } if user else None,
                 "transcript": {
                     "id_transcript": transcript.id_transcript,
-                    "entries": transcript.entries if transcript and transcript.entries else [],
+                    "text": transcript.text,
                     "language": transcript.language
-                }if transcript else None,
+                } if transcript else None,
                 "report": {
                     "id_report": report.id_report,
                     "summary": report.summary,
@@ -413,6 +413,6 @@ def upload_call():
         import traceback
         traceback.print_exc()
         db.session.rollback()
-        print("Error en upload-call:", str(e))
+        print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
 
