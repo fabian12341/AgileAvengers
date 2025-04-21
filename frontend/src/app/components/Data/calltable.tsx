@@ -33,15 +33,21 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
             .padStart(2, "0")}`,
           agent: call.user?.role || "Sin rol",
           sentimentScore: 80,
-          transcript: Array.isArray(call.transcript?.text)
-            ? call.transcript.text.map((entry) => ({
-                speaker:
-                  entry.speaker === "AGENT"
-                    ? call.user?.name || "Agente"
-                    : call.client || "Cliente",
-                message: entry.text,
-              }))
-            : [],
+          transcript: typeof call.transcript?.text === "string"
+          ? call.transcript.text.split("\n\n").map((block) => {
+              const [speakerLine, ...textLines] = block.split("\n");
+              const speakerRaw = speakerLine?.replace(":", "").trim();
+              const speaker =
+                speakerRaw === "AGENT"
+                  ? call.user?.name || "Agente"
+                  : call.client_name || "Cliente";
+              return {
+                speaker,
+                message: textLines.join("\n").trim(),
+              };
+            })
+          : [],
+        
           report: call.report || null,
         }));
         setCallsData(calls);
