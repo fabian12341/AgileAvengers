@@ -3,7 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import Navigation from "../components/Navigation";
 import { FileText } from "lucide-react";
 import CallTable from "../components/Data/calltable";
-import Select from "react-select";
+import ClientOnlySelect from "../components/ClientOnlySelect";
+
 
 const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -103,14 +104,26 @@ const UploadPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
           <div className="col-span-1">
-            <Select
-              options={clients}
-              value={selectedClient}
-              onChange={(val) => setSelectedClient(val)}
-              placeholder="Search or select client"
-              className="text-black"
-              isClearable
-            />
+          <ClientOnlySelect
+            options={clients}
+            value={selectedClient}
+            onChange={(newValue: unknown) => setSelectedClient(newValue as { label: string; value: string } | null)}
+            placeholder="Search or select client"
+            isClearable
+            classNames={{
+              control: () => "bg-gray-800 border border-gray-600 rounded-md text-sm px-2 py-1",
+              input: () => "text-white",
+              singleValue: () => "text-white",
+              menu: () => "bg-gray-800 text-white",
+              option: () => "hover:bg-gray-700 px-2 py-1",
+              placeholder: () => "text-gray-400",
+            }}
+            styles={{
+              control: (base) => ({ ...base, minHeight: "38px" }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
+            menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
+          />
           </div>
           <input
             type="text"
