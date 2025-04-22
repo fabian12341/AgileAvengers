@@ -33,21 +33,21 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
             .padStart(2, "0")}`,
           agent: call.user?.role || "Sin rol",
           sentimentScore: 80,
-          transcript: typeof call.transcript?.text === "string"
-          ? call.transcript.text.split("\n\n").map((block) => {
-              const [speakerLine, ...textLines] = block.split("\n");
-              const speakerRaw = speakerLine?.replace(":", "").trim();
-              const speaker =
-                speakerRaw === "AGENT"
-                  ? call.user?.name || "Agente"
-                  : call.client_name || "Cliente";
-              return {
-                speaker,
-                message: textLines.join("\n").trim(),
-              };
-            })
-          : [],
-        
+transcript: typeof call.transcript?.text === "string"
+  ? call.transcript.text.split("\n\n").map((block) => {
+      const [speakerLine, ...textLines] = block.split("\n");
+      const speakerRaw = speakerLine?.replace(":", "").trim();
+      const speaker =
+        speakerRaw === "AGENT"
+          ? call.user?.name || "Agente"
+          : call.client_name || "Cliente";
+      return {
+        speaker,
+        message: textLines.join("\n").trim(),
+      };
+    })
+  : [],
+
           report: call.report || null,
         }));
         setCallsData(calls);
@@ -105,10 +105,8 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
                   <div
                     key={index}
                     className={`flex ${
-                      entry.speaker.toLowerCase().includes("client")
-                        ? "justify-start"
-                        : "justify-end"
-                    }`}
+                      entry.speaker !== selectedCall.name ? "justify-start" : "justify-end"
+                    }`}                                   
                   >
                     <div
                       className={`px-4 py-2 rounded-lg max-w-[75%] shadow ${

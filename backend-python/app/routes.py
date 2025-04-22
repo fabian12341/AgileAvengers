@@ -14,6 +14,20 @@ def require_api_key():
     if api_key != os.getenv("API_KEY"):
         abort(401, description="API key inválida o ausente")
 
+@main.route('/clients')
+def get_clients():
+    require_api_key()
+
+    from .models import Client
+    clients = Client.query.all()
+    return jsonify([
+        {
+            "id_client": c.id_client,
+            "name": c.name
+        } for c in clients
+    ])
+
+
 @main.route('/calls')
 def get_calls():
     require_api_key()
