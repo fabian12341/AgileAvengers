@@ -11,6 +11,14 @@ class User(db.Model):
     calls = db.relationship('Call', backref='user', lazy=True)
 
 
+class Client(db.Model):
+    __tablename__ = 'Clients'
+    id_client = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+
+    calls = db.relationship('Call', backref='client', lazy=True)
+
+
 class Call(db.Model):
     __tablename__ = 'Calls'
     id_call = db.Column(db.Integer, primary_key=True)
@@ -18,11 +26,12 @@ class Call(db.Model):
     duration = db.Column(db.Integer)
     silence_percentage = db.Column(db.Integer)
     id_user = db.Column(db.Integer, db.ForeignKey('Users.id_user'))
-    id_client = db.Column(db.Integer)
+    id_client = db.Column(db.Integer, db.ForeignKey('Clients.id_client'))
     id_emotions = db.Column(db.Integer)
 
     transcript = db.relationship('Transcript', uselist=False, backref='call', lazy=True)
     report = db.relationship('Report', uselist=False, backref='call', lazy=True)
+
 
 
 class Transcript(db.Model):

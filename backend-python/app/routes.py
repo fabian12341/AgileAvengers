@@ -14,6 +14,20 @@ def require_api_key():
     if api_key != os.getenv("API_KEY"):
         abort(401, description="API key inválida o ausente")
 
+@main.route('/clients')
+def get_clients():
+    require_api_key()
+
+    from .models import Client
+    clients = Client.query.all()
+    return jsonify([
+        {
+            "id_client": c.id_client,
+            "name": c.name
+        } for c in clients
+    ])
+
+
 @main.route('/calls')
 def get_calls():
     require_api_key()
@@ -75,6 +89,7 @@ def get_calls_with_users():
     try:
         calls = Call.query.options(
             joinedload(Call.user),
+            joinedload(Call.client),
             joinedload(Call.transcript),
             joinedload(Call.report),
         ).all()
@@ -145,6 +160,7 @@ def get_calls_with_users():
                 "id_user": call.id_user,
                 "id_client": call.id_client,
                 "id_emotions": call.id_emotions,
+                "client_name": call.client.name if call.client else "Cliente",
                 "user": {
                     "id": user.id_user,
                     "name": user.name,
@@ -377,7 +393,7 @@ def upload_call():
         db.session.add_all([voice1, voice2])
 
         # Transcripción
-        transcript_text = " ".join([s["text"] for s in result["transcript"]])
+        transcript_text = "\n\n".join([f'{s["speaker"]}:\n {s["text"]}' for s in result["transcript"]])
         transcript = Transcript(
             id_call=call.id_call,
             text=transcript_text,

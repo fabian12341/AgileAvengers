@@ -6,14 +6,12 @@ export interface ApiCall {
     name?: string;
     role?: string;
   };
+  client_name?: string;
   date: string;
   duration: number;
   client?: string;
   transcript?: {
-    text?: Array<{
-      speaker: string;
-      text: string;
-    }>;
+    text?: string;
   };
   report?: Call['report'] | null;
 }

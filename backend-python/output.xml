@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.2.2 (Python 3.11.9 on win32)" generated="2025-04-30T10:05:21.571088" rpa="false" schemaversion="5">
+<suite id="s1" name="Api" source="C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\tests\api">
+<suite id="s1-s1" name="Tests" source="C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\tests\api\tests.robot">
+<test id="s1-s1-t1" name="Cargar API Key" line="12">
+<kw name="Get Environment Variable" owner="OperatingSystem">
+<msg time="2025-04-30T10:05:26.024548" level="FAIL">Environment variable 'API_KEY' does not exist.</msg>
+<var>${API_KEY}</var>
+<arg>API_KEY</arg>
+<doc>Returns the value of an environment variable with the given name.</doc>
+<status status="FAIL" start="2025-04-30T10:05:26.024548" elapsed="0.000000">Environment variable 'API_KEY' does not exist.</status>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<arg>${API_KEY}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" start="2025-04-30T10:05:26.024548" elapsed="0.000000"/>
+</kw>
+<status status="FAIL" start="2025-04-30T10:05:26.024548" elapsed="0.000000">Environment variable 'API_KEY' does not exist.</status>
+</test>
+<test id="s1-s1-t2" name="Get Clients (GET /clients)" line="15">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-04-30T10:05:26.028643" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<var>${headers}</var>
+<arg>X-API-KEY</arg>
+<arg>${API_KEY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-04-30T10:05:26.028643" elapsed="0.000000"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:05:26.028643" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>backend</arg>
+<arg>${BASE_URL}</arg>
+<arg>headers=${headers}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-04-30T10:05:26.028643" elapsed="0.000000"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:08.039569" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/clients 
+ path_url=/clients 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ body=None 
+ </msg>
+<msg time="2025-04-30T10:06:08.039569" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/clients 
+ status=401, reason=Unauthorized 
+ headers={'Date': 'Wed, 30 Apr 2025 16:06:08 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '7b98a7f4-5b65-409f', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938847daaa3649d9-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+&lt;title&gt;401 Unauthorized&lt;/title&gt;
+&lt;h1&gt;Unauthorized&lt;/h1&gt;
+&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+ 
+ </msg>
+<msg time="2025-04-30T10:06:08.039569" level="FAIL">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/clients</msg>
+<var>${response}</var>
+<arg>backend</arg>
+<arg>/clients</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2025-04-30T10:05:26.030854" elapsed="42.085712">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/clients</status>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<var>${clientes}</var>
+<arg>${response.json()}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}"/>
+<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+</iter>
+<var>${cliente}</var>
+<value>@{clientes}</value>
+<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+</for>
+<status status="FAIL" start="2025-04-30T10:05:26.028643" elapsed="42.087923">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/clients</status>
+</test>
+<test id="s1-s1-t3" name="Get Calls (GET /calls)" line="26">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-04-30T10:06:08.120604" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<var>${headers}</var>
+<arg>X-API-KEY</arg>
+<arg>${API_KEY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-04-30T10:06:08.120604" elapsed="0.000000"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:08.120604" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>backend</arg>
+<arg>${BASE_URL}</arg>
+<arg>headers=${headers}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-04-30T10:06:08.120604" elapsed="0.000000"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:08.884491" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/calls 
+ path_url=/calls 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ body=None 
+ </msg>
+<msg time="2025-04-30T10:06:08.884491" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/calls 
+ status=401, reason=Unauthorized 
+ headers={'Date': 'Wed, 30 Apr 2025 16:06:08 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '99077b4a-dcfc-4df7', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938848e01c5edab4-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+&lt;title&gt;401 Unauthorized&lt;/title&gt;
+&lt;h1&gt;Unauthorized&lt;/h1&gt;
+&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+ 
+ </msg>
+<msg time="2025-04-30T10:06:08.886514" level="FAIL">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls</msg>
+<var>${response}</var>
+<arg>backend</arg>
+<arg>/calls</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2025-04-30T10:06:08.120604" elapsed="0.765910">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls</status>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:08.886514" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()[0]}</arg>
+<arg>id</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:08.888518" elapsed="0.000000"/>
+</kw>
+<status status="FAIL" start="2025-04-30T10:06:08.116566" elapsed="0.771952">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls</status>
+</test>
+<test id="s1-s1-t4" name="Get Calls with Users (GET /calls/users)" line="33">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-04-30T10:06:08.888518" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<var>${headers}</var>
+<arg>X-API-KEY</arg>
+<arg>${API_KEY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-04-30T10:06:08.888518" elapsed="0.000000"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:08.888518" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>backend</arg>
+<arg>${BASE_URL}</arg>
+<arg>headers=${headers}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-04-30T10:06:08.888518" elapsed="0.000000"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:09.549593" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/calls/users 
+ path_url=/calls/users 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ body=None 
+ </msg>
+<msg time="2025-04-30T10:06:09.549593" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/calls/users 
+ status=401, reason=Unauthorized 
+ headers={'Date': 'Wed, 30 Apr 2025 16:06:09 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '935c65be-1b86-4265', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938848e4cf27dab4-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+&lt;title&gt;401 Unauthorized&lt;/title&gt;
+&lt;h1&gt;Unauthorized&lt;/h1&gt;
+&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+ 
+ </msg>
+<msg time="2025-04-30T10:06:09.549593" level="FAIL">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls/users</msg>
+<var>${response}</var>
+<arg>backend</arg>
+<arg>/calls/users</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2025-04-30T10:06:08.888518" elapsed="0.661075">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls/users</status>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:09.549593" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()[0]}</arg>
+<arg>user</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="NOT RUN" start="2025-04-30T10:06:09.549593" elapsed="0.000000"/>
+</kw>
+<status status="FAIL" start="2025-04-30T10:06:08.888518" elapsed="0.661075">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls/users</status>
+</test>
+<test id="s1-s1-t5" name="Get Reports (GET /reports)" line="40">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-04-30T10:06:09.553679" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<var>${headers}</var>
+<arg>X-API-KEY</arg>
+<arg>${API_KEY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-04-30T10:06:09.549593" elapsed="0.004086"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:09.553679" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>backend</arg>
+<arg>${BASE_URL}</arg>
+<arg>headers=${headers}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-04-30T10:06:09.553679" elapsed="0.000000"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:14.929923" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/reports 
+ path_url=/reports 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ body=None 
+ </msg>
+<msg time="2025-04-30T10:06:14.929923" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/reports 
+ status=200, reason=OK 
+ headers={'Date': 'Wed, 30 Apr 2025 16:06:14 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '02c0e30e-b996-4f97', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938848e8aeccdab4-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=[{"call":{"agent":"Tom Green","client":1,"date":"2025-04-01","id_call":1},"id_report":1,"summary":"The client, who is not fluent in Spanish, is seeking a recommendation for a Spanish teacher. The agent provides the name and address of a teacher named Cecilia Carreras."},{"call":{"agent":"John Doe","client":1,"date":"2025-04-03","id_call":2},"id_report":2,"summary":"The client, Ana, is seeking help with finding a Spanish teacher for classes. The agent, who introduces herself as Ana, confirms that she knows a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":1,"date":"2025-04-03","id_call":3},"id_report":3,"summary":"In this conversation, Ana, the agent, greets the client, who is struggling with Spanish and is looking for a teacher. Ana provides the name of a teacher, Cecilia Carreras, and her location."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-02","id_call":4},"id_report":4,"summary":"The conversation is in Spanish, where Ana (the agent) introduces herself and informs the client (who does not speak Spanish well) about a Spanish teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-01","id_call":5},"id_report":5,"summary":"In this conversation, Ana (the agent) greets the client and introduces herself. The client (SPEAKER 2) mentions that they don't speak Spanish well and inquires if Ana knows a teacher for Spanish classes. Ana responds positively, providing the name and address of a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-02","id_call":6},"id_report":6,"summary":"The client, who struggles with Spanish, is looking for a teacher to take classes. The agent introduces herself as Ana and informs the client that she knows a teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":3,"date":"2025-04-16","id_call":7},"id_report":7,"summary":"The customer service call involves a conversation between Ana (the agent) and a client who is looking for a Spanish teacher. The client, who does not speak Spanish very well, asks Ana if she knows any teachers, to which Ana responds that she knows a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":2,"date":"2025-04-03","id_call":8},"id_report":8,"summary":"The conversation revolves around a discussion about a musical instrument called a saxoboom. The agent (SPEAKER 1) explains that the saxoboom is often confused with other instruments but is unique and requires years of practice to master. The client (SPEAKER 2) expresses excitement upon realizing they have a saxoboom and agrees to demonstrate it."},{"call":{"agent":"Alice Brown","client":17,"date":"2023-06-21","id_call":9},"id_report":9,"summary":"The agent and client are discussing a unique musical instrument called the saxoboom. The agent is explaining the saxoboom and its characteristics while the client expresses excitement upon realizing the saxoboom is present. The client is then asked to demonstrate the instrument."},{"call":{"agent":"Lily Orange","client":15,"date":"2025-04-09","id_call":10},"id_report":10,"summary":"The client, who has limited Spanish proficiency, is seeking a teacher for Spanish classes. The agent responds positively, confirming that they know a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."}]
+ 
+ </msg>
+<msg time="2025-04-30T10:06:14.934205" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>backend</arg>
+<arg>/reports</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-04-30T10:06:09.555988" elapsed="5.378217"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2025-04-30T10:06:14.934205" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2025-04-30T10:06:14.934205" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${response.json()[0]}</arg>
+<arg>summary</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-04-30T10:06:14.934205" elapsed="0.000000"/>
+</kw>
+<status status="PASS" start="2025-04-30T10:06:09.549593" elapsed="5.384612"/>
+</test>
+<test id="s1-s1-t6" name="Delete Invalid Report (DELETE /reports/0)" line="47">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-04-30T10:06:14.938231" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<var>${headers}</var>
+<arg>X-API-KEY</arg>
+<arg>${API_KEY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-04-30T10:06:14.934205" elapsed="0.004026"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:14.938231" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>backend</arg>
+<arg>${BASE_URL}</arg>
+<arg>headers=${headers}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-04-30T10:06:14.938231" elapsed="0.000000"/>
+</kw>
+<kw name="DELETE On Session" owner="RequestsLibrary">
+<msg time="2025-04-30T10:06:15.562347" level="INFO">DELETE Request : url=https://agileavengers-2.onrender.com/reports/0 
+ path_url=/reports/0 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '', 'Content-Length': '0'} 
+ body=None 
+ </msg>
+<msg time="2025-04-30T10:06:15.562347" level="INFO">DELETE Response : url=https://agileavengers-2.onrender.com/reports/0 
+ status=401, reason=Unauthorized 
+ headers={'Date': 'Wed, 30 Apr 2025 16:06:15 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '9cd0f7b5-16ae-4f4f', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '9388490a7e5a49ee-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=&lt;!doctype html&gt;
+&lt;html lang=en&gt;
+&lt;title&gt;401 Unauthorized&lt;/title&gt;
+&lt;h1&gt;Unauthorized&lt;/h1&gt;
+&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+ 
+ </msg>
+<msg time="2025-04-30T10:06:15.562347" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<var>${response}</var>
+<arg>backend</arg>
+<arg>/reports/0</arg>
+<arg>expected_status=any</arg>
+<doc>Sends a DELETE request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-04-30T10:06:14.938231" elapsed="0.624116"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2025-04-30T10:06:15.566546" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<msg time="2025-04-30T10:06:15.566546" level="FAIL">401 != 404</msg>
+<arg>${response.status_code}</arg>
+<arg>404</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="FAIL" start="2025-04-30T10:06:15.562347" elapsed="0.004199">401 != 404</status>
+</kw>
+<status status="FAIL" start="2025-04-30T10:06:14.934205" elapsed="0.632341">401 != 404</status>
+</test>
+<status status="FAIL" start="2025-04-30T10:05:22.069847" elapsed="53.496699"/>
+</suite>
+<status status="FAIL" start="2025-04-30T10:05:21.571088" elapsed="53.995458"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="5" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Api" id="s1" pass="1" fail="5" skip="0">Api</stat>
+<stat name="Tests" id="s1-s1" pass="1" fail="5" skip="0">Api.Tests</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
