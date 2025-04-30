@@ -6,11 +6,7 @@ import Tabs from "../components/ui/Tabs";
 import Navigation from "../components/Navigation";
 import Userbar from "../components/ui/UserCard";
 
-type UserProfilePageProps = {
-  role?: string;
-};
-
-const UserProfilePage = ({ role = "agent" }: UserProfilePageProps) => {
+const UserProfilePage = ({ role = "agent" }) => {
   const tabs = [
     {
       label: "Resumen",
@@ -110,6 +106,7 @@ const UserProfilePage = ({ role = "agent" }: UserProfilePageProps) => {
   return (
     <>
       <Navigation />
+
       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-gray-900 p-4">
         <Userbar
           name="Nombre del Usuario"
@@ -117,6 +114,8 @@ const UserProfilePage = ({ role = "agent" }: UserProfilePageProps) => {
           role="admin"
           imageUrl="https://via.placeholder.com/100"
         />
+
+        {/* Main Content */}
         <div className="col-span-2 space-y-6">
           <Tabs tabs={tabs} />
         </div>
