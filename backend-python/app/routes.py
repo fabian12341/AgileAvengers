@@ -6,6 +6,7 @@ from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, V
 from . import db
 from datetime import datetime
 import requests
+import bcrypt
 
 main = Blueprint('main', __name__)
 
@@ -60,24 +61,35 @@ def post_login():
     
     # Get email and password from the request body
     data = request.get_json()
+    print("Request data:", data)  # Log the incoming request data
+
     email = data.get('email')
     password = data.get('password')
 
     # Validate input
     if not email or not password:
+        print("Missing email or password")
         return jsonify({"error": "Email and password are required"}), 400
 
     # Fetch user from the database by email
     user = User.query.filter_by(email=email).first()
+    print("User fetched from DB:", user)  # Log the user fetched from the database
+
+    if user:
+        print("Password hash from DB:", user.password)  # Log the hashed password
 
     # Check if user exists and password is correct
-    if not user or user.password != password:
-        return jsonify({"error": "Invalid email or password route error", }), 401
+    if not user or not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+        print("Invalid email or password")  # Log invalid login attempt
+        return jsonify({"error": "Invalid email or password"}), 401
 
     # If credentials are valid, return a success response
+    print("Login successful for user:", user.email)  # Log successful login
     return jsonify({
         "message": "Login successful",
         "user": {
+            "id": user.id_user,
+            "name": user.name,
             "email": user.email,
             "role": user.role
         }

@@ -6,13 +6,18 @@ import Tabs from "../components/ui/Tabs";
 import Navigation from "../components/Navigation";
 import Userbar from "../components/ui/UserCard";
 
-const UserProfilePage = ({ role = "agent" }) => {
+interface Props {
+  role?: string;
+}
+
+const UserProfilePage: React.FC<Props> = ({ role = "agent" }) => {
   const tabs = [
     {
       label: "Resumen",
       content: (
         <>
           <div className="grid grid-cols-2 gap-4">
+            {/* Tarjetas de resumen */}
             <Card>
               <CardContent className="p-4">
                 <h3 className="text-sm text-gray-500">Total Calls</h3>
@@ -106,12 +111,11 @@ const UserProfilePage = ({ role = "agent" }) => {
   return (
     <>
       <Navigation />
-
       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-gray-900 p-4">
         <Userbar
           name="Nombre del Usuario"
           email="usuario@empresa.com"
-          role="admin"
+          role={role}
           imageUrl="https://via.placeholder.com/100"
         />
 

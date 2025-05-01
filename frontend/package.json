@@ -11,6 +11,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "lucide-react": "^0.479.0",
     "next": "15.2.2",
     "react": "^19.0.0",
