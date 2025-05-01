@@ -3,9 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import Navigation from "../components/Navigation";
 import { FileText } from "lucide-react";
 import CallTable from "../components/Data/calltable";
-import dynamic from "next/dynamic";
+import ClientOnlySelect from "../components/ClientOnlySelect";
 
-const ClientOnlyCreatableSelect = dynamic(() => import("react-select/creatable"), { ssr: false });
 
 const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -105,51 +104,27 @@ const UploadPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
           <div className="col-span-1">
-            <ClientOnlyCreatableSelect
-              options={clients}
-              value={selectedClient}
-              onChange={(newValue: unknown) =>
-                setSelectedClient(newValue as { label: string; value: string } | null)
-              }
-              placeholder="Search or select client"
-              isClearable
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  minHeight: "38px",
-                  backgroundColor: "#1f2937",
-                  borderColor: "#4b5563",
-                  color: "white",
-                  width: "100%",
-                  fontSize: "0.875rem"
-                }),
-                menu: (base) => ({
-                  ...base,
-                  backgroundColor: "#1f2937",
-                  color: "white",
-                  fontSize: "0.875rem",
-                  border: "1px solid #4b5563",
-                  zIndex: 9999
-                }),
-                option: (base, { isFocused }) => ({
-                  ...base,
-                  backgroundColor: isFocused ? "#374151" : "#1f2937",
-                  color: "white",
-                  padding: "8px 12px",
-                }),
-                singleValue: (base) => ({
-                  ...base,
-                  color: "white",
-                }),
-                placeholder: (base) => ({
-                  ...base,
-                  color: "#9ca3af"
-                }),
-              }}              
-              menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
-            />
+          <ClientOnlySelect
+            options={clients}
+            value={selectedClient}
+            onChange={(newValue: unknown) => setSelectedClient(newValue as { label: string; value: string } | null)}
+            placeholder="Search or select client"
+            isClearable
+            classNames={{
+              control: () => "bg-gray-800 border border-gray-600 rounded-md text-sm px-2 py-1",
+              input: () => "text-white",
+              singleValue: () => "text-white",
+              menu: () => "bg-gray-800 text-white",
+              option: () => "hover:bg-gray-700 px-2 py-1",
+              placeholder: () => "text-gray-400",
+            }}
+            styles={{
+              control: (base) => ({ ...base, minHeight: "38px" }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
+            menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
+          />
           </div>
-
           <input
             type="text"
             placeholder="Agent"
@@ -184,7 +159,6 @@ const UploadPage = () => {
             <option value="es">Español</option>
             <option value="en">English</option>
           </select>
-
           <div className="flex items-center justify-center sm:justify-start">
             <input
               type="file"

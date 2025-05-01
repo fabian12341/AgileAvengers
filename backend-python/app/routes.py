@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, abort
 from mutagen.mp3 import MP3
 from sqlalchemy.orm import joinedload, subqueryload
 import os
-from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, Voice, Suggestion, Client
+from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, Voice, Suggestion
 from . import db
 from datetime import datetime
 import requests
@@ -290,29 +290,24 @@ def delete_report(report_id):
 def upload_call():
     try:
         require_api_key()
-
         file = request.files.get("file")
-        client_name = request.form.get("client")
-        client_obj = db.session.query(Client).filter_by(name=client_name).first()
-        if not client_obj:
-            return jsonify({"error": f"El cliente '{client_name}' no existe en la base de datos"}), 400
-
+        client = request.form.get("client")
         agent = request.form.get("agent")
         project = request.form.get("project")
         date_str = request.form.get("date")
         time_str = request.form.get("time")
         language = request.form.get("language")
 
-        print("Form received:", client_name, agent, project, date_str, time_str)
+        print("Form received:", client, agent, project, date_str, time_str)
 
-        if not all([file, client_name, agent, date_str, time_str]):
+        if not all([file, client, agent, date_str, time_str]):
             print("Missing fields")
             return jsonify({"error": "Faltan campos obligatorios"}), 400
 
         user = User.query.filter_by(name=agent).first()
         if not user:
             print("Agente no existe:", agent)
-            return jsonify({"error": "El agente no existe"}), 404
+            return jsonify({"error": "El agenSte no existe"}), 404
 
         datetime_str = f"{date_str} {time_str}:00"
         print("🕒 Datetime:", datetime_str)
@@ -322,7 +317,7 @@ def upload_call():
             "audio": (file.filename, file.stream, file.mimetype)
         }
         data = {
-            "client": client_name,
+            "client": client,
             "agent": agent,
             "language": language,
             "num_speakers": 2,
@@ -373,7 +368,7 @@ def upload_call():
             duration=int(result["call_duration"]),
             silence_percentage=result["silence_percentage"],
             id_user=user.id_user,
-            id_client=client_obj.id_client,
+            id_client=int(client) if client.isdigit() else 1,
             id_emotions=emotions_overall.id_emotions
         )
         db.session.add(call)
@@ -448,3 +443,4 @@ def upload_call():
         db.session.rollback()
         print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
+
