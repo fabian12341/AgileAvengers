@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/calls/users`,
+          `${process.env.NEXT_PUBLIC_API_URL}/calls/users/${user.id}`,
           {
             method: "GET",
             headers: {
