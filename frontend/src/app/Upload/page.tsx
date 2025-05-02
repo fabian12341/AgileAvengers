@@ -4,13 +4,18 @@ import Navigation from "../components/Navigation";
 import { FileText } from "lucide-react";
 import CallTable from "../components/Data/calltable";
 import ClientOnlySelect from "../components/ClientOnlySelect";
-
+import { useSearchParams } from "next/navigation";
 
 const UploadPage = () => {
+  const searchParams = useSearchParams();
+  const name = searchParams.get("name") || "";
+  const role = searchParams.get("role") || "";
+  const id_team = searchParams.get("id_team") || "";
+
   const [file, setFile] = useState<File | null>(null);
   const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
   const [selectedClient, setSelectedClient] = useState<{ label: string; value: string } | null>(null);
-  const [agent, setAgent] = useState("");
+  const [agent, setAgent] = useState(name); // auto llenado con el nombre del usuario
   const [project, setProject] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -94,36 +99,38 @@ const UploadPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Navigation />
+      <Navigation name={name} role={role} id_team={id_team} />
+
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">Upload New Call</h1>
         <p className="text-gray-400 mb-4">
-          Fill in the fields and select a <strong>.wav</strong> file to upload and generate
-          a transcript and report.
+          Bienvenido, <strong>{name}</strong> — Rol: {role} — Equipo: {id_team}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
           <div className="col-span-1">
-          <ClientOnlySelect
-            options={clients}
-            value={selectedClient}
-            onChange={(newValue: unknown) => setSelectedClient(newValue as { label: string; value: string } | null)}
-            placeholder="Search or select client"
-            isClearable
-            classNames={{
-              control: () => "bg-gray-800 border border-gray-600 rounded-md text-sm px-2 py-1",
-              input: () => "text-white",
-              singleValue: () => "text-white",
-              menu: () => "bg-gray-800 text-white",
-              option: () => "hover:bg-gray-700 px-2 py-1",
-              placeholder: () => "text-gray-400",
-            }}
-            styles={{
-              control: (base) => ({ ...base, minHeight: "38px" }),
-              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-            }}
-            menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
-          />
+            <ClientOnlySelect
+              options={clients}
+              value={selectedClient}
+              onChange={(newValue: unknown) =>
+                setSelectedClient(newValue as { label: string; value: string } | null)
+              }
+              placeholder="Search or select client"
+              isClearable
+              classNames={{
+                control: () => "bg-gray-800 border border-gray-600 rounded-md text-sm px-2 py-1",
+                input: () => "text-white",
+                singleValue: () => "text-white",
+                menu: () => "bg-gray-800 text-white",
+                option: () => "hover:bg-gray-700 px-2 py-1",
+                placeholder: () => "text-gray-400",
+              }}
+              styles={{
+                control: (base) => ({ ...base, minHeight: "38px" }),
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              }}
+              menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
+            />
           </div>
           <input
             type="text"
