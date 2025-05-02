@@ -1,12 +1,15 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Navigation from "../components/Navigation";
 import { FileText } from "lucide-react";
 import CallTable from "../components/Data/calltable";
+import ClientOnlySelect from "../components/ClientOnlySelect";
+
 
 const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [client, setClient] = useState("");
+  const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
+  const [selectedClient, setSelectedClient] = useState<{ label: string; value: string } | null>(null);
   const [agent, setAgent] = useState("");
   const [project, setProject] = useState("");
   const [date, setDate] = useState("");
@@ -14,6 +17,22 @@ const UploadPage = () => {
   const [language, setLanguage] = useState("es");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/clients`, {
+      headers: {
+        "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const options = data.map((c: { id_client: number; name: string }) => ({
+          label: c.name,
+          value: c.name,
+        }));
+        setClients(options);
+      });
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -27,7 +46,7 @@ const UploadPage = () => {
   };
 
   const handleUpload = async () => {
-    if (!file || !client || !agent || !date || !time) {
+    if (!file || !selectedClient || !agent || !date || !time) {
       alert("Please fill out all fields and select a .wav file.");
       return;
     }
@@ -36,7 +55,7 @@ const UploadPage = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("client", client);
+    formData.append("client", selectedClient.value);
     formData.append("agent", agent);
     formData.append("project", project);
     formData.append("date", date);
@@ -87,13 +106,28 @@ const UploadPage = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Client"
-            value={client}
-            onChange={(e) => setClient(e.target.value)}
-            className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+          <div className="col-span-1">
+          <ClientOnlySelect
+            options={clients}
+            value={selectedClient}
+            onChange={(newValue: unknown) => setSelectedClient(newValue as { label: string; value: string } | null)}
+            placeholder="Search or select client"
+            isClearable
+            classNames={{
+              control: () => "bg-gray-800 border border-gray-600 rounded-md text-sm px-2 py-1",
+              input: () => "text-white",
+              singleValue: () => "text-white",
+              menu: () => "bg-gray-800 text-white",
+              option: () => "hover:bg-gray-700 px-2 py-1",
+              placeholder: () => "text-gray-400",
+            }}
+            styles={{
+              control: (base) => ({ ...base, minHeight: "38px" }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            }}
+            menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
           />
+          </div>
           <input
             type="text"
             placeholder="Agent"
