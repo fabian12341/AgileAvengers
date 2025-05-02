@@ -1,17 +1,21 @@
 module.exports = {
-    preset: 'ts-jest',           // Soporte para TypeScript
-    testEnvironment: 'jsdom',    // Simula un navegador para React
-    roots: ['<rootDir>/'],       // Busca pruebas en todo el proyecto
-    testMatch: [                 // Patrón para encontrar archivos de prueba
-      '**/?(*.)+(spec|test).[jt]s?(x)'
-    ],
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-    transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest', // Asegura que ts-jest maneje .ts y .tsx
-    },
-    moduleNameMapper: {          // Soporte para imports de Next.js
-      '^@/(.*)$': '<rootDir>/$1',
-      '\\.(png|jpg|jpeg|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
-    },
-    setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
-  };
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  roots: ['<rootDir>/'],
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(js|jsx)$': 'babel-jest', // Transforma .js y .jsx con babel-jest
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(png|jpg|jpeg|gif|svg)$': '<rootDir>/__mocks__/next/fileMock.js',
+    '\\.(css|less|scss)$': 'identity-obj-proxy',
+    '^next/image$': '<rootDir>/__mocks__/next/image.js',
+    '^next/link$': '<rootDir>/__mocks__/next/link.js',
+    '^@/app/components/ui/button$': '<rootDir>/__mocks__/ui/button.js',
+    '^lucide-react$': '<rootDir>/__mocks__/lucide-react.js',
+  },
+  setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
+};

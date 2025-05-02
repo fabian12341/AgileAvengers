@@ -44,13 +44,16 @@ const UploadPage = () => {
     formData.append("language", language);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-call`, {
-        method: "POST",
-        headers: {
-          "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
-        },
-        body: formData,
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/upload-call`,
+        {
+          method: "POST",
+          headers: {
+            "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
+          },
+          body: formData,
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -79,8 +82,8 @@ const UploadPage = () => {
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4">Upload New Call</h1>
         <p className="text-gray-400 mb-4">
-          Fill in the fields and select a <strong>.wav</strong> file to upload and generate
-          a transcript and report.
+          Fill in the fields and select a <strong>.wav</strong> file to upload
+          and generate a transcript and report.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
@@ -110,17 +113,20 @@ const UploadPage = () => {
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+            data-testid="date-input"
           />
           <input
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
             className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+            data-testid="time-input"
           />
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
             className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
+            data-testid="language-select"
           >
             <option value="es">Español</option>
             <option value="en">English</option>
@@ -132,6 +138,7 @@ const UploadPage = () => {
               onChange={handleFileChange}
               className="hidden"
               ref={fileInputRef}
+              data-testid="file-input"
             />
             <button
               type="button"

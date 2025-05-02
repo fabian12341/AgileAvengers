@@ -46,6 +46,7 @@ const CallSearch: React.FC<CallSearchProps> = ({
           value={searchDate}
           onChange={(e) => setSearchDate(e.target.value)}
           className="bg-gray-800 p-2 rounded-md w-full border border-gray-600 text-white"
+          data-testid="date-input"
         />
       </div>
     </div>
