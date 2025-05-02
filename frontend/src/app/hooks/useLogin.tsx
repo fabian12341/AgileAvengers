@@ -1,15 +1,13 @@
+// src/app/hooks/useLogin.ts
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
 
 export interface User {
-  id: number;
-  name: string;
   email: string;
   role: string;
 }
 
 export const useLogin = () => {
-  const { setUser } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -29,53 +27,37 @@ export const useLogin = () => {
       return false;
     }
 
-    console.log("Login request:", { email, password }); // Debug log
-    console.log("API URL:", process.env.NEXT_PUBLIC_API_URL); // Debug log
-    console.log("API Key:", process.env.NEXT_PUBLIC_API_KEY); // Debug log
-
     try {
+      console.log("Request payload:", { email, password });
+      console.log("API Key:", process.env.NEXT_PUBLIC_API_KEY);
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY, // Ensure this matches the backend
         },
         body: JSON.stringify({ email, password }),
       });
 
-      console.log("Response status:", response.status); // Debug log
+      console.log("Response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.log("Error response:", errorData); // Debug log
-        setError(errorData.error || "Invalid email or password 1");
+        console.log("Response body (error):", errorData);
+        setError(errorData.error || "Invalid email or password");
         setLoading(false);
         return false;
       }
 
       const data = await response.json();
-      console.log("Login response:", data); // Debug log
+      console.log("Response body (success):", data);
 
-      if (!data.user || !data.user.email || !data.user.id) {
-        setError("Invalid email or password 2");
-        setLoading(false);
-        return false;
-      }
-
-      const userData: User = {
-        id: data.user.id,
-        name: data.user.name || "Usuario Desconocido",
-        email: data.user.email,
-        role: data.user.role || "admin",
-      };
-
-      setUser(userData);
-      console.log("Set user in context:", userData); // Debug log
-
+      setUser(data.user);
       setLoading(false);
       return true;
     } catch (err) {
-      console.log("Fetch error:", err); // Debug log
+      console.error("Unexpected error:", err);
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"
       );
@@ -90,5 +72,5 @@ export const useLogin = () => {
     setError(null);
   };
 
-  return { error, loading, login, logout };
+  return { user, error, loading, login, logout };
 };
