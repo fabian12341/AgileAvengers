@@ -2,33 +2,24 @@
 import React, { useEffect, useState } from "react";
 import Card, { CardContent } from "../components/ui/card";
 import Progress from "../components/ui/progress";
+import { useAuth } from "../context/AuthContext";
 
-// Datos simulados para pruebas sin login
-const fakeCalls = [
-  {
-    id_call: 1,
-    duration: 300,
-    silence_percentage: 20,
-    id_user: 1,
-    report: {
-      overall_emotion: 75,
-      speakers: [
-        { emotions: { happiness: 80, sadness: 10, anger: 10 } },
-        { emotions: { happiness: 60, sadness: 30, anger: 10 } },
-      ],
-    },
-  },
-  {
-    id_call: 2,
-    duration: 180,
-    silence_percentage: 10,
-    id_user: 1,
-    report: {
-      overall_emotion: 65,
-      speakers: [{ emotions: { happiness: 70, sadness: 20, anger: 10 } }],
-    },
-  },
-];
+interface Call {
+  id_call: number;
+  duration: number;
+  silence_percentage: number;
+  id_user: number;
+  report?: {
+    overall_emotion?: number;
+    speakers: Array<{
+      emotions: {
+        happiness?: number;
+        sadness?: number;
+        anger?: number;
+      };
+    }>;
+  };
+}
 
 interface DashboardData {
   totalCalls: number;
@@ -43,16 +34,65 @@ interface DashboardData {
 }
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simular carga de datos fake
-    const loadFakeData = () => {
-      try {
-        const userCalls = fakeCalls;
+    console.log("Dashboard user:", user); // Debug log
 
+    const fetchDashboardData = async () => {
+      if (!user || !user.id) {
+        setError("User not logged in");
+        setLoading(false);
+        return;
+      }
+
+      if (
+        !process.env.NEXT_PUBLIC_API_URL ||
+        !process.env.NEXT_PUBLIC_API_KEY
+      ) {
+        setError("API configuration missing");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/calls/users/${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch call data");
+        }
+
+        const calls: Call[] = await response.json();
+        console.log("Fetched calls:", calls); // Debug log
+
+        // Filter calls for the current user
+        const userCalls = calls.filter((call) => call.id_user === user.id);
+
+        if (userCalls.length === 0) {
+          setData({
+            totalCalls: 0,
+            silentPercentage: 0,
+            positivityScore: 0,
+            averageCallLength: 0,
+            emotions: { happiness: 0, sadness: 0, anger: 0 },
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Calculate metrics
         const totalCalls = userCalls.length;
         const silentPercentage =
           userCalls.reduce((sum, call) => sum + call.silence_percentage, 0) /
@@ -65,8 +105,9 @@ const Dashboard: React.FC = () => {
         const averageCallLength =
           userCalls.reduce((sum, call) => sum + call.duration, 0) /
           totalCalls /
-          60;
+          60; // Convert seconds to minutes
 
+        // Calculate average emotions across all speakers in all calls
         let totalHappiness = 0;
         let totalSadness = 0;
         let totalAnger = 0;
@@ -98,13 +139,15 @@ const Dashboard: React.FC = () => {
         });
         setLoading(false);
       } catch (err) {
-        setError("Error al cargar datos simulados");
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred"
+        );
         setLoading(false);
       }
     };
 
-    loadFakeData();
-  }, []);
+    fetchDashboardData();
+  }, [user]);
 
   if (loading) {
     return <div className="text-white">Loading...</div>;
