@@ -14,23 +14,19 @@ export const useLogin = () => {
   const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
-  
+
     if (!email || !password) {
       setError("Email and password are required");
       setLoading(false);
       return false;
     }
-  
+
     if (!process.env.NEXT_PUBLIC_API_URL || !process.env.NEXT_PUBLIC_API_KEY) {
       setError("API configuration is missing");
       setLoading(false);
       return false;
     }
-  
-    try {
-      console.log("Request payload:", { email, password });
-      console.log("API Key:", process.env.NEXT_PUBLIC_API_KEY);
-  
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         headers: {
@@ -39,9 +35,7 @@ export const useLogin = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
-      console.log("Response status:", response.status);
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.log("Response body (error):", errorData);
@@ -49,16 +43,13 @@ export const useLogin = () => {
         setLoading(false);
         return false;
       }
-  
-      const data = await response.json();
-      console.log("Response body (success):", data);
-  
+
       setUser(data.user);
       setLoading(false);
       return true;
     } catch (err) {
       console.error("Unexpected error:", err);
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+
       setUser(null);
       setLoading(false);
       return false;

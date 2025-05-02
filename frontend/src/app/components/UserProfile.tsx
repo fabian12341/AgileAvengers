@@ -1,76 +1,25 @@
 "use client";
 import React from "react";
-import Card, { CardContent } from "../components/ui/card";
-import Progress from "../components/ui/progress";
 import Tabs from "../components/ui/Tabs";
 import Navigation from "../components/Navigation";
 import Userbar from "../components/ui/UserCard";
-
+import Dashboard from "./UserDash";
 interface Props {
   role?: string;
 }
 
 const UserProfilePage: React.FC<Props> = ({ role = "agent" }) => {
+  const storedUser =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "{}")
+      : {};
+
   const tabs = [
     {
       label: "Resumen",
-      content: (
-        <>
-          <div className="grid grid-cols-2 gap-4">
-            {/* Tarjetas de resumen */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm text-gray-500">Total Calls</h3>
-                <p className="text-2xl font-bold">3</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm text-gray-500">Silent Percentage</h3>
-                <p className="text-2xl font-bold">58%</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm text-gray-500">Positivity Score</h3>
-                <p className="text-2xl font-bold">6396%</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm text-gray-500">Average Call Length</h3>
-                <p className="text-2xl font-bold">30</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mt-6">
-            <h4 className="text-sm mb-2 text-gray-500">Emociones Detectadas</h4>
-            <div className="grid grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <p>Anger</p>
-                  <Progress value={66.91} label="Anger" />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <p>Sadness</p>
-                  <Progress value={1} label="Sadness" />
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <p>Happiness</p>
-                  <Progress value={14} label="Happiness" />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </>
-      ),
+      content: <Dashboard />,
     },
-    ...(role === "leader"
+    ...(storedUser.role === "leader"
       ? [
           {
             label: "Equipo",
@@ -88,7 +37,7 @@ const UserProfilePage: React.FC<Props> = ({ role = "agent" }) => {
           },
         ]
       : []),
-    ...(role === "admin"
+    ...(storedUser.role === "admin"
       ? [
           {
             label: "Administración",
@@ -111,15 +60,13 @@ const UserProfilePage: React.FC<Props> = ({ role = "agent" }) => {
   return (
     <>
       <Navigation />
-      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-gray-900 p-4">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-gray-900">
         <Userbar
-          name="Nombre del Usuario"
-          email="usuario@empresa.com"
-          role={role}
+          name={storedUser.name || "Nombre del Usuario"}
+          email={storedUser.email || "usuario@empresa.com"}
+          role={storedUser.role || role}
           imageUrl="https://via.placeholder.com/100"
         />
-
-        {/* Main Content */}
         <div className="col-span-2 space-y-6">
           <Tabs tabs={tabs} />
         </div>
