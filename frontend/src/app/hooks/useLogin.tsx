@@ -14,7 +14,10 @@ export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; user?: User }> => {
+  const login = async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; user?: User }> => {
     setLoading(true);
     setError(null);
 

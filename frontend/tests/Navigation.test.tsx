@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import Navigation from "@/app/components/Navigation"; // Ajusta la ruta según tu estructura
-
+import Navigation from "@/app/components/Navigation";
 describe("Navigation Component", () => {
   test("renders logo with link to /Home", () => {
     render(<Navigation />);
