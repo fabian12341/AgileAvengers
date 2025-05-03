@@ -6,9 +6,13 @@ import { useSearchParams } from "next/navigation";
 
 const Home: React.FC = () => {
   const searchParams = useSearchParams();
-  const name = searchParams.get("name") || "";
-  const role = searchParams.get("role") || "";
-  const id_team = searchParams.get("id_team") || "";
+
+  const stored = typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+  const fallback = stored ? JSON.parse(stored) : {};
+
+  const name = searchParams.get("name") || fallback.name || "";
+  const role = searchParams.get("role") || fallback.role || "";
+  const id_team = searchParams.get("id_team") || fallback.id_team || "";
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">

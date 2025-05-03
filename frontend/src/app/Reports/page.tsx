@@ -4,8 +4,18 @@ import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
 import { useCallsData } from "../hooks/useCallData";
 import { useReports, Report } from "../hooks/useReportsData";
+import { useSearchParams } from "next/navigation";
 
 const ReportsPage = () => {
+  const searchParams = useSearchParams();
+
+  const stored = typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+  const fallback = stored ? JSON.parse(stored) : {};
+
+  const name = searchParams.get("name") || fallback.name || "";
+  const role = searchParams.get("role") || fallback.role || "";
+  const id_team = searchParams.get("id_team") || fallback.id_team || "";
+
   const callsData = useCallsData();
   const { reports, deleteReport } = useReports();
 
@@ -20,8 +30,7 @@ const ReportsPage = () => {
   const generateReport = async () => {
     const filteredCallIds = callsData
       .filter((call) => {
-        const matchesClient =
-          selectedClient === "" || call.name === selectedClient;
+        const matchesClient = selectedClient === "" || call.name === selectedClient;
         const callDate = new Date(call.date);
         const matchesDate =
           (!startDate || callDate >= new Date(startDate)) &&
@@ -38,17 +47,14 @@ const ReportsPage = () => {
     setIsGenerating(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/reports/from-calls`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
-          },
-          body: JSON.stringify({ call_ids: filteredCallIds }),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/from-calls`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
+        },
+        body: JSON.stringify({ call_ids: filteredCallIds }),
+      });
 
       await res.json();
       alert("Reporte generado correctamente.");
@@ -63,13 +69,12 @@ const ReportsPage = () => {
 
   return (
     <>
-      <Navigation />
+      <Navigation name={name} role={role} id_team={id_team} />
       <main className="min-h-screen bg-gray-900 text-white px-8 py-10">
         <div className="w-full max-w-4xl">
           <h1 className="text-2xl font-bold mb-2">Generate report</h1>
           <p className="text-gray-400 mb-4">
-            Please fill out the following information to generate a report for a
-            group of calls.
+            Usuario: <strong>{name}</strong> — Rol: {role} — Equipo: {id_team}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">

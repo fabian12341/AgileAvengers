@@ -8,14 +8,18 @@ import { useSearchParams } from "next/navigation";
 
 const UploadPage = () => {
   const searchParams = useSearchParams();
-  const name = searchParams.get("name") || "";
-  const role = searchParams.get("role") || "";
-  const id_team = searchParams.get("id_team") || "";
+
+  const stored = typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+  const fallback = stored ? JSON.parse(stored) : {};
+
+  const name = searchParams.get("name") || fallback.name || "";
+  const role = searchParams.get("role") || fallback.role || "";
+  const id_team = searchParams.get("id_team") || fallback.id_team || "";
 
   const [file, setFile] = useState<File | null>(null);
   const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
   const [selectedClient, setSelectedClient] = useState<{ label: string; value: string } | null>(null);
-  const [agent, setAgent] = useState(name); // auto llenado con el nombre del usuario
+  const [agent, setAgent] = useState(name);
   const [project, setProject] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
