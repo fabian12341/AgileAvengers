@@ -6,14 +6,23 @@ import { UserCircle, Menu } from "lucide-react";
 import Image from "next/image";
 import myLogo from "./ui/assets/NEORISlogolight.png";
 
-const Navigation = () => {
+interface Props {
+  name: string;
+  role: string;
+  id_team: string;
+}
+
+const Navigation = ({ name, role, id_team }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const query = `?name=${encodeURIComponent(name)}&role=${encodeURIComponent(
+    role
+  )}&id_team=${encodeURIComponent(id_team)}`;
 
   return (
     <nav className="flex items-center justify-between p-4 bg-gray-900 text-white">
       {/* Logo */}
       <div className="flex items-center">
-        <Link href="/Home">
+        <Link href={`/Home${query}`}>
           <Image
             src={myLogo}
             alt="Logo"
@@ -26,22 +35,22 @@ const Navigation = () => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex gap-4">
-        <Link href="/Home">
+        <Link href={`/Home${query}`}>
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Home
           </Button>
         </Link>
-        <Link href="/Upload">
+        <Link href={`/Upload${query}`}>
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Uploads
           </Button>
         </Link>
-        <Link href="/Reports">
+        <Link href={`/Reports${query}`}>
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Reports
           </Button>
         </Link>
-        <Link href="/User">
+        <Link href={`/User${query}`}>
           <UserCircle
             size={24}
             className="text-white mx-auto mt-2"
@@ -62,22 +71,22 @@ const Navigation = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="absolute top-16 right-4 bg-gray-800 p-4 rounded-lg shadow-md flex flex-col gap-2 md:hidden">
-          <Link href="/">
+          <Link href={`/Home${query}`}>
             <Button variant="ghost" className="text-white hover:text-gray-300">
               Home
             </Button>
           </Link>
-          <Link href="/Upload">
+          <Link href={`/Upload${query}`}>
             <Button variant="ghost" className="text-white hover:text-gray-300">
               Uploads
             </Button>
           </Link>
-          <Link href="/Reports">
+          <Link href={`/Reports${query}`}>
             <Button variant="ghost" className="text-white hover:text-gray-300">
               Reports
             </Button>
           </Link>
-          <Link href="/User">
+          <Link href={`/User${query}`}>
             <UserCircle
               size={24}
               className="text-white mx-auto mt-2"

@@ -91,7 +91,8 @@ def post_login():
             "id": user.id_user,
             "name": user.name,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
+            "id_team": user.id_team,
         }
     }), 200
 

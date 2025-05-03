@@ -7,6 +7,7 @@ class User(db.Model):
     email = db.Column(db.String(100))
     role = db.Column(db.String(50))
     password = db.Column(db.String(100))
+    id_team = db.Column(db.Integer, db.ForeignKey('Teams.id_team'))
 
     calls = db.relationship('Call', backref='user', lazy=True)
 
