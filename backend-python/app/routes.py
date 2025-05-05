@@ -443,5 +443,9 @@ def upload_call():
         traceback.print_exc()
         db.session.rollback()
         print("🔥 Error en upload-call:", str(e))
+<<<<<<< HEAD
+        return jsonify({"error": str(e)}), 500
+=======
         return jsonify({"error": str(e)}), 500
 
+>>>>>>> 9791197c1ae9cb0146cb9eef989671c01cba1e8e
