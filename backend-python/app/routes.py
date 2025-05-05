@@ -6,6 +6,7 @@ from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, V
 from . import db
 from datetime import datetime
 import requests
+import bcrypt
 
 main = Blueprint('main', __name__)
 
@@ -13,6 +14,20 @@ def require_api_key():
     api_key = request.headers.get("X-API-KEY")
     if api_key != os.getenv("API_KEY"):
         abort(401, description="API key inválida o ausente")
+
+@main.route('/clients')
+def get_clients():
+    require_api_key()
+
+    from .models import Client
+    clients = Client.query.all()
+    return jsonify([
+        {
+            "id_client": c.id_client,
+            "name": c.name
+        } for c in clients
+    ])
+
 
 @main.route('/calls')
 def get_calls():
@@ -46,26 +61,38 @@ def post_login():
     
     # Get email and password from the request body
     data = request.get_json()
+    print("Request data:", data)  # Log the incoming request data
+
     email = data.get('email')
     password = data.get('password')
 
     # Validate input
     if not email or not password:
+        print("Missing email or password")
         return jsonify({"error": "Email and password are required"}), 400
 
     # Fetch user from the database by email
     user = User.query.filter_by(email=email).first()
+    print("User fetched from DB:", user)  # Log the user fetched from the database
+
+    if user:
+        print("Password hash from DB:", user.password)  # Log the hashed password
 
     # Check if user exists and password is correct
-    if not user or user.password != password:
-        return jsonify({"error": "Invalid email or password route error", }), 401
+    if not user or not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+        print("Invalid email or password")  # Log invalid login attempt
+        return jsonify({"error": "Invalid email or password"}), 401
 
     # If credentials are valid, return a success response
+    print("Login successful for user:", user.email)  # Log successful login
     return jsonify({
         "message": "Login successful",
         "user": {
+            "id": user.id_user,
+            "name": user.name,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
+            "id_team": user.id_team,
         }
     }), 200
 
@@ -75,6 +102,7 @@ def get_calls_with_users():
     try:
         calls = Call.query.options(
             joinedload(Call.user),
+            joinedload(Call.client),
             joinedload(Call.transcript),
             joinedload(Call.report),
         ).all()
@@ -145,6 +173,7 @@ def get_calls_with_users():
                 "id_user": call.id_user,
                 "id_client": call.id_client,
                 "id_emotions": call.id_emotions,
+                "client_name": call.client.name if call.client else "Cliente",
                 "user": {
                     "id": user.id_user,
                     "name": user.name,
@@ -153,9 +182,9 @@ def get_calls_with_users():
                 } if user else None,
                 "transcript": {
                     "id_transcript": transcript.id_transcript,
-                    "entries": transcript.entries if transcript and transcript.entries else [],
+                    "text": transcript.text,
                     "language": transcript.language
-                }if transcript else None,
+                } if transcript else None,
                 "report": {
                     "id_report": report.id_report,
                     "summary": report.summary,
@@ -377,7 +406,7 @@ def upload_call():
         db.session.add_all([voice1, voice2])
 
         # Transcripción
-        transcript_text = " ".join([s["text"] for s in result["transcript"]])
+        transcript_text = "\n\n".join([f'{s["speaker"]}:\n {s["text"]}' for s in result["transcript"]])
         transcript = Transcript(
             id_call=call.id_call,
             text=transcript_text,
@@ -413,6 +442,6 @@ def upload_call():
         import traceback
         traceback.print_exc()
         db.session.rollback()
-        print("Error en upload-call:", str(e))
+        print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
 
