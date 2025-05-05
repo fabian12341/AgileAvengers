@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import Button from "./ui/button";
@@ -6,23 +7,14 @@ import { UserCircle, Menu } from "lucide-react";
 import Image from "next/image";
 import myLogo from "./ui/assets/NEORISlogolight.png";
 
-interface Props {
-  name: string;
-  role: string;
-  id_team: string;
-}
-
-const Navigation = ({ name, role, id_team }: Props) => {
+const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const query = `?name=${encodeURIComponent(name)}&role=${encodeURIComponent(
-    role
-  )}&id_team=${encodeURIComponent(id_team)}`;
 
   return (
-    <nav className="flex items-center justify-between p-4 bg-gray-900 text-white">
+    <nav className="relative flex items-center justify-between p-4 bg-gray-900 text-white">
       {/* Logo */}
       <div className="flex items-center">
-        <Link href={`/Home${query}`}>
+        <Link href="/Home">
           <Image
             src={myLogo}
             alt="Logo"
@@ -35,63 +27,73 @@ const Navigation = ({ name, role, id_team }: Props) => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex gap-4">
-        <Link href={`/Home${query}`}>
+        <Link href="/Home">
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Home
           </Button>
         </Link>
-        <Link href={`/Upload${query}`}>
+        <Link href="/Upload">
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Uploads
           </Button>
         </Link>
-        <Link href={`/Reports${query}`}>
+        <Link href="/Reports">
           <Button variant="ghost" className="text-white hover:text-gray-300">
             Reports
           </Button>
         </Link>
-        <Link href={`/User${query}`}>
+        <Link href="/User">
           <UserCircle
             size={24}
             className="text-white mx-auto mt-2"
-            data-testid="user-circle-mobile"
+            data-testid="user-circle-desktop"
           />
         </Link>
       </div>
 
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden"
-        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden p-2 rounded focus:outline-none focus:ring-2 focus:ring-white"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
         data-testid="menu-button"
+        aria-label="Toggle menu"
       >
         <Menu size={24} className="text-white" data-testid="menu-icon" />
       </button>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="absolute top-16 right-4 bg-gray-800 p-4 rounded-lg shadow-md flex flex-col gap-2 md:hidden">
-          <Link href={`/Home${query}`}>
-            <Button variant="ghost" className="text-white hover:text-gray-300">
-              Home
-            </Button>
+        <div className="absolute top-16 right-4 z-[100] bg-gray-800 p-4 rounded-lg shadow-md flex flex-col gap-2 md:hidden min-w-[150px]">
+          <Link
+            href="/Home"
+            className="block px-6 py-3 rounded text-white hover:text-gray-300 hover:bg-gray-700 w-full text-left"
+            onClick={() => setIsOpen(false)}
+          >
+            Home
           </Link>
-          <Link href={`/Upload${query}`}>
-            <Button variant="ghost" className="text-white hover:text-gray-300">
-              Uploads
-            </Button>
+          <Link
+            href="/Upload"
+            className="block px-6 py-3 rounded text-white hover:text-gray-300 hover:bg-gray-700 w-full text-left"
+            onClick={() => setIsOpen(false)}
+          >
+            Uploads
           </Link>
-          <Link href={`/Reports${query}`}>
-            <Button variant="ghost" className="text-white hover:text-gray-300">
-              Reports
-            </Button>
+          <Link
+            href="/Reports"
+            className="block px-6 py-3 rounded text-white hover:text-gray-300 hover:bg-gray-700 w-full text-left"
+            onClick={() => setIsOpen(false)}
+          >
+            Reports
           </Link>
-          <Link href={`/User${query}`}>
-            <UserCircle
-              size={24}
-              className="text-white mx-auto mt-2"
-              data-testid="user-circle-mobile"
-            />
+          <Link
+            href="/User"
+            className="flex justify-center items-center p-3 rounded text-white hover:text-gray-300 hover:bg-gray-700 w-full"
+            onClick={() => setIsOpen(false)}
+          >
+            <UserCircle size={24} data-testid="user-circle-mobile" />
           </Link>
         </div>
       )}
