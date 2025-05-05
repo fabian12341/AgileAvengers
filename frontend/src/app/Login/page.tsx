@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaUser, FaLock } from "react-icons/fa";
-import { useLogin } from "../hooks/useLogin"; // Import the custom hook
+import { useLogin } from "../hooks/useLogin";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [formError, setFormError] = useState(""); // State for validation errors
-  const { login, error, loading } = useLogin(); // Use the hook
+  const [formError, setFormError] = useState("");
+  const { login, error, loading } = useLogin();
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -21,14 +21,22 @@ export default function Login() {
     setFormError("");
 
     try {
-      const success = await login(email, password);
+      const result = await login(email, password);
 
-      if (!success) {
-        setFormError("Invalid email or password. Please try again. haha");
+      if (!result.success || !result.user) {
+        setFormError("Invalid email or password. Please try again.");
         return;
       }
 
-      router.push("/Home");
+      const { name, role, id_team } = result.user;
+      if (result.success) {
+        // Guardar datos de usuario en localStorage
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({ name: result.user.name, role: result.user.role, id_team: result.user.id_team })
+        );
+      router.push(`/Home?name=${encodeURIComponent(name)}&role=${role}&id_team=${id_team}`);
+      }
     } catch (err) {
       setFormError("An unexpected error occurred. Please try again.");
       console.error("Login failed:", err);
@@ -41,16 +49,15 @@ export default function Login() {
         <h1 className="text-white text-3xl font-semibold mb-6 text-center">
           NEORIS
         </h1>
-        {/* Display form validation error */}
+
         {formError && (
-          <div className="text-red-500 text-sm mb-4 text-center">
-            {formError}
-          </div>
+          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
         )}
-        {/* Display login error */}
+
         {error && (
           <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
         )}
+
         <div className="mb-4">
           <label className="text-gray-400 text-sm">Email</label>
           <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
@@ -66,6 +73,7 @@ export default function Login() {
             />
           </div>
         </div>
+
         <div className="mb-4">
           <label className="text-gray-400 text-sm">Password</label>
           <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
@@ -81,6 +89,7 @@ export default function Login() {
             />
           </div>
         </div>
+
         <div className="text-right mb-4">
           <a
             onClick={() => router.push("/ForgPwd")}
@@ -89,10 +98,11 @@ export default function Login() {
             Forgot password?
           </a>
         </div>
+
         <button
           className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition duration-300"
           onClick={handleLogin}
-          disabled={loading} // Disable button while loading
+          disabled={loading}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
