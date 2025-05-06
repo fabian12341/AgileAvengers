@@ -116,28 +116,29 @@ const UploadPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
           <div className="col-span-1">
-            <ClientOnlySelect
-              options={clients}
-              value={selectedClient}
-              onChange={(newValue: unknown) =>
-                setSelectedClient(newValue as { label: string; value: string } | null)
-              }
-              placeholder="Search or select client"
-              isClearable
-              classNames={{
-                control: () => "bg-gray-800 border border-gray-600 rounded-md text-sm px-2 py-1",
-                input: () => "text-white",
-                singleValue: () => "text-white",
-                menu: () => "bg-gray-800 text-white",
-                option: () => "hover:bg-gray-700 px-2 py-1",
-                placeholder: () => "text-gray-400",
-              }}
-              styles={{
-                control: (base) => ({ ...base, minHeight: "38px" }),
-                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-              }}
-              menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
-            />
+          <ClientOnlySelect
+            options={clients}
+            value={selectedClient}
+            onChange={(newValue: unknown) =>
+              setSelectedClient(newValue as { label: string; value: string } | null)
+            }
+            placeholder="Search or select client"
+            isClearable
+            unstyled={true}
+            className="w-full"
+            classNames={{
+              control: () =>
+                "bg-gray-800 text-white border border-gray-600 rounded-md px-4 py-3 h-[70px] text-base",              
+              input: () => "text-white",
+              singleValue: () => "text-white",
+              placeholder: () => "text-gray-400",
+              menu: () => "bg-gray-800 text-white z-50",
+              option: () => "hover:bg-gray-700 px-2 py-1",
+            }}
+            menuPortalTarget={
+              typeof window !== "undefined" ? document.body : undefined
+          }
+          />
           </div>
           <input
             type="text"
@@ -219,7 +220,12 @@ const UploadPage = () => {
         )}
 
         <div className="mb-6"></div>
-        <CallTable refresh={false} />
+        <CallTable
+          refresh={false}
+          role={role}
+          id_team={id_team}
+          agentName={name}
+        />
       </div>
     </div>
   );

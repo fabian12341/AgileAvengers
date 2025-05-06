@@ -2,16 +2,17 @@ import { Call } from "./Call";
 
 export interface ApiCall {
   id_call: number;
+  date: string;
+  duration: number;
+  client_name?: string;
   user?: {
     name?: string;
     role?: string;
+    id_team?: number;
   };
-  client_name?: string;
-  date: string;
-  duration: number;
-  client?: string;
   transcript?: {
     text?: string;
   };
-  report?: Call['report'] | null;
+  report?: any;
 }
+
