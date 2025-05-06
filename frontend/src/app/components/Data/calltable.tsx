@@ -37,8 +37,9 @@ const CallTable: React.FC<{
           filtered = data.filter((call) => call.user?.id_team === teamId);
         }
         else if (role === "Agent") {
-          filtered = data.filter((call) => call.user?.name === agentName);
+          filtered = data.filter((call) => call.user?.name?.toLowerCase().trim() === agentName.toLowerCase().trim());
         }
+        
 
         const calls: Call[] = filtered.map((call: ApiCall) => ({
           id: call.id_call,
