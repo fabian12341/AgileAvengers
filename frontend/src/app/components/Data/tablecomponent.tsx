@@ -16,6 +16,7 @@ interface Call {
   duration: string;
   agent: string;
   onView: (type: "transcription" | "report") => void;
+  download?: React.ReactNode;
 }
 
 interface TableComponentProps {
@@ -48,6 +49,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ calls }) => {
           <TableHead>Agente</TableHead>
           <TableHead>Transcript</TableHead>
           <TableHead>Reporte</TableHead>
+          <TableHead>Descargar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -81,6 +83,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ calls }) => {
                 onClick={() => handleClick(call.id, "report", call.onView)}
               />
             </TableCell>
+            <TableCell>{call.download || <span className="text-gray-500">-</span>}</TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface Call {
     id: number;
     name: string;
@@ -12,6 +14,7 @@ export interface Call {
       overall_emotion?: number;
       silence_percentage?: number;
       suggestions?: string[];
+      path?: string;
       speakers?: {
         role: string;
         emotions: {
@@ -30,6 +33,7 @@ export interface Call {
           hnr: number;
           tempo: number;
         };
+        download?: React.ReactNode;
       }[];
     } | null;
   }
