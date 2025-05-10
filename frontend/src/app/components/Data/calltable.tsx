@@ -68,19 +68,29 @@ const CallTable: React.FC<{
               : [],
           report: call.report || null,
           download: call.report?.path ? (
-            <a
-              href={`http://140.84.182.253:5000/get_report?file_path=${call.report.path}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${call.report.path}`);
+                  const json = await res.json();
+                  if (json.url?.signedURL) {
+                    window.open(json.url.signedURL, "_blank");
+                  } else {
+                    alert("URL de descarga no disponible.");
+                  }
+                } catch (err) {
+                  console.error("Error al obtener el PDF:", err);
+                  alert("Hubo un problema al descargar el reporte.");
+                }
+              }}
               title="Descargar PDF"
               className="text-blue-400 text-lg"
             >
               📄
-            </a>
+            </button>
           ) : (
             <span className="text-gray-400">-</span>
-          ),          
+          ),
         }));
 
         setCallsData(calls);
