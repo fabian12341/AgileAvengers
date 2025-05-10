@@ -189,6 +189,7 @@ def get_calls_with_users():
                 "report": {
                     "id_report": report.id_report,
                     "summary": report.summary,
+                    "path": report.path,  # <--- aquí se agrega
                     "overall_emotion": general_emotions.overall_sentiment_score if general_emotions else None,
                     "suggestions": suggestions_by_report.get(report.id_report, []),
                     "speakers": speaker_data
@@ -417,13 +418,18 @@ def upload_call():
         db.session.add(transcript)
 
         # Reporte
+        report_path = result.get("report_path", "no_path")
+        full_report_url = f"http://140.84.182.253:5000/get_report?file_path={report_path}"
+
+        # Reporte
         report = Report(
             id_call=call.id_call,
             summary=result["summary"],
-            path="no_path"
+            path=result["report_path"]
         )
         db.session.add(report)
         db.session.flush()
+
 
         # Sugerencias
         for s in result["suggestions"]:
