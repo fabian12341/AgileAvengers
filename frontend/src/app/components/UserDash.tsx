@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import Card, { CardContent } from "../components/ui/card";
 import Progress from "../components/ui/progress";
-import { useAuth } from "../context/AuthContext";
 
 interface Call {
   id_call: number;
@@ -21,203 +20,141 @@ interface Call {
   };
 }
 
-interface DashboardData {
-  totalCalls: number;
-  silentPercentage: number;
-  positivityScore: number;
-  averageCallLength: number;
-  emotions: {
-    happiness: number;
-    sadness: number;
-    anger: number;
-  };
-}
+const Dashboard = () => {
+  // Leer los datos del usuario desde el localStorage
+  const stored =
+    typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+  const fallback = stored ? JSON.parse(stored) : {};
 
-const Dashboard: React.FC = () => {
-  const { user } = useAuth();
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const name = fallback.name || "";
+  const role = fallback.role || "";
+  const id_team = fallback.id_team || "";
+
+  const [calls, setCalls] = useState<Call[]>([]);
 
   useEffect(() => {
-    console.log("Dashboard user:", user); // Debug log
-
-    const fetchDashboardData = async () => {
-      if (!user || !user.id) {
-        setError("User not logged in");
-        setLoading(false);
-        return;
-      }
-
-      if (
-        !process.env.NEXT_PUBLIC_API_URL ||
-        !process.env.NEXT_PUBLIC_API_KEY
-      ) {
-        setError("API configuration missing");
-        setLoading(false);
-        return;
-      }
-
+    const fetchCalls = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/calls/users/${user.id}`,
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/calls-by-agent/${name}`,
           {
-            method: "GET",
             headers: {
-              "Content-Type": "application/json",
-              "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY,
+              "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
             },
           }
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch call data");
-        }
-
-        const calls: Call[] = await response.json();
-        console.log("Fetched calls:", calls); // Debug log
-
-        // Filter calls for the current user
-        const userCalls = calls.filter((call) => call.id_user === user.id);
-
-        if (userCalls.length === 0) {
-          setData({
-            totalCalls: 0,
-            silentPercentage: 0,
-            positivityScore: 0,
-            averageCallLength: 0,
-            emotions: { happiness: 0, sadness: 0, anger: 0 },
-          });
-          setLoading(false);
-          return;
-        }
-
-        // Calculate metrics
-        const totalCalls = userCalls.length;
-        const silentPercentage =
-          userCalls.reduce((sum, call) => sum + call.silence_percentage, 0) /
-          totalCalls;
-        const positivityScore =
-          userCalls.reduce(
-            (sum, call) => sum + (call.report?.overall_emotion || 0),
-            0
-          ) / totalCalls;
-        const averageCallLength =
-          userCalls.reduce((sum, call) => sum + call.duration, 0) /
-          totalCalls /
-          60; // Convert seconds to minutes
-
-        // Calculate average emotions across all speakers in all calls
-        let totalHappiness = 0;
-        let totalSadness = 0;
-        let totalAnger = 0;
-        let speakerCount = 0;
-
-        userCalls.forEach((call) => {
-          if (call.report?.speakers) {
-            call.report.speakers.forEach((speaker) => {
-              totalHappiness += speaker.emotions.happiness || 0;
-              totalSadness += speaker.emotions.sadness || 0;
-              totalAnger += speaker.emotions.anger || 0;
-              speakerCount++;
-            });
-          }
-        });
-
-        const emotions = {
-          happiness: speakerCount > 0 ? totalHappiness / speakerCount : 0,
-          sadness: speakerCount > 0 ? totalSadness / speakerCount : 0,
-          anger: speakerCount > 0 ? totalAnger / speakerCount : 0,
-        };
-
-        setData({
-          totalCalls,
-          silentPercentage,
-          positivityScore,
-          averageCallLength,
-          emotions,
-        });
-        setLoading(false);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unexpected error occurred"
-        );
-        setLoading(false);
+        const data = await res.json();
+        setCalls(data);
+      } catch (error) {
+        console.error("Error fetching calls:", error);
       }
     };
 
-    fetchDashboardData();
-  }, [user]);
+    if (name) {
+      fetchCalls();
+    }
+  }, [name]);
 
-  if (loading) {
-    return <div className="text-white">Loading...</div>;
-  }
+  // Función para calcular la duración promedio de las llamadas
+  const getAverageCallDuration = () => {
+    if (calls.length === 0) return 0;
+    const totalDuration = calls.reduce((acc, call) => acc + call.duration, 0);
+    return totalDuration / calls.length;
+  };
 
-  if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
-  }
+  // Función para calcular las emociones promedio
+  const getAverageEmotion = (emotion: "happiness" | "sadness" | "anger") => {
+    const totalEmotion = calls.reduce((acc, call) => {
+      const emotionValue =
+        call.report?.speakers?.reduce((emotionAcc, speaker) => {
+          return emotionAcc + (speaker.emotions[emotion] || 0);
+        }, 0) || 0;
+      return acc + emotionValue;
+    }, 0);
+    return totalEmotion / calls.length;
+  };
 
-  if (!data) {
-    return <div className="text-white">No data available</div>;
-  }
+  const averageCallDuration = getAverageCallDuration();
+  const happiness = getAverageEmotion("happiness");
+  const sadness = getAverageEmotion("sadness");
+  const anger = getAverageEmotion("anger");
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="text-sm text-gray-500">Total Calls</h3>
-            <p className="text-2xl font-bold">{data.totalCalls}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="text-sm text-gray-500">Silent Percentage</h3>
-            <p className="text-2xl font-bold">
-              {data.silentPercentage.toFixed(1)}%
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="text-sm text-gray-500">Positivity Score</h3>
-            <p className="text-2xl font-bold">
-              {data.positivityScore.toFixed(1)}%
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="text-sm text-gray-500">Average Call Length</h3>
-            <p className="text-2xl font-bold">
-              {data.averageCallLength.toFixed(1)} min
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="max-w-6xl mx-auto p-6">
+        <p className="text-gray-400 mb-4">
+          Bienvenido, <strong>{name}</strong> — Rol: {role} — Equipo: {id_team}
+        </p>
 
-      <div className="mt-6">
-        <h4 className="text-sm mb-2 text-gray-500">Emociones Detectadas</h4>
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <p>Anger</p>
-              <Progress value={data.emotions.anger} label="Anger" />
+        <h1 className="text-2xl font-bold mb-4">Dashboard de Llamadas</h1>
+
+        {/* Promedio de duración de llamadas comparado con 5 minutos */}
+        <Card className="mb-4 bg-gray-800">
+          <CardContent>
+            <h2 className="text-xl font-semibold">
+              Duración Promedio de Llamadas
+            </h2>
+            <Progress
+              value={(averageCallDuration / 300) * 100}
+              label={`${averageCallDuration}s / 5min`}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Gráfico de emociones: Felicidad, Tristeza, Ira */}
+        <Card className="mb-4 bg-gray-800">
+          <CardContent>
+            <h2 className="text-xl font-semibold">Promedio de Emociones</h2>
+            <div className="flex space-x-4">
+              <div className="flex-1">
+                <h3 className="text-md">Felicidad</h3>
+                <Progress
+                  value={happiness * 100}
+                  label={`${(happiness * 100).toFixed(2)}%`}
+                />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-md">Tristeza</h3>
+                <Progress
+                  value={sadness * 100}
+                  label={`${(sadness * 100).toFixed(2)}%`}
+                />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-md">Ira</h3>
+                <Progress
+                  value={anger * 100}
+                  label={`${(anger * 100).toFixed(2)}%`}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Llamadas individuales */}
+        {calls.map((call) => (
+          <Card key={call.id_call} className="mb-4 bg-gray-800">
+            <CardContent>
+              <p>
+                <strong>ID de llamada:</strong> {call.id_call}
+              </p>
+              <p>
+                <strong>Duración:</strong> {call.duration} segundos
+              </p>
+              <p>
+                <strong>Silencio:</strong> {call.silence_percentage}%
+              </p>
+              {call.report && call.report.overall_emotion !== undefined && (
+                <Progress
+                  value={call.report.overall_emotion * 100}
+                  label={`Emoción: ${(
+                    call.report.overall_emotion * 100
+                  ).toFixed(2)}%`}
+                />
+              )}
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p>Sadness</p>
-              <Progress value={data.emotions.sadness} label="Sadness" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p>Happiness</p>
-              <Progress value={data.emotions.happiness} label="Happiness" />
-            </CardContent>
-          </Card>
-        </div>
+        ))}
       </div>
     </div>
   );
