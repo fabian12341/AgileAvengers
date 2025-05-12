@@ -77,12 +77,26 @@ def post_login():
 
     if user:
         print("Password hash from DB:", user.password)  # Log the hashed password
-
+    else:
+        print(f"User with email {email} not found in the database")
+    
     # Check if user exists and password is correct
-    if not user or not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-        print("Invalid email or password")  # Log invalid login attempt
+    if not user:
+        print(f"User with email {email} not found in the database")
         return jsonify({"error": "Invalid email or password"}), 401
-
+    
+    try:
+        print(f"Plain-text password entered by user: {password}")
+        print(f"Hashed password from database: {user.password}")
+        if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            print(f"Password verification failed for user {email}")
+            return jsonify({"error": "Invalid email or password"}), 401
+        else:
+            print(f"Password verification successful for user {email}")
+    except Exception as e:
+        print(f"Error during password verification for user {email}: {str(e)}")
+        return jsonify({"error": "An error occurred during login"}), 500
+    
     # If credentials are valid, return a success response
     print("Login successful for user:", user.email)  # Log successful login
     return jsonify({
@@ -94,7 +108,6 @@ def post_login():
             "role": user.role
         }
     }), 200
-
 @main.route('/calls/users')
 def get_calls_with_users():
     require_api_key()

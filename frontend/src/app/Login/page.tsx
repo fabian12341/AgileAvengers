@@ -24,7 +24,7 @@ export default function Login() {
       const success = await login(email, password);
 
       if (!success) {
-        setFormError("Invalid email or password. Please try again. haha");
+        setFormError(" ");
         return;
       }
 

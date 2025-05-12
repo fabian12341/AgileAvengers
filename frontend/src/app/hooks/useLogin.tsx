@@ -45,7 +45,7 @@ export const useLogin = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.log("Response body (error):", errorData);
-        setError(errorData.error || "Invalid email or password");
+        setError(errorData.error || "Invalid email or password here?");
         setLoading(false);
         return false;
       }
