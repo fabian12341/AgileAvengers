@@ -29,6 +29,7 @@ const Dashboard = () => {
   const name = fallback.name || "";
   const role = fallback.role || "";
   const id_team = fallback.id_team || "";
+  const id_user = fallback.id_user || null;
 
   const [calls, setCalls] = useState<Call[]>([]);
 
@@ -36,7 +37,7 @@ const Dashboard = () => {
     const fetchCalls = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/calls-by-agent/${name}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/calls-by-agent-id/${id_user}`,
           {
             headers: {
               "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
@@ -50,10 +51,16 @@ const Dashboard = () => {
       }
     };
 
-    if (name) {
+    if (id_user) {
       fetchCalls();
     }
-  }, [name]);
+  }, [id_user]);
+
+  useEffect(() => {
+    if (calls.length > 0) {
+      console.log("Primer llamada:", calls[0]);
+    }
+  }, [calls]);
 
   const getAverageCallDuration = () => {
     if (calls.length === 0) return 0;
