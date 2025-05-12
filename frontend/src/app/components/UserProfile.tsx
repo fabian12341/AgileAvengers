@@ -4,14 +4,16 @@ import Tabs from "../components/ui/Tabs";
 import Navigation from "../components/Navigation";
 import Userbar from "../components/ui/UserCard";
 import Dashboard from "./UserDash";
+
 interface Props {
   role?: string;
 }
 
 const UserProfilePage: React.FC<Props> = ({ role = "agent" }) => {
+  // Obtener usuario logueado como en el Dashboard
   const storedUser =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "{}")
+      ? JSON.parse(localStorage.getItem("userInfo") || "{}")
       : {};
 
   const tabs = [

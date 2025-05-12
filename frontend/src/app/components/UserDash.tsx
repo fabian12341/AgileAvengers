@@ -8,6 +8,7 @@ interface Call {
   duration: number;
   silence_percentage: number;
   id_user: number;
+  date?: string;
   report?: {
     overall_emotion?: number;
     speakers: Array<{
@@ -21,7 +22,6 @@ interface Call {
 }
 
 const Dashboard = () => {
-  // Leer los datos del usuario desde el localStorage
   const stored =
     typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
   const fallback = stored ? JSON.parse(stored) : {};
@@ -55,29 +55,79 @@ const Dashboard = () => {
     }
   }, [name]);
 
-  // Función para calcular la duración promedio de las llamadas
   const getAverageCallDuration = () => {
     if (calls.length === 0) return 0;
     const totalDuration = calls.reduce((acc, call) => acc + call.duration, 0);
     return totalDuration / calls.length;
   };
 
-  // Función para calcular las emociones promedio
   const getAverageEmotion = (emotion: "happiness" | "sadness" | "anger") => {
-    const totalEmotion = calls.reduce((acc, call) => {
-      const emotionValue =
-        call.report?.speakers?.reduce((emotionAcc, speaker) => {
-          return emotionAcc + (speaker.emotions[emotion] || 0);
-        }, 0) || 0;
-      return acc + emotionValue;
-    }, 0);
-    return totalEmotion / calls.length;
+    let totalEmotion = 0;
+    let count = 0;
+
+    calls.forEach((call) => {
+      if (call.report?.speakers?.length) {
+        call.report.speakers.forEach((speaker) => {
+          const value = speaker.emotions[emotion];
+          if (typeof value === "number") {
+            totalEmotion += value;
+            count++;
+          }
+        });
+      }
+    });
+
+    return count > 0 ? totalEmotion / count : 0;
   };
 
   const averageCallDuration = getAverageCallDuration();
   const happiness = getAverageEmotion("happiness");
   const sadness = getAverageEmotion("sadness");
   const anger = getAverageEmotion("anger");
+
+  const total = happiness + sadness + anger;
+  const radius = 60;
+  const circumference = 2 * Math.PI * radius;
+
+  const getArc = (value: number, offset: number, color: string) => {
+    const length = (value / total) * circumference;
+    return (
+      <circle
+        r={radius}
+        cx="100"
+        cy="100"
+        stroke={color}
+        strokeWidth="30"
+        fill="transparent"
+        strokeDasharray={`${length} ${circumference - length}`}
+        strokeDashoffset={-offset}
+      />
+    );
+  };
+
+  const happinessLength = (happiness / total) * circumference;
+  const sadnessLength = (sadness / total) * circumference;
+
+  const getEmotionDistribution = () => {
+    const distribution = {
+      happiness: 0,
+      sadness: 0,
+      anger: 0,
+    };
+
+    calls.forEach((call) => {
+      call.report?.speakers?.forEach((speaker) => {
+        for (const emotion in distribution) {
+          const value = speaker.emotions[emotion as keyof typeof distribution];
+          if (typeof value === "number") {
+            distribution[emotion as keyof typeof distribution] += value;
+          }
+        }
+      });
+    });
+
+    return distribution;
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -88,24 +138,53 @@ const Dashboard = () => {
 
         <h1 className="text-2xl font-bold mb-4">Dashboard de Llamadas</h1>
 
-        {/* Promedio de duración de llamadas comparado con 5 minutos */}
-        <Card className="mb-4 bg-gray-800">
-          <CardContent>
-            <h2 className="text-xl font-semibold">
-              Duración Promedio de Llamadas
-            </h2>
-            <Progress
-              value={(averageCallDuration / 300) * 100}
-              label={`${averageCallDuration}s / 5min`}
-            />
-          </CardContent>
-        </Card>
+        {/* Gráficas combinadas en una sola fila responsiva */}
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          {/* Duración promedio */}
+          <Card className="flex-1 bg-gray-800">
+            <CardContent>
+              <h2 className="text-xl font-semibold mb-2">
+                Duración Promedio de Llamadas
+              </h2>
+              <Progress
+                value={(averageCallDuration / 300) * 100}
+                label={`${averageCallDuration.toFixed(2)}s / 5min`}
+              />
+            </CardContent>
+          </Card>
 
-        {/* Gráfico de emociones: Felicidad, Tristeza, Ira */}
+          {/* Pie Chart de emociones */}
+          <Card className="flex-1 bg-gray-800">
+            <CardContent>
+              <h2 className="text-xl font-semibold mb-2">
+                Distribución Emocional Promedio
+              </h2>
+              <svg
+                width="200"
+                height="200"
+                viewBox="0 0 200 200"
+                className="mx-auto"
+              >
+                {getArc(happiness, 0, "#34D399")}
+                {getArc(sadness, happinessLength, "#60A5FA")}
+                {getArc(anger, happinessLength + sadnessLength, "#F87171")}
+              </svg>
+              <div className="text-center mt-2 text-sm text-gray-400">
+                <p>Felicidad: {(happiness * 100).toFixed(1)}%</p>
+                <p>Tristeza: {(sadness * 100).toFixed(1)}%</p>
+                <p>Ira: {(anger * 100).toFixed(1)}%</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Promedio de emociones */}
         <Card className="mb-4 bg-gray-800">
           <CardContent>
-            <h2 className="text-xl font-semibold">Promedio de Emociones</h2>
-            <div className="flex space-x-4">
+            <h2 className="text-xl font-semibold mb-4">
+              Promedio de Emociones
+            </h2>
+            <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <h3 className="text-md">Felicidad</h3>
                 <Progress
@@ -131,7 +210,101 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Llamadas individuales */}
+        {/* Distribución total de emociones */}
+        <Card className="mb-4 bg-gray-800">
+          <CardContent>
+            <h2 className="text-xl font-semibold mb-4">
+              Distribución Total de Emociones
+            </h2>
+            {(() => {
+              const distribution = getEmotionDistribution();
+              const maxValue = Math.max(...Object.values(distribution), 1);
+              const barColors = {
+                happiness: "bg-green-400",
+                sadness: "bg-blue-400",
+                anger: "bg-red-400",
+              };
+              return (
+                <div className="space-y-3">
+                  {Object.entries(distribution).map(([emotion, value]) => (
+                    <div key={emotion}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="capitalize">{emotion}</span>
+                        <span>{value.toFixed(2)}</span>
+                      </div>
+                      <div className="w-full h-4 bg-gray-700 rounded">
+                        <div
+                          className={`${
+                            barColors[emotion as keyof typeof barColors]
+                          } h-4 rounded`}
+                          style={{ width: `${(value / maxValue) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
+        {/* Línea de tiempo */}
+        <Card className="mb-4 bg-gray-800">
+          <CardContent>
+            <h2 className="text-xl font-semibold mb-2">
+              Tendencia de Felicidad por Fecha
+            </h2>
+            <div className="overflow-x-auto">
+              <svg width={calls.length * 60} height="150">
+                {calls.map((call, i) => {
+                  const y =
+                    130 -
+                    (call.report?.speakers?.[0]?.emotions?.happiness || 0) *
+                      100;
+                  return (
+                    <circle
+                      key={i}
+                      cx={i * 60 + 30}
+                      cy={y}
+                      r="4"
+                      fill="#34D399"
+                    >
+                      <title>{`Felicidad: ${
+                        (call.report?.speakers?.[0]?.emotions?.happiness || 0) *
+                        100
+                      }%`}</title>
+                    </circle>
+                  );
+                })}
+                {calls.map((call, i) => {
+                  const y1 =
+                    130 -
+                    (call.report?.speakers?.[0]?.emotions?.happiness || 0) *
+                      100;
+                  const next = calls[i + 1];
+                  if (!next) return null;
+                  const y2 =
+                    130 -
+                    (next.report?.speakers?.[0]?.emotions?.happiness || 0) *
+                      100;
+                  return (
+                    <line
+                      key={`line-${i}`}
+                      x1={i * 60 + 30}
+                      y1={y1}
+                      x2={(i + 1) * 60 + 30}
+                      y2={y2}
+                      stroke="#34D399"
+                      strokeWidth="2"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Detalle de llamadas individuales */}
         {calls.map((call) => (
           <Card key={call.id_call} className="mb-4 bg-gray-800">
             <CardContent>
@@ -144,7 +317,7 @@ const Dashboard = () => {
               <p>
                 <strong>Silencio:</strong> {call.silence_percentage}%
               </p>
-              {call.report && call.report.overall_emotion !== undefined && (
+              {call.report?.overall_emotion !== undefined && (
                 <Progress
                   value={call.report.overall_emotion * 100}
                   label={`Emoción: ${(
