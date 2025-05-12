@@ -70,18 +70,19 @@ const CallTable: React.FC<{
           download: call.report?.path ? (
             <button
               onClick={async () => {
-                try {
-                  const res = await fetch(`${call.report.path}`);
-                  const json = await res.json();
-                  if (json.url?.signedURL) {
-                    window.open(json.url.signedURL, "_blank");
-                  } else {
-                    alert("URL de descarga no disponible.");
-                  }
-                } catch (err) {
-                  console.error("Error al obtener el PDF:", err);
-                  alert("Hubo un problema al descargar el reporte.");
+              try {
+                const res = await fetch(`${call.report.path}`);
+                const data = await res.json();
+
+                if (data?.url?.signedURL) {
+                  window.open(data.url.signedURL, "_blank");
+                } else {
+                  throw new Error("Signed URL not found");
                 }
+              } catch (error) {
+                console.error("Error al obtener el PDF:", error);
+                alert("No se pudo obtener el archivo PDF.");
+              }
               }}
               title="Descargar PDF"
               className="text-blue-400 text-lg"

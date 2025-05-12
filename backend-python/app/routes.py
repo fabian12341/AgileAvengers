@@ -438,7 +438,7 @@ def upload_call():
         report = Report(
             id_call=call.id_call,
             summary=result["summary"],
-            path=result["report_path"]
+            path=f"http://140.84.182.253:5000/get_report?file_path={result['report_path']}"
         )
         db.session.add(report)
         db.session.flush()

@@ -20,6 +20,7 @@ const UploadClient = () => {
   const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
   const [selectedClient, setSelectedClient] = useState<{ label: string; value: string } | null>(null);
   const [agent, setAgent] = useState(name);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [project, setProject] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -86,7 +87,9 @@ const UploadClient = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Call uploaded and processed successfully!");
-      } else {
+        setRefreshTrigger(prev => !prev);
+      }
+      else {
         console.error("Error:", data);
         alert(data.error || "Error uploading call.");
       }
@@ -213,7 +216,7 @@ const UploadClient = () => {
           </>
         )}
         <div className="mb-6"></div>
-        <CallTable refresh={false} role={role} id_team={id_team} agentName={name} />
+        <CallTable refresh={refreshTrigger} role={role} id_team={id_team} agentName={name} />
       </div>
     </div>
   );
