@@ -71,7 +71,7 @@ const CallTable: React.FC<{
             <button
               onClick={async () => {
               try {
-                const res = await fetch(`${call.report.path}`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/get_report?file_path=${call.report.path}`);
                 const data = await res.json();
 
                 if (data?.url?.signedURL) {
