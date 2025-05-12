@@ -26,6 +26,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="w-full h-[calc(100vh-80px)] md:h-auto md:pt-[56.25%] relative">
       <iframe
+        data-testid="dashboard-iframe"
         className="absolute top-0 left-0 w-full h-full"
         src={dashboardURL}
         frameBorder="0"

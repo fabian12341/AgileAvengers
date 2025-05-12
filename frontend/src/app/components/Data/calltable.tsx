@@ -8,7 +8,12 @@ import { Call } from "@/app/interfaces/Call";
 const safeFixed = (val: number | undefined | null, digits = 2) =>
   val != null ? val.toFixed(digits) : "N/A";
 
-const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
+const CallTable: React.FC<{
+  refresh: boolean;
+  role: string;
+  id_team: number;
+  agentName: string;
+}> = ({ refresh, role, id_team, agentName }) => {
   const [callsData, setCallsData] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [view, setView] = useState<"none" | "report" | "transcription">("none");
@@ -24,7 +29,20 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
     })
       .then((res) => res.json() as Promise<ApiCall[]>)
       .then((data) => {
-        const calls: Call[] = data.map((call: ApiCall) => ({
+        let filtered = data;
+
+        if (role === "TeamLeader") {
+          const teamId = Number(id_team);
+          filtered = data.filter((call) => call.user?.id_team === teamId);
+        } else if (role === "Agent") {
+          filtered = data.filter(
+            (call) =>
+              call.user?.name?.toLowerCase().trim() ===
+              agentName.toLowerCase().trim()
+          );
+        }
+
+        const calls: Call[] = filtered.map((call: ApiCall) => ({
           id: call.id_call,
           name: call.user?.name || "Desconocido",
           date: call.date.split(" ")[0],
@@ -33,29 +51,54 @@ const CallTable: React.FC<{ refresh: boolean }> = ({ refresh }) => {
             .padStart(2, "0")}`,
           agent: call.user?.role || "Sin rol",
           sentimentScore: 80,
-transcript: typeof call.transcript?.text === "string"
-  ? call.transcript.text.split("\n\n").map((block) => {
-      const [speakerLine, ...textLines] = block.split("\n");
-      const speakerRaw = speakerLine?.replace(":", "").trim();
-      const speaker =
-        speakerRaw === "AGENT"
-          ? call.user?.name || "Agente"
-          : call.client_name || "Cliente";
-      return {
-        speaker,
-        message: textLines.join("\n").trim(),
-      };
-    })
-  : [],
-
+          transcript:
+            typeof call.transcript?.text === "string"
+              ? call.transcript.text.split("\n\n").map((block) => {
+                  const [speakerLine, ...textLines] = block.split("\n");
+                  const speakerRaw = speakerLine?.replace(":", "").trim();
+                  const speaker =
+                    speakerRaw === "AGENT"
+                      ? call.user?.name || "Agente"
+                      : call.client_name || "Cliente";
+                  return {
+                    speaker,
+                    message: textLines.join("\n").trim(),
+                  };
+                })
+              : [],
           report: call.report || null,
+          download: call.report?.path ? (
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${call.report.path}`);
+                  const json = await res.json();
+                  if (json.url?.signedURL) {
+                    window.open(json.url.signedURL, "_blank");
+                  } else {
+                    alert("URL de descarga no disponible.");
+                  }
+                } catch (err) {
+                  console.error("Error al obtener el PDF:", err);
+                  alert("Hubo un problema al descargar el reporte.");
+                }
+              }}
+              title="Descargar PDF"
+              className="text-blue-400 text-lg"
+            >
+              📄
+            </button>
+          ) : (
+            <span className="text-gray-400">-</span>
+          ),
         }));
+
         setCallsData(calls);
       })
       .catch((error) => {
         console.error("Error al obtener las llamadas:", error);
       });
-  }, [refresh]);
+  }, [refresh, role, id_team, agentName]);
 
   const handleView = (call: Call, type: "transcription" | "report") => {
     setSelectedCall(call);
@@ -89,6 +132,7 @@ transcript: typeof call.transcript?.text === "string"
         }))}
       />
 
+      {/* Transcription modal */}
       {selectedCall && view === "transcription" && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
@@ -105,8 +149,10 @@ transcript: typeof call.transcript?.text === "string"
                   <div
                     key={index}
                     className={`flex ${
-                      entry.speaker !== selectedCall.name ? "justify-start" : "justify-end"
-                    }`}                                   
+                      entry.speaker !== selectedCall.name
+                        ? "justify-start"
+                        : "justify-end"
+                    }`}
                   >
                     <div
                       className={`px-4 py-2 rounded-lg max-w-[75%] shadow ${
@@ -138,6 +184,7 @@ transcript: typeof call.transcript?.text === "string"
         </div>
       )}
 
+      {/* Report modal */}
       {selectedCall && view === "report" && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
@@ -194,15 +241,12 @@ transcript: typeof call.transcript?.text === "string"
                       <p className="text-sm">
                         <strong>Emociones:</strong>
                         <br />
-                        Felicidad: {safeFixed(
-                          speaker.emotions.happiness
-                        )} | Tristeza: {safeFixed(speaker.emotions.sadness)} |
-                        Ira: {safeFixed(speaker.emotions.anger)} | Neutralidad:{" "}
+                        Felicidad: {safeFixed(speaker.emotions.happiness)} |
+                        Tristeza: {safeFixed(speaker.emotions.sadness)} | Ira:{" "}
+                        {safeFixed(speaker.emotions.anger)} | Neutralidad:{" "}
                         {safeFixed(speaker.emotions.neutrality)}
                         <br />
-                        Sentimiento de texto: {
-                          speaker.emotions.text_sentiment
-                        }{" "}
+                        Sentimiento de texto: {speaker.emotions.text_sentiment}{" "}
                         ({safeFixed(speaker.emotions.text_sentiment_score)})
                       </p>
                       <p className="text-sm mt-1">
