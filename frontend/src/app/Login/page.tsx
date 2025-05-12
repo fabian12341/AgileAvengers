@@ -23,11 +23,16 @@ export default function Login() {
     try {
       const result = await login(email, password);
       
-      if (!success) {
-        setFormError(" ");
+    if (!result.success) {
+      setFormError("Login failed. Please check your credentials.");
+      return;
+    }
+
+
+      if (!result.user) {
+        setFormError("Login failed. User data is missing.");
         return;
       }
-
       const { name, role, id_team } = result.user;
       if (result.success) {
         // Guardar datos de usuario en localStorage
