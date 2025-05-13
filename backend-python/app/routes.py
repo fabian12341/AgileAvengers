@@ -445,8 +445,7 @@ def upload_call():
         db.session.add(transcript)
 
         # Reporte
-        report_path = result.get("report_path", "no_path")
-        full_report_url = f"http://140.84.182.253:5000/get_report?file_path={report_path}"
+        report_path = result.get("report_path")
 
         # Reporte
         report = Report(
