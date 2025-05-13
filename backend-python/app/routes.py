@@ -109,6 +109,7 @@ def post_login():
             "id_team": user.id_team,
         }
     }), 200
+    
 @main.route('/calls/users')
 def get_calls_with_users():
     require_api_key()
@@ -119,6 +120,8 @@ def get_calls_with_users():
             joinedload(Call.transcript),
             joinedload(Call.report),
         ).all()
+
+        from urllib.parse import urlparse
 
         # Preload todas las sugerencias y emociones en un solo query
         all_reports = [c.report for c in calls if c.report]
@@ -153,6 +156,16 @@ def get_calls_with_users():
             transcript = call.transcript
             report = call.report
             general_emotions = emotions_map.get(call.id_emotions)
+
+            signed_url = None
+            if report and report.path and "http" not in report.path:
+                try:
+                    r = requests.get(
+                        f"http://140.84.182.253:5000/get_report?file_path={report.path}"
+                    )
+                    signed_url = r.json().get("url", {}).get("signedURL")
+                except Exception as e:
+                    print("❌ Error obteniendo URL firmada:", e)
 
             speaker_data = []
             for speaker in speakers_by_call.get(call.id_call, []):
@@ -202,7 +215,7 @@ def get_calls_with_users():
                 "report": {
                     "id_report": report.id_report,
                     "summary": report.summary,
-                    "path": report.path,  # <--- aquí se agrega
+                    "path": signed_url or report.path,
                     "overall_emotion": general_emotions.overall_sentiment_score if general_emotions else None,
                     "suggestions": suggestions_by_report.get(report.id_report, []),
                     "speakers": speaker_data
@@ -215,6 +228,7 @@ def get_calls_with_users():
         import traceback
         traceback.print_exc()
         return jsonify({"error": "Error interno en /calls/users"}), 500
+
 
 
 
@@ -438,7 +452,7 @@ def upload_call():
         report = Report(
             id_call=call.id_call,
             summary=result["summary"],
-            path=report_path  # solo "reports/..."
+            path=report_path
         )
         db.session.add(report)
         db.session.flush()
