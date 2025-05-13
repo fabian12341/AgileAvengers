@@ -20,6 +20,8 @@ const CallTable: React.FC<{
   const [searchId, setSearchId] = useState("");
   const [searchClient, setSearchClient] = useState("");
   const [searchDate, setSearchDate] = useState("");
+  const showDelete = role === "Admin" || role === "TeamLeader";
+
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/calls/users`, {
@@ -68,24 +70,61 @@ const CallTable: React.FC<{
               : [],
           report: call.report || null,
           download: call.report?.path ? (
-          <button
-            onClick={async () => {
-              try {
-                const url = `${call.report.path}`;
-                window.open(url, "_blank");
-              } catch (error) {
-                console.error("Error al abrir el PDF:", error);
-                alert("No se pudo abrir el archivo PDF.");
-              }
-            }}
-            title="Descargar PDF"
-            className="text-blue-400 text-lg"
-          >
-            📄
-          </button>
+            <button
+              onClick={async () => {
+                try {
+                  const url = `${call.report.path}`;
+                  window.open(url, "_blank");
+                } catch (error) {
+                  console.error("Error al abrir el PDF:", error);
+                  alert("No se pudo abrir el archivo PDF.");
+                }
+              }}
+              title="Descargar PDF"
+              className="text-blue-400 text-lg"
+            >
+              📄
+            </button>
           ) : (
             <span className="text-gray-400">-</span>
           ),
+            deleteButton: showDelete ? (
+              <button
+                onClick={async () => {
+                  const confirmDelete = confirm(
+                    "¿Estás seguro de que quieres eliminar esta llamada?"
+                  );
+                  if (!confirmDelete) return;
+
+                  try {
+                    const res = await fetch(
+                      `${process.env.NEXT_PUBLIC_API_URL}/calls/${call.id_call}`,
+                      {
+                        method: "DELETE",
+                        headers: {
+                          "X-API-KEY":
+                            process.env.NEXT_PUBLIC_API_KEY || "",
+                        },
+                      }
+                    );
+                    if (res.ok) {
+                      setCallsData((prev) =>
+                        prev.filter((c) => c.id !== call.id_call)
+                      );
+                    } else {
+                      alert("Error al eliminar la llamada");
+                    }
+                  } catch (err) {
+                    console.error("Error al eliminar:", err);
+                    alert("Error de red al eliminar");
+                  }
+                }}
+                className="text-red-500 text-xl hover:text-red-700 ml-auto"
+                title="Eliminar llamada"
+              >
+                🗑️
+              </button>
+            ) : null,
         }));
 
         setCallsData(calls);
@@ -124,10 +163,11 @@ const CallTable: React.FC<{
         calls={filteredCalls.map((call) => ({
           ...call,
           onView: (type) => handleView(call, type),
+          deleteButton: call.deleteButton,
         }))}
+        showDelete={showDelete}
       />
 
-      {/* Transcription modal */}
       {selectedCall && view === "transcription" && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
@@ -179,7 +219,6 @@ const CallTable: React.FC<{
         </div>
       )}
 
-      {/* Report modal */}
       {selectedCall && view === "report" && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"

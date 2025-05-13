@@ -7,7 +7,7 @@ import {
   TableBody,
   TableCell,
 } from "./table";
-import { EyeIcon } from "lucide-react";
+import { EyeIcon, Trash2Icon } from "lucide-react";
 
 interface Call {
   id: number;
@@ -17,13 +17,17 @@ interface Call {
   agent: string;
   onView: (type: "transcription" | "report") => void;
   download?: React.ReactNode;
+  onDelete?: () => void;
+  deleteButton?: React.ReactNode;
+  role?: string;
 }
 
 interface TableComponentProps {
   calls: Call[];
+  showDelete?: boolean;
 }
 
-const TableComponent: React.FC<TableComponentProps> = ({ calls }) => {
+const TableComponent: React.FC<TableComponentProps> = ({ calls, showDelete }) => {
   const [selectedCall, setSelectedCall] = useState<{
     id: number;
     type: "transcription" | "report";
@@ -50,6 +54,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ calls }) => {
           <TableHead>Transcript</TableHead>
           <TableHead>Reporte</TableHead>
           <TableHead>Descargar</TableHead>
+          {showDelete && <TableHead>Eliminar</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -68,9 +73,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ calls }) => {
                     ? "text-blue-500"
                     : "text-gray-400"
                 }`}
-                onClick={() =>
-                  handleClick(call.id, "transcription", call.onView)
-                }
+                onClick={() => handleClick(call.id, "transcription", call.onView)}
               />
             </TableCell>
             <TableCell>
@@ -83,7 +86,13 @@ const TableComponent: React.FC<TableComponentProps> = ({ calls }) => {
                 onClick={() => handleClick(call.id, "report", call.onView)}
               />
             </TableCell>
-            <TableCell>{call.download || <span className="text-gray-500">-</span>}</TableCell>
+            <TableCell>
+              {call.download || <span className="text-gray-500">-</span>}
+            </TableCell>
+    
+            {showDelete && (
+              <TableCell>{call.deleteButton}</TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>
