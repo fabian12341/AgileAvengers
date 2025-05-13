@@ -72,7 +72,7 @@ const CallTable: React.FC<{
               onClick={async () => {
               try {
                 const res = await fetch(
-                  `${process.env.NEXT_PUBLIC_API_URL}/get_report?file_path=${call.report.path}`
+                  `${call.report.path}`
                 );
                 const data = await res.json();
 
