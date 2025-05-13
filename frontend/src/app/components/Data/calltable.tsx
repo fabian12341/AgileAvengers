@@ -68,27 +68,21 @@ const CallTable: React.FC<{
               : [],
           report: call.report || null,
           download: call.report?.path ? (
-            <button
-              onClick={async () => {
+          <button
+            onClick={async () => {
               try {
-                const res = await fetch(`${call.report.path}`);
-                const data = await res.json();
-
-                if (data?.url?.signedURL) {
-                  window.open(data.url.signedURL, "_blank");
-                } else {
-                  throw new Error("Signed URL not found");
-                }
+                const url = `${call.report.path}`;
+                window.open(url, "_blank");
               } catch (error) {
-                console.error("Error al obtener el PDF:", error);
-                alert("No se pudo obtener el archivo PDF.");
+                console.error("Error al abrir el PDF:", error);
+                alert("No se pudo abrir el archivo PDF.");
               }
-              }}
-              title="Descargar PDF"
-              className="text-blue-400 text-lg"
-            >
-              📄
-            </button>
+            }}
+            title="Descargar PDF"
+            className="text-blue-400 text-lg"
+          >
+            📄
+          </button>
           ) : (
             <span className="text-gray-400">-</span>
           ),

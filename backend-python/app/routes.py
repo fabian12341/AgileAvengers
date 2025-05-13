@@ -478,3 +478,45 @@ def upload_call():
         print("🔥 Error en upload-call:", str(e))
         return jsonify({"error": str(e)}), 500
 
+@main.route('/calls/<int:call_id>', methods=['DELETE'])
+def delete_call(call_id):
+    require_api_key()
+
+    call = Call.query.get(call_id)
+    if not call:
+        return jsonify({"error": "Call not found"}), 404
+
+    # Eliminar Transcript
+    if call.transcript:
+        db.session.delete(call.transcript)
+
+    # Eliminar Report y sus Suggestions
+    if call.report:
+        suggestions = Suggestion.query.filter_by(id_report=call.report.id_report).all()
+        for s in suggestions:
+            db.session.delete(s)
+        db.session.delete(call.report)
+
+    # Eliminar SpeakerAnalysis y Voices
+    speakers = SpeakerAnalysis.query.filter_by(id_call=call.id_call).all()
+    for s in speakers:
+        voice = Voice.query.filter_by(id_speaker_analysis=s.id_speaker_analysis).first()
+        if voice:
+            db.session.delete(voice)
+        if s.id_emotions:
+            emo = Emotions.query.get(s.id_emotions)
+            if emo:
+                db.session.delete(emo)
+        db.session.delete(s)
+
+    # Emotions generales de la llamada
+    if call.id_emotions:
+        emo = Emotions.query.get(call.id_emotions)
+        if emo:
+            db.session.delete(emo)
+
+    # Finalmente, borrar la llamada
+    db.session.delete(call)
+    db.session.commit()
+
+    return jsonify({"message": "Call and related data deleted"}), 200
