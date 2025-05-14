@@ -552,7 +552,7 @@ def get_user_dashboard(id_user):
         report = report_map.get(call.id_call)
         speakers = []
         for sa in speaker_analysis:
-            if sa.id_call == call.id_call:
+            if sa.id_call == call.id_call and sa.role == "Agent":
                 emo = emo_map.get(sa.id_emotions)
                 if emo:
                     speakers.append({
