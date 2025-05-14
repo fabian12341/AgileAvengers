@@ -15,6 +15,7 @@ const UploadClient = () => {
   const name = searchParams.get("name") || fallback.name || "";
   const role = searchParams.get("role") || fallback.role || "";
   const id_team = searchParams.get("id_team") || fallback.id_team || "";
+  const id_user = Number(searchParams.get("id")) || null;
 
   const [file, setFile] = useState<File | null>(null);
   const [clients, setClients] = useState<{ label: string; value: string }[]>([]);

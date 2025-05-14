@@ -12,10 +12,14 @@ const HomeClient = () => {
   const name = searchParams.get("name") || fallback.name || "Desconocido";
   const role = searchParams.get("role") || fallback.role || "Agente";
   const id_team = searchParams.get("id_team") || fallback.id_team || 1;
+  const idFromParams = searchParams.get("id");
+  const id_user = idFromParams && !isNaN(Number(idFromParams)) ? Number(idFromParams) : undefined;
+
+
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      <Navigation name={name} role={role} id_team={id_team} />
+      <Navigation name={name} role={role} id_team={id_team} id={id_user} />
       <Dashboard />
     </div>
   );
