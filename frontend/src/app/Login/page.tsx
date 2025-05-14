@@ -28,15 +28,13 @@ export default function Login() {
         return;
       }
 
-      const { name, role, id_team } = result.user;
-      if (result.success) {
-        // Guardar datos de usuario en localStorage
-        localStorage.setItem(
-          "userInfo",
-          JSON.stringify({ name: result.user.name, role: result.user.role, id_team: result.user.id_team })
-        );
-      router.push(`/Home?name=${encodeURIComponent(name)}&role=${role}&id_team=${id_team}`);
-      }
+      const userInfo = result.user; // Usa todo el objeto user
+      localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Guarda todo
+
+      const { name, role, id_team } = userInfo;
+      router.push(
+        `/Home?name=${encodeURIComponent(name)}&role=${role}&id_team=${id_team}`
+      );
     } catch (err) {
       setFormError("An unexpected error occurred. Please try again.");
       console.error("Login failed:", err);
@@ -51,7 +49,9 @@ export default function Login() {
         </h1>
 
         {formError && (
-          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {formError}
+          </div>
         )}
 
         {error && (
