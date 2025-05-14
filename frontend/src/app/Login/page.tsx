@@ -56,7 +56,9 @@ export default function Login() {
         </h1>
 
         {formError && (
-          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {formError}
+          </div>
         )}
 
         {error && (

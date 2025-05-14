@@ -520,3 +520,64 @@ def delete_call(call_id):
     db.session.commit()
 
     return jsonify({"message": "Call and related data deleted"}), 200
+
+@main.route('/User/<int:id_user>', methods=['GET'])
+def get_user_dashboard(id_user):
+    require_api_key()
+
+    user = User.query.get(id_user)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    calls = Call.query.filter_by(id_user=id_user).all()
+
+    # Extraer reports relacionados con esas llamadas
+    reports = Report.query.filter(Report.id_call.in_([c.id_call for c in calls])).all()
+    report_map = {r.id_call: r for r in reports}
+
+    # Cargar speakers para cada report
+    speaker_analysis = SpeakerAnalysis.query.filter(
+        SpeakerAnalysis.id_call.in_([c.id_call for c in calls])
+    ).all()
+
+    emotions = Emotions.query.all()
+    emo_map = {e.id_emotions: e for e in emotions}
+
+    response_calls = []
+    for call in calls:
+        report = report_map.get(call.id_call)
+        speakers = []
+        for sa in speaker_analysis:
+            if sa.id_call == call.id_call:
+                emo = emo_map.get(sa.id_emotions)
+                if emo:
+                    speakers.append({
+                        "emotions": {
+                            "happiness": emo.happiness,
+                            "sadness": emo.sadness,
+                            "anger": emo.anger
+                        }
+                    })
+        response_calls.append({
+            "id_call": call.id_call,
+            "duration": call.duration,
+            "silence_percentage": call.silence_percentage,
+            "date": call.date.strftime("%Y-%m-%d") if call.date else None,
+            "report": {
+                "id_report": report.id_report if report else None,
+                "summary": report.summary if report else "",
+                "speakers": speakers
+            } if report else None
+        })
+
+    return jsonify({
+        "user": {
+            "id": user.id_user,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "id_team": user.id_team
+        },
+        "calls": response_calls,
+        "reports": []  # solo si quieres enviar también todos los reports aparte
+    })
