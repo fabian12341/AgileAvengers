@@ -65,7 +65,7 @@ const UserProfilePage = () => {
 
   return (
     <>
-      <Navigation name={name} role={role} id_team={id_team} />
+      <Navigation name={name} role={role} id_team={id_team} id={Number(id)} />
       <div className="p-6 bg-gray-900 text-white min-h-screen space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-4">

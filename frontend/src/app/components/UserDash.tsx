@@ -30,7 +30,7 @@ const Dashboard = () => {
   const name = searchParams.get("name") || "Nombre del Usuario";
   const role = searchParams.get("role") || "agent";
   const id_team = searchParams.get("id_team") || "";
-  const id_user = searchParams.get("id") || "";
+  const id_user = Number(searchParams.get("id")) || null;
 
   const [calls, setCalls] = useState<Call[]>([]);
 
@@ -38,7 +38,7 @@ const Dashboard = () => {
     const fetchCalls = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/calls-by-agent-id/${id_user}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/User/${id_user}`,
           {
             headers: {
               "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
@@ -46,13 +46,15 @@ const Dashboard = () => {
           }
         );
         const data = await res.json();
-        setCalls(data);
+        console.log("📊 Dashboard data:", data);
+        setCalls(data.calls || []);
       } catch (error) {
-        console.error("Error fetching calls:", error);
+        console.error("Error fetching dashboard data:", error);
       }
     };
 
-    if (id_user) {
+
+    if (id_user && !isNaN(id_user)) {
       fetchCalls();
     }
   }, [id_user]);
@@ -143,7 +145,7 @@ const Dashboard = () => {
               </h2>
               <Progress
                 value={(averageCallDuration / 300) * 100}
-                label={`${averageCallDuration.toFixed(2)}s / 5min`}
+                label={`${averageCallDuration.toFixed(0)}s / 5min`}
               />
             </CardContent>
           </Card>
@@ -159,9 +161,9 @@ const Dashboard = () => {
                 {getArc(anger, happinessLength + sadnessLength, "#F87171")}
               </svg>
               <div className="text-center mt-2 text-sm text-gray-400">
-                <p>Felicidad: {(happiness * 100).toFixed(1)}%</p>
-                <p>Tristeza: {(sadness * 100).toFixed(1)}%</p>
-                <p>Ira: {(anger * 100).toFixed(1)}%</p>
+                <p>Felicidad: {(happiness * 100).toFixed(2)}%</p>
+                <p>Tristeza: {(sadness * 100).toFixed(2)}%</p>
+                <p>Ira: {(anger * 100).toFixed(2)}%</p>
               </div>
             </CardContent>
           </Card>
@@ -171,11 +173,17 @@ const Dashboard = () => {
         <Card className="mb-4 bg-gray-800">
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">Promedio de Emociones</h2>
-            <div className="flex flex-col md:flex-row gap-4">
-              <Progress value={happiness * 100} label={`Felicidad: ${(happiness * 100).toFixed(2)}%`} />
-              <Progress value={sadness * 100} label={`Tristeza: ${(sadness * 100).toFixed(2)}%`} />
-              <Progress value={anger * 100} label={`Ira: ${(anger * 100).toFixed(2)}%`} />
-            </div>
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="text-center">
+                  <Progress value={happiness * 100} label={`Felicidad: ${(happiness * 100).toFixed(2)}%`} />
+                </div>
+                <div className="text-center">
+                  <Progress value={sadness * 100} label={`Tristeza: ${(sadness * 100).toFixed(2)}%`} />
+                </div>
+                <div className="text-center">
+                  <Progress value={anger * 100} label={`Ira: ${(anger * 100).toFixed(2)}%`} />
+                </div>
+              </div>
           </CardContent>
         </Card>
 

@@ -41,8 +41,9 @@ export default function Progress({
       </svg>
       <div className="text-white mt-2 text-sm text-center">
         <strong>{label}</strong>
-        <div>{value}%</div>
+        <div>{value.toFixed(2)}%</div>
       </div>
+
     </div>
   );
 }
