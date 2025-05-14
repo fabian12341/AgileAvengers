@@ -47,11 +47,6 @@ const Navigation: React.FC<NavigationProps> = ({ name, role, id_team }) => {
             Uploads
           </Button>
         </Link>
-        <Link href="/Reports">
-          <Button variant="ghost" className="text-white hover:text-gray-300">
-            Reports
-          </Button>
-        </Link>
         <Link href="/User">
           <UserCircle size={24} className="text-white mt-2" />
         </Link>

@@ -149,13 +149,6 @@ const UploadClient = () => {
                 className="bg-gray-800 p-2 rounded-md w-full border border-gray-600 cursor-not-allowed text-white"
               />
               <input
-                type="text"
-                placeholder="Project"
-                value={project}
-                onChange={(e) => setProject(e.target.value)}
-                className="bg-gray-800 p-2 rounded-md w-full border border-gray-600"
-              />
-              <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
