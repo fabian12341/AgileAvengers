@@ -530,19 +530,23 @@ def get_user_dashboard(id_user):
         return jsonify({"error": "Usuario no encontrado"}), 404
 
     calls = Call.query.filter_by(id_user=id_user).all()
+    call_ids = [c.id_call for c in calls]
 
-    # Extraer reports relacionados con esas llamadas
-    reports = Report.query.filter(Report.id_call.in_([c.id_call for c in calls])).all()
+    # Obtener reports relacionados
+    reports = Report.query.filter(Report.id_call.in_(call_ids)).all()
     report_map = {r.id_call: r for r in reports}
 
-    # Cargar speakers para cada report
+    # Obtener speaker analysis
     speaker_analysis = SpeakerAnalysis.query.filter(
-        SpeakerAnalysis.id_call.in_([c.id_call for c in calls])
+        SpeakerAnalysis.id_call.in_(call_ids)
     ).all()
 
-    emotions = Emotions.query.all()
+    # Obtener solo las emociones relevantes
+    emotion_ids = list(filter(None, [s.id_emotions for s in speaker_analysis]))
+    emotions = Emotions.query.filter(Emotions.id_emotions.in_(emotion_ids)).all()
     emo_map = {e.id_emotions: e for e in emotions}
 
+    # Construir respuesta de llamadas
     response_calls = []
     for call in calls:
         report = report_map.get(call.id_call)
@@ -579,5 +583,5 @@ def get_user_dashboard(id_user):
             "id_team": user.id_team
         },
         "calls": response_calls,
-        "reports": []  # solo si quieres enviar también todos los reports aparte
+        "reports": []  # puedes rellenarlo si lo necesitas después
     })
