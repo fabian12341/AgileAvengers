@@ -71,7 +71,7 @@ const UserProfilePage = () => {
           <div className="space-y-4">
             <Userbar
               name={name}
-              email={searchParams.get("email") || stored.email || "usuario@empresa.com"}
+              email={searchParams.get("email") || stored.email || ""}
               role={role}
               imageUrl="https://cdn-icons-png.flaticon.com/512/1144/1144760.png"
             />
