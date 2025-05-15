@@ -15,7 +15,9 @@ const UploadClient = () => {
   const name = searchParams.get("name") || fallback.name || "";
   const role = searchParams.get("role") || fallback.role || "";
   const id_team = searchParams.get("id_team") || fallback.id_team || "";
-  const id_user = Number(searchParams.get("id")) || null;
+  const idFromParams = searchParams.get("id");
+  const id_user = idFromParams && !isNaN(Number(idFromParams)) ? Number(idFromParams) : fallback.id;
+
 
   const [file, setFile] = useState<File | null>(null);
   const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
@@ -108,7 +110,7 @@ const UploadClient = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Navigation name={name} role={role} id_team={id_team} />
+      <Navigation name={name} role={role} id_team={id_team} id={id_user} />
       <div className="max-w-6xl mx-auto p-6">
         <p className="text-gray-400 mb-4">
           Bienvenido, <strong>{name}</strong> — Rol: {role} — Equipo: {id_team}

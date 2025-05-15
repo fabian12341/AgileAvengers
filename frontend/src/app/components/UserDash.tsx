@@ -1,8 +1,10 @@
+// Dashboard limpio con gráficas sin redundancia y estilizadas
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Card, { CardContent } from "../components/ui/card";
 import Progress from "../components/ui/progress";
+import { ArrowLeft } from "lucide-react";
 
 interface Call {
   id_call: number;
@@ -34,7 +36,8 @@ const Dashboard = () => {
   const name = searchParams.get("name") || "Nombre del Usuario";
   const role = searchParams.get("role") || "agent";
   const id_team = Number(searchParams.get("id_team")) || 0;
-  const id_user = Number(searchParams.get("id")) || null;
+  const idFromParams = searchParams.get("id");
+  const id_user = idFromParams && !isNaN(Number(idFromParams)) ? Number(idFromParams) : 0;
 
   const [calls, setCalls] = useState<Call[]>([]);
   const [teamAgents, setTeamAgents] = useState<Agent[]>([]);
@@ -53,7 +56,7 @@ const Dashboard = () => {
       console.error("Error fetching dashboard data:", error);
     }
   };
-  
+
   useEffect(() => {
     if (role === "TeamLeader" && id_team) {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
@@ -63,17 +66,11 @@ const Dashboard = () => {
       })
         .then((res) => res.json())
         .then((users) => {
-          console.log("Usuarios recibidos:", users);
-          console.log("Filtro: id_team =", id_team, typeof id_team);
-            users.forEach((u: Agent) => {
-            console.log(`${u.name} - id_team: ${u.id_team} (${typeof u.id_team})`);
-            });
-        const agents = users.filter(
-          (u: Agent) =>
-            u.role.toLowerCase() === "agent" &&
-            String(u.id_team) === String(id_team)
-        );
-          console.log("🎯 Agentes filtrados:", agents);
+          const agents = users.filter(
+            (u: Agent) =>
+              u.role.toLowerCase() === "agent" &&
+              String(u.id_team) === String(id_team)
+          );
           setTeamAgents(agents);
         })
         .catch((err) => console.error("Error fetching agents:", err));
@@ -84,59 +81,26 @@ const Dashboard = () => {
 
   const getAverageCallDuration = () => calls.length === 0 ? 0 : calls.reduce((acc, c) => acc + c.duration, 0) / calls.length;
 
-  const getAverageEmotion = (emotion: "happiness" | "sadness" | "anger") => {
-    let total = 0, count = 0;
-    calls.forEach((c) => {
-      c.report?.speakers?.forEach((s) => {
-        const val = s.emotions[emotion];
-        if (typeof val === "number") {
-          total += val;
-          count++;
-        }
-      });
-    });
-    return count > 0 ? total / count : 0;
-  };
-
-  const averageCallDuration = getAverageCallDuration();
-  const happiness = getAverageEmotion("happiness");
-  const sadness = getAverageEmotion("sadness");
-  const anger = getAverageEmotion("anger");
-
-  const total = happiness + sadness + anger || 1;
-  const radius = 60;
-  const circumference = 2 * Math.PI * radius;
-
-  const getArc = (value: number, offset: number, color: string) => {
-    const length = (value / total) * circumference;
-    return (
-      <circle
-        r={radius}
-        cx="100"
-        cy="100"
-        stroke={color}
-        strokeWidth="30"
-        fill="transparent"
-        strokeDasharray={`${length} ${circumference - length}`}
-        strokeDashoffset={-offset}
-      />
-    );
-  };
-
-  const happinessLength = (happiness / total) * circumference;
-  const sadnessLength = (sadness / total) * circumference;
-
   const getEmotionDistribution = () => {
     const result = { happiness: 0, sadness: 0, anger: 0 };
     calls.forEach((call) => {
       call.report?.speakers?.forEach((s) => {
-        (["happiness", "sadness", "anger"] as const).forEach((e) => {
+        (['happiness', 'sadness', 'anger'] as const).forEach((e) => {
           const val = s.emotions[e];
           if (typeof val === "number") result[e] += val;
         });
       });
     });
     return result;
+  };
+
+  const averageCallDuration = getAverageCallDuration();
+  const emotionTotals = getEmotionDistribution();
+  const max = Math.max(...Object.values(emotionTotals), 1);
+  const colors = {
+    happiness: "bg-green-400",
+    sadness: "bg-blue-400",
+    anger: "bg-red-400",
   };
 
   return (
@@ -149,97 +113,69 @@ const Dashboard = () => {
         {!selectedAgentId && role === "TeamLeader" && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Selecciona un agente</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {teamAgents.map((agent) => (
-                <button
-                  key={agent.id}
-                  className="bg-gray-700 hover:bg-gray-600 rounded px-4 py-2"
-                  onClick={() => {
-                  setSelectedAgentId(agent.id);
-                  fetchUserCalls(agent.id);
-                }}
-                >
-                  {agent.name}
-                </button>
-              ))}
-            </div>
+              <div className="flex flex-col gap-3">
+                {teamAgents.map((agent) => (
+                  <button
+                    key={agent.id}
+                    className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded px-4 py-2 transition text-left"
+                    onClick={() => {
+                      setSelectedAgentId(agent.id);
+                      fetchUserCalls(agent.id);
+                    }}
+                  >
+                    {agent.name}
+                  </button>
+                ))}
+              </div>
           </div>
         )}
 
         {(role !== "TeamLeader" || selectedAgentId) && (
           <>
-            <h1 className="text-2xl font-bold mb-4">Dashboard de Llamadas</h1>
+            {role === "TeamLeader" && selectedAgentId && (
+              <button
+                onClick={() => {
+                  setSelectedAgentId(null);
+                  setCalls([]);
+                }}
+                className="flex items-center text-sm text-gray-400 hover:text-white mb-4"
+              >
+                <ArrowLeft className="mr-2" size={16} />
+                Volver a lista de agentes
+              </button>
+            )}
 
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <Card className="flex-1 bg-gray-800">
-                <CardContent>
-                  <h2 className="text-xl font-semibold mb-2">Duración Promedio de Llamadas</h2>
-                  <Progress
-                    value={(averageCallDuration / 300) * 100}
-                    label={`${averageCallDuration.toFixed(0)}s / 5min`}
-                  />
-                </CardContent>
-              </Card>
+            <h1 className="text-2xl font-bold mb-6">Dashboard de Llamadas</h1>
 
-              <Card className="flex-1 bg-gray-800">
-                <CardContent>
-                  <h2 className="text-xl font-semibold mb-2">Distribución Emocional Promedio</h2>
-                  <svg width="200" height="200" viewBox="0 0 200 200" className="mx-auto">
-                    {getArc(happiness, 0, "#34D399")}
-                    {getArc(sadness, happinessLength, "#60A5FA")}
-                    {getArc(anger, happinessLength + sadnessLength, "#F87171")}
-                  </svg>
-                  <div className="text-center mt-2 text-sm text-gray-400">
-                    <p>Felicidad: {(happiness * 100).toFixed(2)}%</p>
-                    <p>Tristeza: {(sadness * 100).toFixed(2)}%</p>
-                    <p>Ira: {(anger * 100).toFixed(2)}%</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="mb-4 bg-gray-800">
+            <Card className="mb-6">
               <CardContent>
-                <h2 className="text-xl font-semibold mb-4">Promedio de Emociones</h2>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <Progress value={happiness * 100} label={`Felicidad: ${(happiness * 100).toFixed(2)}%`} />
-                  <Progress value={sadness * 100} label={`Tristeza: ${(sadness * 100).toFixed(2)}%`} />
-                  <Progress value={anger * 100} label={`Ira: ${(anger * 100).toFixed(2)}%`} />
-                </div>
+                <h2 className="text-xl font-semibold mb-2">Duración Promedio de Llamadas</h2>
+                <Progress
+                  value={(averageCallDuration / 300) * 100}
+                  label={`${averageCallDuration.toFixed(0)}s / 5min`}
+                />
               </CardContent>
             </Card>
 
-            <Card className="mb-4 bg-gray-800">
+            <Card className="mb-6">
               <CardContent>
                 <h2 className="text-xl font-semibold mb-4">Distribución Total de Emociones</h2>
-                {(() => {
-                  const dist = getEmotionDistribution();
-                  const max = Math.max(...Object.values(dist), 1);
-                  const colors = {
-                    happiness: "bg-green-400",
-                    sadness: "bg-blue-400",
-                    anger: "bg-red-400",
-                  };
-
-                  return (
-                    <div className="space-y-3">
-                      {Object.entries(dist).map(([emotion, val]) => (
-                        <div key={emotion}>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="capitalize">{emotion}</span>
-                            <span>{val.toFixed(2)}</span>
-                          </div>
-                          <div className="w-full h-4 bg-gray-700 rounded">
-                            <div
-                              className={`${colors[emotion as keyof typeof colors]} h-4 rounded`}
-                              style={{ width: `${(val / max) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                <div className="space-y-3">
+                  {Object.entries(emotionTotals).map(([emotion, val]) => (
+                    <div key={emotion}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="capitalize">{emotion}</span>
+                        <span>{val.toFixed(2)}</span>
+                      </div>
+                      <div className="w-full h-4 bg-gray-700 rounded">
+                        <div
+                          className={`${colors[emotion as keyof typeof colors]} h-4 rounded`}
+                          style={{ width: `${(val / max) * 100}%` }}
+                        />
+                      </div>
                     </div>
-                  );
-                })()}
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </>
