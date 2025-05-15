@@ -51,7 +51,8 @@ def get_users():
             "id": u.id_user,
             "name": u.name,
             "email": u.email,
-            "role": u.role
+            "role": u.role,
+            "id_team": u.id_team
         } for u in users
     ])
 
