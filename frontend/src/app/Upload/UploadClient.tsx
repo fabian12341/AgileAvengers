@@ -18,7 +18,6 @@ const UploadClient = () => {
   const idFromParams = searchParams.get("id");
   const id_user = idFromParams && !isNaN(Number(idFromParams)) ? Number(idFromParams) : fallback.id;
 
-
   const [file, setFile] = useState<File | null>(null);
   const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
   const [selectedClient, setSelectedClient] = useState<{ label: string; value: string } | null>(null);
@@ -171,7 +170,7 @@ const UploadClient = () => {
                 <option value="es">Español</option>
                 <option value="en">English</option>
               </select>
-              <div className="flex items-center justify-center sm:justify-start">
+              <div className="flex items-center justify-center sm:justify-start gap-4">
                 <input
                   type="file"
                   accept=".wav"
@@ -186,6 +185,13 @@ const UploadClient = () => {
                 >
                   <FileText size={20} />
                   File
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.open('/tetris', '_blank')}
+                  className="flex items-center gap-2 bg-green-700 border border-gray-600 px-4 py-2 rounded-md text-white hover:bg-green-800 transition"
+                >
+                  🎮 Tetris
                 </button>
               </div>
             </div>
