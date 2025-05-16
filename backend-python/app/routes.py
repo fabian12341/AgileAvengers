@@ -159,14 +159,15 @@ def get_calls_with_users():
             general_emotions = emotions_map.get(call.id_emotions)
 
             signed_url = None
-            if report and report.path and "http" not in report.path:
-                try:
+            try:
+                # Siempre intenta firmar si no es una URL de Supabase válida
+                if not report.path.startswith("https://ilkvcdusafqdtxwrfzri.supabase.co/"):
                     r = requests.get(
                         f"http://140.84.182.253:5000/get_report?file_path={report.path}"
                     )
                     signed_url = r.json().get("url", {}).get("signedURL")
-                except Exception as e:
-                    print("❌ Error obteniendo URL firmada:", e)
+            except Exception as e:
+                print("❌ Error obteniendo URL firmada:", e)
 
             speaker_data = []
             for speaker in speakers_by_call.get(call.id_call, []):
