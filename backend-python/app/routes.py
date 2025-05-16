@@ -451,7 +451,8 @@ def upload_call():
 
         # Reporte
         report_path = result.get("report_path")
-        
+        print("🔥 Valor original de report_path:", report_path)
+
         # Firmar la URL del PDF si no está firmada
         signed_url = report_path
         if report_path and not report_path.startswith("http"):
@@ -460,8 +461,10 @@ def upload_call():
                     f"http://140.84.182.253:5000/get_report?file_path={report_path}"
                 )
                 signed_url = r.json().get("url", {}).get("signedURL") or report_path
+                print("✅ URL firmada en upload-call:", signed_url)
             except Exception as e:
                 print("❌ Error al firmar la URL del reporte en upload-call:", e)
+
 
 
         # Reporte
