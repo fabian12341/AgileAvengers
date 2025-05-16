@@ -158,17 +158,20 @@ def get_calls_with_users():
             report = call.report
             general_emotions = emotions_map.get(call.id_emotions)
 
-            signed_url = None
-            try:
-                # Siempre intenta firmar si no es una URL de Supabase válida
-                if not report.path.startswith("https://ilkvcdusafqdtxwrfzri.supabase.co/"):
-                    r = requests.get(
-                        f"http://140.84.182.253:5000/get_report?file_path={report.path}"
-                    )
-                    signed_url = r.json().get("url", {}).get("signedURL")
-            except Exception as e:
-                print("❌ Error obteniendo URL firmada:", e)
+            # Obtener la ruta del reporte si existe
+            report_path = report.path if report and hasattr(report, "path") else None
 
+# Firmar el archivo con Supabase si no tiene token
+            signed_url = report_path
+            if report_path and not report_path.startswith("http"):
+                try:
+                    r = requests.get(
+                        f"http://140.84.182.253:5000/get_report?file_path={report_path}"
+                    )
+                    signed_url = r.json().get("url", {}).get("signedURL") or report_path
+                    print("✅ URL firmada:", signed_url)
+                except Exception as e:
+                    print("❌ Error al firmar la URL:", e)
             speaker_data = []
             for speaker in speakers_by_call.get(call.id_call, []):
                 emotion = emotions_map.get(speaker.id_emotions)
@@ -448,12 +451,24 @@ def upload_call():
 
         # Reporte
         report_path = result.get("report_path")
+        
+        # Firmar la URL del PDF si no está firmada
+        signed_url = report_path
+        if report_path and not report_path.startswith("http"):
+            try:
+                r = requests.get(
+                    f"http://140.84.182.253:5000/get_report?file_path={report_path}"
+                )
+                signed_url = r.json().get("url", {}).get("signedURL") or report_path
+            except Exception as e:
+                print("❌ Error al firmar la URL del reporte en upload-call:", e)
+
 
         # Reporte
         report = Report(
             id_call=call.id_call,
             summary=result["summary"],
-            path=report_path
+            path=signed_url,
         )
         db.session.add(report)
         db.session.flush()
