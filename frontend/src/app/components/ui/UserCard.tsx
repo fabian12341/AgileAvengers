@@ -1,5 +1,5 @@
 import React from "react";
-import { userbarProps } from "@/app/interfaces/usercb";
+import { userbarProps } from "@/app/types/usercb";
 
 const Userbar: React.FC<userbarProps> = ({ name, email, role, imageUrl }) => {
   return (

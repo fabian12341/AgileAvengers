@@ -1,98 +1,24 @@
-// Dashboard limpio con gráficas sin redundancia y estilizadas
+// app/Dashboard.tsx
 "use client";
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import React from "react";
+import { useDashboardData } from "../hooks/useDashUserData";
 import Card, { CardContent } from "../components/ui/card";
 import Progress from "../components/ui/progress";
 import { ArrowLeft } from "lucide-react";
 
-interface Call {
-  id_call: number;
-  duration: number;
-  silence_percentage: number;
-  id_user: number;
-  date?: string;
-  report?: {
-    overall_emotion?: number;
-    speakers: Array<{
-      emotions: {
-        happiness?: number;
-        sadness?: number;
-        anger?: number;
-      };
-    }>;
-  };
-}
-
-interface Agent {
-  id: number;
-  name: string;
-  role: string;
-  id_team: number;
-}
-
 const Dashboard = () => {
-  const searchParams = useSearchParams();
-  const name = searchParams.get("name") || "Nombre del Usuario";
-  const role = searchParams.get("role") || "agent";
-  const id_team = Number(searchParams.get("id_team")) || 0;
-  const idFromParams = searchParams.get("id");
-  const id_user = idFromParams && !isNaN(Number(idFromParams)) ? Number(idFromParams) : 0;
-
-  const [calls, setCalls] = useState<Call[]>([]);
-  const [teamAgents, setTeamAgents] = useState<Agent[]>([]);
-  const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
-
-  const fetchUserCalls = async (userId: number) => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/${userId}`, {
-        headers: {
-          "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
-        },
-      });
-      const data = await res.json();
-      setCalls(data.calls || []);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (role === "TeamLeader" && id_team) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
-        headers: {
-          "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
-        },
-      })
-        .then((res) => res.json())
-        .then((users) => {
-          const agents = users.filter(
-            (u: Agent) =>
-              u.role.toLowerCase() === "agent" &&
-              String(u.id_team) === String(id_team)
-          );
-          setTeamAgents(agents);
-        })
-        .catch((err) => console.error("Error fetching agents:", err));
-    } else if (id_user !== null) {
-      fetchUserCalls(id_user);
-    }
-  }, [role, id_team, id_user]);
-
-  const getAverageCallDuration = () => calls.length === 0 ? 0 : calls.reduce((acc, c) => acc + c.duration, 0) / calls.length;
-
-  const getEmotionDistribution = () => {
-    const result = { happiness: 0, sadness: 0, anger: 0 };
-    calls.forEach((call) => {
-      call.report?.speakers?.forEach((s) => {
-        (['happiness', 'sadness', 'anger'] as const).forEach((e) => {
-          const val = s.emotions[e];
-          if (typeof val === "number") result[e] += val;
-        });
-      });
-    });
-    return result;
-  };
+  const {
+    name,
+    role,
+    id_team,
+    calls,
+    teamAgents,
+    selectedAgentId,
+    setSelectedAgentId,
+    fetchUserCalls,
+    getAverageCallDuration,
+    getEmotionDistribution,
+  } = useDashboardData();
 
   const averageCallDuration = getAverageCallDuration();
   const emotionTotals = getEmotionDistribution();
@@ -113,20 +39,20 @@ const Dashboard = () => {
         {!selectedAgentId && role === "TeamLeader" && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Selecciona un agente</h2>
-              <div className="flex flex-col gap-3">
-                {teamAgents.map((agent) => (
-                  <button
-                    key={agent.id}
-                    className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded px-4 py-2 transition text-left"
-                    onClick={() => {
-                      setSelectedAgentId(agent.id);
-                      fetchUserCalls(agent.id);
-                    }}
-                  >
-                    {agent.name}
-                  </button>
-                ))}
-              </div>
+            <div className="flex flex-col gap-3">
+              {teamAgents.map((agent) => (
+                <button
+                  key={agent.id}
+                  className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded px-4 py-2 transition text-left"
+                  onClick={() => {
+                    setSelectedAgentId(agent.id);
+                    fetchUserCalls(agent.id);
+                  }}
+                >
+                  {agent.name}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -136,7 +62,6 @@ const Dashboard = () => {
               <button
                 onClick={() => {
                   setSelectedAgentId(null);
-                  setCalls([]);
                 }}
                 className="flex items-center text-sm text-gray-400 hover:text-white mb-4"
               >
@@ -149,7 +74,9 @@ const Dashboard = () => {
 
             <Card className="mb-6">
               <CardContent>
-                <h2 className="text-xl font-semibold mb-2">Duración Promedio de Llamadas</h2>
+                <h2 className="text-xl font-semibold mb-2">
+                  Duración Promedio de Llamadas
+                </h2>
                 <Progress
                   value={(averageCallDuration / 300) * 100}
                   label={`${averageCallDuration.toFixed(0)}s / 5min`}
@@ -159,7 +86,9 @@ const Dashboard = () => {
 
             <Card className="mb-6">
               <CardContent>
-                <h2 className="text-xl font-semibold mb-4">Distribución Total de Emociones</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Distribución Total de Emociones
+                </h2>
                 <div className="space-y-3">
                   {Object.entries(emotionTotals).map(([emotion, val]) => (
                     <div key={emotion}>
@@ -169,7 +98,9 @@ const Dashboard = () => {
                       </div>
                       <div className="w-full h-4 bg-gray-700 rounded">
                         <div
-                          className={`${colors[emotion as keyof typeof colors]} h-4 rounded`}
+                          className={`${
+                            colors[emotion as keyof typeof colors]
+                          } h-4 rounded`}
                           style={{ width: `${(val / max) * 100}%` }}
                         />
                       </div>

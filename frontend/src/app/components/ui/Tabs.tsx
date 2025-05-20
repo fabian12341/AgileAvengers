@@ -1,14 +1,6 @@
 // components/Tabs.tsx
 import { useState, ReactNode } from "react";
-
-interface Tab {
-  label: string;
-  content: ReactNode;
-}
-
-interface TabsProps {
-  tabs: Tab[];
-}
+import { Tab, TabsProps } from "@/app/types/TabInterfaces";
 
 export default function Tabs({ tabs }: TabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);

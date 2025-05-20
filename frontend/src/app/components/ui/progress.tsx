@@ -1,9 +1,5 @@
 // components/Progress.tsx
-interface ProgressProps {
-  label: string;
-  value: number; // entre 0 y 100
-  color?: string; // opcional, para personalizar el color
-}
+import { ProgressProps } from "@/app/types/Progress";
 
 export default function Progress({
   label,
@@ -43,7 +39,6 @@ export default function Progress({
         <strong>{label}</strong>
         <div>{value.toFixed(2)}%</div>
       </div>
-
     </div>
   );
 }
