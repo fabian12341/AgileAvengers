@@ -52,7 +52,7 @@ const HomeClient = () => {
       <Navigation name={name} role={role} id_team={id_team} id={id_user} />
       <div className="max-w-6xl mx-auto p-6">
         <p className="text-gray-400 text-xl mb-4">
-          Bienvenido, <strong>{name}</strong>  Rol: {role}  Equipo: {id_team}
+          Bienvenido, <strong>{name}</strong>
         </p>
       </div>
       <Dashboard />
