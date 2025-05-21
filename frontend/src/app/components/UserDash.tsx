@@ -58,7 +58,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (role === "TeamLeader" && id_team) {
+    if ((role === "TeamLeader" && id_team) || role === "Admin") {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
         headers: {
           "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
@@ -66,11 +66,7 @@ const Dashboard = () => {
       })
         .then((res) => res.json())
         .then((users) => {
-          const agents = users.filter(
-            (u: Agent) =>
-              u.role.toLowerCase() === "agent" &&
-              String(u.id_team) === String(id_team)
-          );
+          const agents = users.filter((u: Agent) => u.role.toLowerCase() === "agent");
           setTeamAgents(agents);
         })
         .catch((err) => console.error("Error fetching agents:", err));
@@ -85,7 +81,7 @@ const Dashboard = () => {
     const result = { happiness: 0, sadness: 0, anger: 0 };
     calls.forEach((call) => {
       call.report?.speakers?.forEach((s) => {
-        (['happiness', 'sadness', 'anger'] as const).forEach((e) => {
+        (["happiness", "sadness", "anger"] as const).forEach((e) => {
           const val = s.emotions[e];
           if (typeof val === "number") result[e] += val;
         });
@@ -103,6 +99,12 @@ const Dashboard = () => {
     anger: "bg-red-400",
   };
 
+  const groupedByTeam = teamAgents.reduce((acc: Record<number, Agent[]>, agent) => {
+    if (!acc[agent.id_team]) acc[agent.id_team] = [];
+    acc[agent.id_team].push(agent);
+    return acc;
+  }, {});
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="max-w-6xl mx-auto p-6">
@@ -110,37 +112,42 @@ const Dashboard = () => {
           Bienvenido, <strong>{name}</strong> — Rol: {role} — Equipo: {id_team}
         </p>
 
-        {!selectedAgentId && role === "TeamLeader" && (
+        {!selectedAgentId && (role === "TeamLeader" || role === "Admin") && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Selecciona un agente</h2>
-              <div className="flex flex-col gap-3">
-                {teamAgents.map((agent) => (
-                  <button
-                    key={agent.id}
-                    className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded px-4 py-2 transition text-left"
-                    onClick={() => {
-                      setSelectedAgentId(agent.id);
-                      fetchUserCalls(agent.id);
-                    }}
-                  >
-                    {agent.name}
-                  </button>
-                ))}
+            {Object.entries(groupedByTeam).map(([teamId, agents]) => (
+              <div key={teamId} className="mb-4">
+                <h3 className="text-lg font-medium text-gray-300 mb-2">Equipo {teamId}</h3>
+                <div className="flex flex-col gap-3">
+                  {agents.map((agent) => (
+                    <button
+                      key={agent.id}
+                      className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded px-4 py-2 transition text-left"
+                      onClick={() => {
+                        setSelectedAgentId(agent.id);
+                        fetchUserCalls(agent.id);
+                      }}
+                    >
+                      {agent.name}
+                    </button>
+                  ))}
+                </div>
               </div>
+            ))}
           </div>
         )}
 
-        {(role !== "TeamLeader" || selectedAgentId) && (
+        {(role !== "TeamLeader" && role !== "Admin") || selectedAgentId ? (
           <>
-            {role === "TeamLeader" && selectedAgentId && (
+            {(role === "TeamLeader" || role === "Admin") && selectedAgentId && (
               <button
                 onClick={() => {
                   setSelectedAgentId(null);
                   setCalls([]);
                 }}
-                className="flex items-center text-sm text-gray-400 hover:text-white mb-4"
+                className="flex items-center gap-2 text-lg font-semibold px-5 py-3 bg-indigo-500 text-gray-900 rounded hover:bg-gray-300 transition mb-6 shadow"
               >
-                <ArrowLeft className="mr-2" size={16} />
+                <ArrowLeft size={20} />
                 Volver a lista de agentes
               </button>
             )}
@@ -179,7 +186,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );

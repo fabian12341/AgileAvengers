@@ -45,7 +45,7 @@ const Navigation: React.FC<NavigationProps> = ({ name, role, id_team, id }) => {
         </Link>
         <Link href={`/Upload?name=${name}&role=${role}&id_team=${id_team}&id=${id ?? ""}`}>
           <Button variant="ghost" className="text-white hover:text-gray-300">
-            Uploads
+            {(role === "TeamLeader" || role === "Admin") ? "Calls" : "Uploads"}
           </Button>
         </Link>
         <Link href={`/User?name=${name}&role=${role}&id_team=${id_team}&id=${id ?? ""}`}>
