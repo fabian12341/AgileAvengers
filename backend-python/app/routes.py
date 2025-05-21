@@ -687,6 +687,4 @@ def verify_code():
 
     return jsonify({"message": "Code verified successfully."})
 
-        "reports": []
-    })
     
