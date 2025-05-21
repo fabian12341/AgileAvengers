@@ -161,7 +161,7 @@ def get_calls_with_users():
             # Obtener la ruta del reporte si existe
             report_path = report.path if report and hasattr(report, "path") else None
 
-# Firmar el archivo con Supabase si no tiene token
+            # Firmar el archivo con Supabase si no tiene token
             signed_url = report_path
             if report_path and not report_path.startswith("http"):
                 try:
@@ -233,10 +233,6 @@ def get_calls_with_users():
         import traceback
         traceback.print_exc()
         return jsonify({"error": "Error interno en /calls/users"}), 500
-
-
-
-
 
 @main.route('/reports/from-calls', methods=['POST'])
 def create_reports_from_calls():
@@ -358,16 +354,12 @@ def upload_call():
             "num_speakers": 2,
             "datetime": datetime_str
         }
-        print("Enviando a VM...")
         vm_response = requests.post("http://140.84.182.253:5000/analyze-call", files=files, data=data)
-        print("📬 Respuesta VM Status:", vm_response.status_code)
 
         if vm_response.status_code != 200:
-            print("Error desde VM:", vm_response.text)
             return jsonify({"error": "Error al procesar con la VM"}), 500
 
         result = vm_response.json()
-        print("Resultado de la VM recibido.")
 
         def map_emotions(e):
             return {
@@ -603,5 +595,6 @@ def get_user_dashboard(id_user):
             "id_team": user.id_team
         },
         "calls": response_calls,
-        "reports": []  # puedes rellenarlo si lo necesitas después
+        "reports": []
     })
+    
