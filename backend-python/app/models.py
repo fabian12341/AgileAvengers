@@ -1,5 +1,12 @@
 from . import db
 
+class Team(db.Model):
+    __tablename__ = 'Teams'
+    id_team = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))  
+    users = db.relationship('User', backref='team', lazy=True)
+
+
 class User(db.Model):
     __tablename__ = 'Users'
     id_user = db.Column(db.Integer, primary_key=True)
@@ -34,7 +41,6 @@ class Call(db.Model):
     report = db.relationship('Report', uselist=False, backref='call', lazy=True)
 
 
-
 class Transcript(db.Model):
     __tablename__ = 'Transcripts'
     id_transcript = db.Column(db.Integer, primary_key=True)
@@ -50,6 +56,7 @@ class Report(db.Model):
     path = db.Column(db.String(255), default="no_path")
     summary = db.Column(db.Text)
     id_call = db.Column(db.Integer, db.ForeignKey('Calls.id_call'), unique=True)
+
 
 class Emotions(db.Model):
     __tablename__ = 'Emotions'
@@ -96,3 +103,12 @@ class KeyWord(db.Model):
     word = db.Column(db.String(255), nullable=False)
     id_report = db.Column(db.Integer, db.ForeignKey('Reports.id_report'))
 
+
+class PasswordResetCode(db.Model):
+    __tablename__ = 'PasswordResetCodes'
+
+    id_code = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_user = db.Column(db.Integer, db.ForeignKey('Users.id_user', ondelete='CASCADE'), nullable=False)
+    code = db.Column(db.String(6), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    user = db.relationship('User', backref=db.backref('reset_codes', cascade='all, delete-orphan'))
