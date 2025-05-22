@@ -39,12 +39,21 @@ export default function Tetris() {
   const [pos, setPos] = useState({x: 3, y: 0});
   const [gameOver, setGameOver] = useState(false);
 
-  // Rotation function for shape matrix
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.5;
+      audioRef.current.play().catch(() => {
+        console.log('Se requiere interacción del usuario para reproducir audio automáticamente.');
+      });
+    }
+  }, []);
+
   function rotate(matrix: number[][]) {
     return matrix[0].map((_, index) => matrix.map(row => row[index]).reverse());
   }
 
-  // Get current shape matrix with rotation
   function getShapeMatrix() {
     let shape = shapes[currentShape];
     let matrix = shape;
@@ -54,7 +63,6 @@ export default function Tetris() {
     return matrix;
   }
 
-  // Check collision
   function isValidPosition(x: number, y: number, matrix: number[][]) {
     for(let i=0; i < matrix.length; i++){
       for(let j=0; j < matrix[i].length; j++){
@@ -69,7 +77,6 @@ export default function Tetris() {
     return true;
   }
 
-  // Place piece on board
   function placePiece() {
     const matrix = getShapeMatrix();
     let newBoard = board.map(row => row.slice());
@@ -85,7 +92,6 @@ export default function Tetris() {
     return newBoard;
   }
 
-  // Clear lines
   function clearLines(board: number[][]) {
     let newBoard = board.filter(row => row.some(cell => cell === 0));
     let cleared = ROWS - newBoard.length;
@@ -95,27 +101,23 @@ export default function Tetris() {
     return newBoard;
   }
 
-  // Move piece down
   function moveDown() {
     const matrix = getShapeMatrix();
     if(isValidPosition(pos.x, pos.y + 1, matrix)){
       setPos({...pos, y: pos.y + 1});
     } else {
-      // Place piece and start new
       let newBoard = placePiece();
       newBoard = clearLines(newBoard);
       setBoard(newBoard);
       setCurrentShape(randomShape());
       setCurrentRotation(0);
       setPos({x: 3, y: 0});
-      // Check if new piece collides immediately = game over
       if(!isValidPosition(3, 0, shapes[currentShape])){
         setGameOver(true);
       }
     }
   }
 
-  // Handle keyboard input
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if(gameOver) return;
@@ -127,7 +129,6 @@ export default function Tetris() {
       } else if(e.key === 'ArrowDown'){
         moveDown();
       } else if(e.key === 'ArrowUp'){
-        // Rotate
         let nextRotation = (currentRotation +1) % 4;
         let rotatedMatrix = shapes[currentShape];
         for(let i=0; i<nextRotation; i++) rotatedMatrix = rotate(rotatedMatrix);
@@ -138,7 +139,6 @@ export default function Tetris() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [pos, currentRotation, currentShape, board, gameOver]);
 
-  // Auto move down every second
   useEffect(() => {
     if(gameOver) return;
     const interval = setInterval(() => {
@@ -149,6 +149,17 @@ export default function Tetris() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      {/* 🎵 Música de fondo */}
+      <audio ref={audioRef} src="/tetris-theme.mp3" loop />
+
+      {/* Botón por si se bloquea la reproducción automática */}
+      <button
+        className="mb-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-500"
+        onClick={() => audioRef.current?.play()}
+      >
+        Play Music
+      </button>
+
       <h1 className="text-4xl font-bold mb-6">Tetris</h1>
       {gameOver ? (
         <div>
@@ -174,7 +185,6 @@ export default function Tetris() {
         >
           {board.map((row, y) =>
             row.map((cell, x) => {
-              // Check if current piece occupies this cell
               const matrix = getShapeMatrix();
               const relativeX = x - pos.x;
               const relativeY = y - pos.y;
