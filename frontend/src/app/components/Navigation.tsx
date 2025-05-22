@@ -53,7 +53,7 @@ const Navigation: React.FC<NavigationProps> = ({ name, role, id_team, id }) => {
           }`}
         >
           <Button variant="ghost" className="text-white hover:text-gray-300">
-            Uploads
+            {(role === "TeamLeader" || role === "Admin") ? "Calls" : "Uploads"}
           </Button>
         </Link>
         <Link

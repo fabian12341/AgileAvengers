@@ -1,0 +1,105 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { FaKey } from "react-icons/fa";
+import { useVerification } from "../hooks/useVerification";
+
+export default function VerifyCode() {
+  const [code, setCode] = useState("");
+  const [formError, setFormError] = useState("");
+  const { verify, error, loading } = useVerification();
+  const router = useRouter();
+
+  const handleVerify = async () => {
+    if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+      setFormError("Please enter a valid 6-digit code.");
+      return;
+    }
+
+    setFormError("");
+
+    try {
+      const result = await verify(code);
+
+      if (!result.success) {
+        setFormError("Verification failed. Please check your code.");
+        return;
+      }
+
+      if (!result.user) {
+        setFormError("Verification failed. User data is missing.");
+        return;
+      }
+
+      const { id, email } = result.user;
+      if (result.success) {
+        // Store user data in localStorage (optional, adjust as needed)
+        localStorage.setItem("userInfo", JSON.stringify({ id, email }));
+        // Redirect to a success page (adjust the route as needed)
+        router.push(`/Home?id=${id}&email=${encodeURIComponent(email)}`); // CAMBIAR
+      }
+    } catch (err) {
+      setFormError("An unexpected error occurred. Please try again.");
+      console.error("Verification failed:", err);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
+      <div className="w-full max-w-md p-6 sm:p-8 rounded-xl bg-gray-800 shadow-lg">
+        <h1 className="text-white text-3xl font-semibold mb-6 text-center">
+          NEORIS
+        </h1>
+
+        {formError && (
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {formError}
+          </div>
+        )}
+
+        {error && (
+          <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
+        )}
+
+        <div className="mb-4">
+          <label className="text-gray-400 text-sm">Verification Code</label>
+          <div className="flex items-center bg-gray-700 p-2 rounded-lg mt-1">
+            <span className="text-gray-400">
+              <FaKey size={20} />
+            </span>
+            <input
+              type="text"
+              className="bg-transparent border-none outline-none text-white w-full ml-2"
+              value={code}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                setCode(value);
+              }}
+              placeholder="Enter 6-digit code"
+              maxLength={6}
+            />
+          </div>
+        </div>
+
+        <button
+          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition duration-300"
+          onClick={handleVerify}
+          disabled={loading}
+        >
+          {loading ? "Verifying..." : "Verify"}
+        </button>
+        
+        <div className="text-center mt-4">
+          <a
+            onClick={() => router.push("/Login")}
+            className="text-purple-400 text-sm cursor-pointer hover:underline"
+          >
+            Back to Login
+          </a>
+        </div>
+
+      </div>
+    </div>
+  );
+}

@@ -2,10 +2,14 @@ from flask import Blueprint, jsonify, request, abort
 from mutagen.mp3 import MP3
 from sqlalchemy.orm import joinedload, subqueryload
 import os
-from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, Voice, Suggestion
+from .models import Call, User, Report, Transcript, Emotions, SpeakerAnalysis, Voice, Suggestion, PasswordResetCode
 from . import db
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import requests
+import random
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import bcrypt
 
 main = Blueprint('main', __name__)
@@ -161,7 +165,7 @@ def get_calls_with_users():
             # Obtener la ruta del reporte si existe
             report_path = report.path if report and hasattr(report, "path") else None
 
-# Firmar el archivo con Supabase si no tiene token
+            # Firmar el archivo con Supabase si no tiene token
             signed_url = report_path
             if report_path and not report_path.startswith("http"):
                 try:
@@ -233,10 +237,6 @@ def get_calls_with_users():
         import traceback
         traceback.print_exc()
         return jsonify({"error": "Error interno en /calls/users"}), 500
-
-
-
-
 
 @main.route('/reports/from-calls', methods=['POST'])
 def create_reports_from_calls():
@@ -358,16 +358,12 @@ def upload_call():
             "num_speakers": 2,
             "datetime": datetime_str
         }
-        print("Enviando a VM...")
         vm_response = requests.post("http://140.84.182.253:5000/analyze-call", files=files, data=data)
-        print("📬 Respuesta VM Status:", vm_response.status_code)
 
         if vm_response.status_code != 200:
-            print("Error desde VM:", vm_response.text)
             return jsonify({"error": "Error al procesar con la VM"}), 500
 
         result = vm_response.json()
-        print("Resultado de la VM recibido.")
 
         def map_emotions(e):
             return {
@@ -605,3 +601,90 @@ def get_user_dashboard(id_user):
         "calls": response_calls,
         "reports": []  # puedes rellenarlo si lo necesitas después
     })
+    
+# Ruta para enviar el correo de verificacion al olvidar contraseña
+@main.route('/send-email', methods=['POST'])
+def send_email():
+    require_api_key()
+
+    data = request.json
+    receiver_email = data.get("receiver_email")
+    
+    SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+    SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
+    
+    if not SENDER_EMAIL or not SENDER_PASSWORD:
+        return jsonify({"error": "Missing sender email or password"}), 500
+
+    if not receiver_email:
+        return jsonify({"error": "Missing 'receiver_email'"}), 400
+
+    user = User.query.filter_by(email=receiver_email).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Codigo de verificación
+    code = str(random.randint(100000, 999999))
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+
+    # Guardar el codigo en la base de datos
+    reset_code = PasswordResetCode(id_user=user.id_user, code=code, expires_at=expires_at)
+    db.session.add(reset_code)
+    db.session.commit()
+
+    # Contenido del correo
+    subject = "Verification Code from Shield AI"
+    body = f"Hello, your verification code is {code}. It expires in 10 minutes."
+
+    message = MIMEMultipart()
+    message["From"] = SENDER_EMAIL
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    message.attach(MIMEText(body, "plain"))
+
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.send_message(message)
+        return jsonify({"message": "Email sent successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
+# Ruta para verificar el codigo de verificacion
+@main.route('/verify-code', methods=['POST'])
+def verify_code():
+    require_api_key()
+
+    data = request.json
+    receiver_email = data.get("receiver_email")
+    input_code = data.get("code")
+
+    if not receiver_email or not input_code:
+        return jsonify({"error": "Missing 'receiver_email' or 'code'"}), 400
+
+    user = User.query.filter_by(email=receiver_email).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Buscando el código en la base de datos
+    reset_code = PasswordResetCode.query.filter_by(id_user=user.id_user, code=input_code).first()
+    if not reset_code:
+        return jsonify({"error": "Invalid code"}), 400
+
+    current_time = datetime.now(timezone.utc)
+       
+    expires_at = reset_code.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)  # Assume UTC if naive
+    if expires_at < current_time:
+        return jsonify({"error": "Code expired"}), 400
+
+    # Borrar el codigo de la BD despues de verificar
+    db.session.delete(reset_code)
+    db.session.commit()
+
+    return jsonify({"message": "Code verified successfully."})
+
+    
