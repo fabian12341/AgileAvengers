@@ -1,13 +1,5 @@
 import React from "react";
-
-interface CallSearchProps {
-  searchId: string;
-  setSearchId: (value: string) => void;
-  searchClient: string;
-  setSearchClient: (value: string) => void;
-  searchDate: string;
-  setSearchDate: (value: string) => void;
-}
+import { CallSearchProps } from "@/app/types/CallSearchProps";
 
 const CallSearch: React.FC<CallSearchProps> = ({
   searchId,

@@ -1,22 +1,12 @@
 // src/app/components/ReportDetailsModal.tsx
 import React from "react";
+import { ReportDetailsModalProps } from "../types/ReportDetailsModal";
 
-interface ReportDetailsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  report: {
-    id_report: number;
-    summary: string;
-    call: {
-      id_call: number;
-      date: string;
-      client: number;
-      agent: string;
-    };
-  } | null;
-}
-
-const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({ isOpen, onClose, report }) => {
+const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
+  isOpen,
+  onClose,
+  report,
+}) => {
   if (!isOpen || !report) return null;
 
   return (
@@ -31,11 +21,21 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({ isOpen, onClose
 
         <h2 className="text-xl font-semibold mb-4">Detalles del Reporte</h2>
 
-        <p><strong>ID del Reporte:</strong> {report.id_report}</p>
-        <p><strong>Fecha de llamada:</strong> {report.call.date}</p>
-        <p><strong>Cliente ID:</strong> {report.call.client}</p>
-        <p><strong>Agente:</strong> {report.call.agent}</p>
-        <p className="mt-4"><strong>Resumen:</strong></p>
+        <p>
+          <strong>ID del Reporte:</strong> {report.id_report}
+        </p>
+        <p>
+          <strong>Fecha de llamada:</strong> {report.call.date}
+        </p>
+        <p>
+          <strong>Cliente ID:</strong> {report.call.client}
+        </p>
+        <p>
+          <strong>Agente:</strong> {report.call.agent}
+        </p>
+        <p className="mt-4">
+          <strong>Resumen:</strong>
+        </p>
         <p className="text-sm text-gray-800 mt-1">{report.summary}</p>
       </div>
     </div>

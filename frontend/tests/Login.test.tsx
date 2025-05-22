@@ -1,13 +1,3 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import Login from "@/app/Login/page";
-import { useLogin } from "@/app/hooks/useLogin";
-
-
-// Mock de useLogin
-jest.mock("../hooks/useLogin", () => ({
-  useLogin: jest.fn(),
-}));
-
 // Mock de useRouter
 jest.mock("next/navigation", () => ({
   useRouter: () => ({

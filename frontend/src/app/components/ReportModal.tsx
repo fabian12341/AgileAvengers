@@ -1,16 +1,7 @@
 // components/ReportModal.tsx
 "use client";
 import React from "react";
-
-interface ReportModalProps {
-  report: {
-    date: string;
-    agent: string;
-    client: string;
-    summary: string;
-  };
-  onClose: () => void;
-}
+import { ReportModalProps } from "../types/ReportModalProps";
 
 const ReportModal = ({ report, onClose }: ReportModalProps) => {
   return (

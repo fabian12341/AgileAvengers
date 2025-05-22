@@ -1,35 +1,9 @@
 import { useState, useEffect } from "react";
-
-export interface Call {
-  id: number;
-  name: string;
-  date: string;
-  duration: string;
-  agent: string;
-  sentimentScore: number;
-  transcript: { speaker: string; message: string }[];
-  reportSummary?: string;
-}
-
-// Define el tipo para los datos crudos de la API
-interface RawCall {
-  id_call: number;
-  user?: {
-    name: string;
-    role: string;
-  };
-  date: string;
-  duration: number;
-  transcript?: {
-    text: string;
-  };
-  report?: {
-    summary: string;
-  };
-}
+import { RawCall } from "../types/RawCall";
+import { CallUseCallD } from "../types/CallUseCallD";
 
 export const useCallsData = () => {
-  const [callsData, setCallsData] = useState<Call[]>([]);
+  const [callsData, setCallsData] = useState<CallUseCallD[]>([]);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/calls/users`, {

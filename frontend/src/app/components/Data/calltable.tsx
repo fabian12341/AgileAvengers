@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import TableComponent from "./tablecomponent";
 import CallSearch from "./callsearch";
-import { ApiCall } from "@/app/interfaces/APICall";
-import { Call } from "@/app/interfaces/Call";
+import { ApiCall } from "@/app/types/APICall";
+import { Call } from "@/app/types/Call";
 
 const safeFixed = (val: number | undefined | null, digits = 2) =>
   val != null ? val.toFixed(digits) : "N/A";
@@ -21,7 +21,6 @@ const CallTable: React.FC<{
   const [searchClient, setSearchClient] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const showDelete = role === "Admin" || role === "TeamLeader";
-
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/calls/users`, {
@@ -88,43 +87,42 @@ const CallTable: React.FC<{
           ) : (
             <span className="text-gray-400">-</span>
           ),
-            deleteButton: showDelete ? (
-              <button
-                onClick={async () => {
-                  const confirmDelete = confirm(
-                    "¿Estás seguro de que quieres eliminar esta llamada?"
-                  );
-                  if (!confirmDelete) return;
+          deleteButton: showDelete ? (
+            <button
+              onClick={async () => {
+                const confirmDelete = confirm(
+                  "¿Estás seguro de que quieres eliminar esta llamada?"
+                );
+                if (!confirmDelete) return;
 
-                  try {
-                    const res = await fetch(
-                      `${process.env.NEXT_PUBLIC_API_URL}/calls/${call.id_call}`,
-                      {
-                        method: "DELETE",
-                        headers: {
-                          "X-API-KEY":
-                            process.env.NEXT_PUBLIC_API_KEY || "",
-                        },
-                      }
-                    );
-                    if (res.ok) {
-                      setCallsData((prev) =>
-                        prev.filter((c) => c.id !== call.id_call)
-                      );
-                    } else {
-                      alert("Error al eliminar la llamada");
+                try {
+                  const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/calls/${call.id_call}`,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        "X-API-KEY": process.env.NEXT_PUBLIC_API_KEY || "",
+                      },
                     }
-                  } catch (err) {
-                    console.error("Error al eliminar:", err);
-                    alert("Error de red al eliminar");
+                  );
+                  if (res.ok) {
+                    setCallsData((prev) =>
+                      prev.filter((c) => c.id !== call.id_call)
+                    );
+                  } else {
+                    alert("Error al eliminar la llamada");
                   }
-                }}
-                className="text-red-500 text-xl hover:text-red-700 ml-auto"
-                title="Eliminar llamada"
-              >
-                🗑️
-              </button>
-            ) : null,
+                } catch (err) {
+                  console.error("Error al eliminar:", err);
+                  alert("Error de red al eliminar");
+                }
+              }}
+              className="text-red-500 text-xl hover:text-red-700 ml-auto"
+              title="Eliminar llamada"
+            >
+              🗑️
+            </button>
+          ) : null,
         }));
 
         setCallsData(calls);
@@ -280,7 +278,9 @@ const CallTable: React.FC<{
                         {safeFixed(speaker.emotions.anger)} | Neutralidad:{" "}
                         {safeFixed(speaker.emotions.neutrality)}
                         <br />
-                        Sentimiento de texto: {speaker.emotions.text_sentiment}{" "}
+                        Sentimiento de texto: {
+                          speaker.emotions.text_sentiment
+                        }{" "}
                         ({safeFixed(speaker.emotions.text_sentiment_score)})
                       </p>
                       <p className="text-sm mt-1">

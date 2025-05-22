@@ -1,16 +1,6 @@
 // src/app/hooks/useReportsData.ts
 import { useState, useEffect } from "react";
-
-export interface Report {
-  id_report: number;
-  summary: string;
-  call: {
-    id_call: number;
-    date: string;
-    client: number;
-    agent: string;
-  };
-}
+import { Report } from "../types/Report";
 
 export const useReports = () => {
   const [reports, setReports] = useState<Report[]>([]);
@@ -21,9 +11,9 @@ export const useReports = () => {
         "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
       },
     })
-      .then(res => res.json())
-      .then(data => setReports(data))
-      .catch(err => console.error("Error al cargar reportes:", err));
+      .then((res) => res.json())
+      .then((data) => setReports(data))
+      .catch((err) => console.error("Error al cargar reportes:", err));
   };
 
   useEffect(() => {
@@ -38,7 +28,7 @@ export const useReports = () => {
           "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "",
         },
       });
-      setReports(prev => prev.filter(r => r.id_report !== id));
+      setReports((prev) => prev.filter((r) => r.id_report !== id));
     } catch (err) {
       console.error("Error al eliminar el reporte:", err);
     }

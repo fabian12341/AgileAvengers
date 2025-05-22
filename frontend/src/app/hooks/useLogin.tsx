@@ -1,13 +1,6 @@
 // src/app/hooks/useLogin.ts
 import { useState } from "react";
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  id_team: number;
-}
+import { User } from "../types/user";
 
 export const useLogin = () => {
   const [user, setUser] = useState<User | null>(null);
