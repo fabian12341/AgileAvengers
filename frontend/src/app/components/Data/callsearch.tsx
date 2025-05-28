@@ -12,10 +12,10 @@ const CallSearch: React.FC<CallSearchProps> = ({
   return (
     <div className="mb-4">
       <h2 className="text-xl font-bold mt-4">
-        Search for transcript or report
+        Busca por un transcript o reporte
       </h2>
       <p className="text-gray-400 mb-4">
-        Fill in the necessary fields to find a specific call.
+        LLena los campos para buscar un transcript o reporte de llamada.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">

@@ -127,7 +127,7 @@ const UploadClient = () => {
                   onChange={(newValue: unknown) =>
                     setSelectedClient(newValue as { label: string; value: string } | null)
                   }
-                  placeholder="Search or select client"
+                  placeholder="Busca o selecciona un cliente"
                   isClearable
                   unstyled={true}
                   className="w-full"
