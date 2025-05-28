@@ -8,7 +8,7 @@ import { useVerification } from "../hooks/useVerification";
 export default function VerifyCode() {
   const [code, setCode] = useState("");
   const [formError, setFormError] = useState("");
-  const { verify, error, loading } = useVerification();
+  const { verify, loading, error, message } = useVerification();
   const router = useRouter();
 
   const handleVerify = async () => {
@@ -19,30 +19,13 @@ export default function VerifyCode() {
 
     setFormError("");
 
-    try {
-      const result = await verify(code);
+    const success = await verify(code);
 
-      if (!result.success) {
-        setFormError("Verification failed. Please check your code.");
-        return;
-      }
-
-      if (!result.user) {
-        setFormError("Verification failed. User data is missing.");
-        return;
-      }
-
-      const { id, email } = result.user;
-      if (result.success) {
-        // Store user data in localStorage (optional, adjust as needed)
-        localStorage.setItem("userInfo", JSON.stringify({ id, email }));
-        // Redirect to a success page (adjust the route as needed)
-        router.push(`/Home?id=${id}&email=${encodeURIComponent(email)}`); // CAMBIAR
-      }
-    } catch (err) {
-      setFormError("An unexpected error occurred. Please try again.");
-      console.error("Verification failed:", err);
+    if (!success) {
+      setFormError("Verification failed. Please check your code.");
+      return;
     }
+
   };
 
   return (
@@ -53,13 +36,15 @@ export default function VerifyCode() {
         </h1>
 
         {formError && (
-          <div className="text-red-500 text-sm mb-4 text-center">
-            {formError}
-          </div>
+          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
         )}
 
         {error && (
           <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
+        )}
+
+        {message && (
+          <div className="text-green-500 text-sm mb-4 text-center">{message}</div>
         )}
 
         <div className="mb-4">
@@ -89,7 +74,7 @@ export default function VerifyCode() {
         >
           {loading ? "Verifying..." : "Verify"}
         </button>
-        
+
         <div className="text-center mt-4">
           <a
             onClick={() => router.push("/Login")}
@@ -98,7 +83,6 @@ export default function VerifyCode() {
             Back to Login
           </a>
         </div>
-
       </div>
     </div>
   );

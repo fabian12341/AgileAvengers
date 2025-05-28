@@ -1,37 +1,76 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useVerification = () => {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string | null>(null);
 
-  const verify = async (code: string) => {
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedEmail = localStorage.getItem("recoveryEmail");
+      console.log("Retrieved email from localStorage:", savedEmail);
+      setEmail(savedEmail);
+    }
+  }, []);
+
+  const verify = async (code: string): Promise<{ success: boolean }> => {
     setLoading(true);
-    setError("");
+    setError(null);
+    setMessage(null);
+
+    if (!email) {
+      setError("Email is missing");
+      setLoading(false);
+      return { success: false };
+    }
+
+    if (!process.env.NEXT_PUBLIC_API_URL || !process.env.NEXT_PUBLIC_API_KEY) {
+      setError("API configuration is missing");
+      setLoading(false);
+      return { success: false };
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verify-code`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+        },
+        body: JSON.stringify({ receiver_email: email, code }),
       });
 
-      const result = await response.json();
+      const rawText = await response.text();
+      console.log("Raw response text:", rawText);
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (err) {
+        setError("Invalid JSON returned from server.");
+        setLoading(false);
+        return { success: false };
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || "Verification failed");
+        console.log("Response body (error):", data);
+        setError(data.message || "Verification failed");
+        setLoading(false);
+        return { success: false };
       }
 
-      if (!result.user) {
-        throw new Error("User data is missing");
-      }
-
-      return { success: true, user: result.user };
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
-      return { success: false };
-    } finally {
+      
+      setMessage("Verification successful");
       setLoading(false);
+      return { success: true };
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unexpected error");
+      setMessage(null);
+      setLoading(false);
+      return { success: false };
     }
   };
 
-  return { verify, error, loading };
+  return { message, error, loading, verify };
 };

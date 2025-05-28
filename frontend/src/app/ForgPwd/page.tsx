@@ -3,36 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaEnvelope } from "react-icons/fa";
+import { useSendRecoveryEmail } from "../hooks/useSendRecoveryEmail";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [formError, setFormError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { sendEmail, loading, error, message } = useSendRecoveryEmail();
+
   const router = useRouter();
 
-  const handleSubmit = async () => {
-    if (!email) {
-      setFormError("Please enter your email.");
-      return;
-    }
-
-    setFormError("");
-    setLoading(true);
-
-    try {
-      // Simular petición (reemplaza con llamada real a tu API)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setSuccessMessage(
-        "If the email is registered, you'll receive a recovery link."
-      );
-    } catch (err) {
-      setFormError("Something went wrong. Please try again.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleSubmit = async () => {
+  const success = await sendEmail(email);
+  if (success) {
+    router.push("/Verification");
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
@@ -41,15 +25,15 @@ export default function ForgotPassword() {
           Forgot Password
         </h1>
 
-        {formError && (
+        {error && (
           <div className="text-red-500 text-sm mb-4 text-center">
-            {formError}
+            {error}
           </div>
         )}
 
-        {successMessage && (
+        {message && (
           <div className="text-green-500 text-sm mb-4 text-center">
-            {successMessage}
+            {message}
           </div>
         )}
 
