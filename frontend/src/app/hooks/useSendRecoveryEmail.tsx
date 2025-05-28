@@ -18,7 +18,7 @@ export const useSendRecoveryEmail = () => {
     localStorage.setItem("recoveryEmail", email);
 
     if (!process.env.NEXT_PUBLIC_API_URL || !process.env.NEXT_PUBLIC_API_KEY) {
-      setError("API configuration is missing");
+      setError("API configuration missing");
       setLoading(false);
       return { success: false };
     }
