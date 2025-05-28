@@ -49,3 +49,14 @@ Delete Invalid Report (DELETE /reports/0)
     Create Session    backend    ${BASE_URL}    headers=${headers}
     ${response}=    DELETE On Session    backend    /reports/0    expected_status=any
     Should Be Equal As Strings    ${response.status_code}    404
+
+Login With Valid Credentials (POST /login)
+    [Documentation]    Probar inicio de sesión con email y contraseña correctos
+    ${headers}=    Create Dictionary    Content-Type=application/json    X-API-KEY=${API_KEY}
+    Create Session    backend    ${BASE_URL}    headers=${headers}
+    ${body}=    Create Dictionary    email=john.doe@company.com    password=password123
+    ${response}=    POST On Session    backend    /login    json=${body}
+    Should Be Equal As Strings    ${response.status_code}    200
+    ${json}=    Set Variable    ${response.json()}
+    Dictionary Should Contain Key    ${json}    message
+    Dictionary Should Contain Key    ${json["user"]}    email

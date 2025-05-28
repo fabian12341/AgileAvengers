@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import Navigation from "../components/Navigation";
 import Button from "../components/ui/button";
 import { useCallsData } from "../hooks/useCallData";
-import { useReports, Report } from "../hooks/useReportsData";
+import { useReports } from "../hooks/useReportsData";
+import { Report } from "../types/Report";
 import { useSearchParams } from "next/navigation";
 
 const ReportsPage = () => {

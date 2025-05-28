@@ -66,7 +66,12 @@ const Dashboard = () => {
       })
         .then((res) => res.json())
         .then((users) => {
-          const agents = users.filter((u: Agent) => u.role.toLowerCase() === "agent");
+          let agents = users.filter((u: Agent) => u.role.toLowerCase() === "agent");
+
+          if (role === "TeamLeader") {
+            agents = agents.filter((a: Agent) => a.id_team === id_team);
+          }
+
           setTeamAgents(agents);
         })
         .catch((err) => console.error("Error fetching agents:", err));
@@ -74,6 +79,7 @@ const Dashboard = () => {
       fetchUserCalls(id_user);
     }
   }, [role, id_team, id_user]);
+
 
   const getAverageCallDuration = () => calls.length === 0 ? 0 : calls.reduce((acc, c) => acc + c.duration, 0) / calls.length;
 

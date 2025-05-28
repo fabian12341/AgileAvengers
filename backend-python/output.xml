@@ -1,73 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.2.2 (Python 3.11.9 on win32)" generated="2025-04-30T10:05:21.571088" rpa="false" schemaversion="5">
-<suite id="s1" name="Api" source="C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\tests\api">
-<suite id="s1-s1" name="Tests" source="C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\tests\api\tests.robot">
-<test id="s1-s1-t1" name="Cargar API Key" line="12">
+<robot generator="Robot 7.2.2 (Python 3.11.9 on win32)" generated="2025-05-23T12:04:29.286084" rpa="false" schemaversion="5">
+<suite id="s1" name="Tests" source="C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\tests\api\tests.robot">
+<test id="s1-t1" name="Cargar API Key" line="12">
 <kw name="Get Environment Variable" owner="OperatingSystem">
-<msg time="2025-04-30T10:05:26.024548" level="FAIL">Environment variable 'API_KEY' does not exist.</msg>
+<msg time="2025-05-23T12:04:30.078251" level="INFO">${API_KEY} = 123</msg>
 <var>${API_KEY}</var>
 <arg>API_KEY</arg>
 <doc>Returns the value of an environment variable with the given name.</doc>
-<status status="FAIL" start="2025-04-30T10:05:26.024548" elapsed="0.000000">Environment variable 'API_KEY' does not exist.</status>
+<status status="PASS" start="2025-05-23T12:04:30.078251" elapsed="0.000000"/>
 </kw>
 <kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2025-05-23T12:04:30.078251" level="INFO">${API_KEY} = 123</msg>
 <arg>${API_KEY}</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<status status="NOT RUN" start="2025-04-30T10:05:26.024548" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:30.078251" elapsed="0.000000"/>
 </kw>
-<status status="FAIL" start="2025-04-30T10:05:26.024548" elapsed="0.000000">Environment variable 'API_KEY' does not exist.</status>
+<status status="PASS" start="2025-05-23T12:04:30.078251" elapsed="0.000000"/>
 </test>
-<test id="s1-s1-t2" name="Get Clients (GET /clients)" line="15">
+<test id="s1-t2" name="Get Clients (GET /clients)" line="15">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2025-04-30T10:05:26.028643" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<msg time="2025-05-23T12:04:30.082597" level="INFO">${headers} = {'X-API-KEY': '123'}</msg>
 <var>${headers}</var>
 <arg>X-API-KEY</arg>
 <arg>${API_KEY}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2025-04-30T10:05:26.028643" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:30.082597" elapsed="0.000000"/>
 </kw>
 <kw name="Create Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:05:26.028643" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2025-05-23T12:04:30.082597" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': '123'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
 <arg>backend</arg>
 <arg>${BASE_URL}</arg>
 <arg>headers=${headers}</arg>
 <doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2025-04-30T10:05:26.028643" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:30.082597" elapsed="0.000000"/>
 </kw>
 <kw name="GET On Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:08.039569" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/clients 
+<msg time="2025-05-23T12:04:31.250635" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/clients 
  path_url=/clients 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '123'} 
  body=None 
  </msg>
-<msg time="2025-04-30T10:06:08.039569" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/clients 
- status=401, reason=Unauthorized 
- headers={'Date': 'Wed, 30 Apr 2025 16:06:08 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '7b98a7f4-5b65-409f', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938847daaa3649d9-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
- body=&lt;!doctype html&gt;
-&lt;html lang=en&gt;
-&lt;title&gt;401 Unauthorized&lt;/title&gt;
-&lt;h1&gt;Unauthorized&lt;/h1&gt;
-&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+<msg time="2025-05-23T12:04:31.250635" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/clients 
+ status=200, reason=OK 
+ headers={'Date': 'Fri, 23 May 2025 18:04:30 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': 'http://localhost:3000', 'rndr-id': '18f7c03b-cfa8-43c1', 'vary': 'Origin, Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '944679df189e49df-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=[{"id_client":1,"name":"Tech Innovations Inc."},{"id_client":2,"name":"Green Solutions Ltd."},{"id_client":3,"name":"Bright Future Co."},{"id_client":4,"name":"NextGen Tech LLC"},{"id_client":5,"name":"Smart Solutions GmbH"},{"id_client":6,"name":"Clean Energy Corp."},{"id_client":7,"name":"Global Ventures"},{"id_client":8,"name":"FastTrack Solutions"},{"id_client":9,"name":"Creative Designs Co."},{"id_client":10,"name":"Advanced Systems Inc."},{"id_client":11,"name":"Future Enterprises"},{"id_client":12,"name":"EcoWorld LLC"},{"id_client":13,"name":"Powerhouse Industries"},{"id_client":14,"name":"BlueWave Technologies"},{"id_client":15,"name":"Visionary Group"},{"id_client":16,"name":"Unified Enterprises"},{"id_client":17,"name":"Alpha Technologies"},{"id_client":18,"name":"Synergy Solutions"},{"id_client":19,"name":"RapidGrowth Corp."},{"id_client":20,"name":"WorldWide Holdings"}]
  
  </msg>
-<msg time="2025-04-30T10:06:08.039569" level="FAIL">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/clients</msg>
+<msg time="2025-05-23T12:04:31.250635" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>backend</arg>
 <arg>/clients</arg>
 <doc>Sends a GET request on a previously created HTTP Session.</doc>
-<status status="FAIL" start="2025-04-30T10:05:26.030854" elapsed="42.085712">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/clients</status>
+<status status="PASS" start="2025-05-23T12:04:30.082597" elapsed="1.168038"/>
 </kw>
 <kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2025-05-23T12:04:31.254142" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
 <arg>${response.status_code}</arg>
 <arg>200</arg>
 <doc>Fails if objects are unequal after converting them to strings.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.250635" elapsed="0.003507"/>
 </kw>
 <kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-05-23T12:04:31.254142" level="INFO">${clientes} = [{'id_client': 1, 'name': 'Tech Innovations Inc.'}, {'id_client': 2, 'name': 'Green Solutions Ltd.'}, {'id_client': 3, 'name': 'Bright Future Co.'}, {'id_client': 4, 'name': 'NextGen Tech LLC'}, {'id_...</msg>
 <var>${clientes}</var>
 <arg>${response.json()}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
 </kw>
 <for flavor="IN">
 <iter>
@@ -75,252 +75,632 @@
 <arg>${cliente}</arg>
 <arg>id_client</arg>
 <doc>Fails if ``key`` is not found from ``dictionary``.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
 </kw>
 <kw name="Dictionary Should Contain Key" owner="Collections">
 <arg>${cliente}</arg>
 <arg>name</arg>
 <doc>Fails if ``key`` is not found from ``dictionary``.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
 </kw>
-<var name="${cliente}"/>
-<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+<var name="${cliente}">{'id_client': 1, 'name': 'Tech Innovations Inc.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 2, 'name': 'Green Solutions Ltd.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 3, 'name': 'Bright Future Co.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 4, 'name': 'NextGen Tech LLC'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.004408"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 5, 'name': 'Smart Solutions GmbH'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 6, 'name': 'Clean Energy Corp.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.002014"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.260564" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 7, 'name': 'Global Ventures'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.258550" elapsed="0.002014"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 8, 'name': 'FastTrack Solutions'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.260564" elapsed="0.000505"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 9, 'name': 'Creative Designs Co.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 10, 'name': 'Advanced Systems Inc.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.001743"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 11, 'name': 'Future Enterprises'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.261069" elapsed="0.001743"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 12, 'name': 'EcoWorld LLC'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 13, 'name': 'Powerhouse Industries'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 14, 'name': 'BlueWave Technologies'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.262812" elapsed="0.002009"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 15, 'name': 'Visionary Group'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 16, 'name': 'Unified Enterprises'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.264821" elapsed="0.002011"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 17, 'name': 'Alpha Technologies'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 18, 'name': 'Synergy Solutions'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 19, 'name': 'RapidGrowth Corp.'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</iter>
+<iter>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>id_client</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${cliente}</arg>
+<arg>name</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
+</kw>
+<var name="${cliente}">{'id_client': 20, 'name': 'WorldWide Holdings'}</var>
+<status status="PASS" start="2025-05-23T12:04:31.266832" elapsed="0.000000"/>
 </iter>
 <var>${cliente}</var>
 <value>@{clientes}</value>
-<status status="NOT RUN" start="2025-04-30T10:06:08.116566" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.254142" elapsed="0.012690"/>
 </for>
-<status status="FAIL" start="2025-04-30T10:05:26.028643" elapsed="42.087923">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/clients</status>
+<status status="PASS" start="2025-05-23T12:04:30.078251" elapsed="1.188581"/>
 </test>
-<test id="s1-s1-t3" name="Get Calls (GET /calls)" line="26">
+<test id="s1-t3" name="Get Calls (GET /calls)" line="26">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2025-04-30T10:06:08.120604" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<msg time="2025-05-23T12:04:31.271266" level="INFO">${headers} = {'X-API-KEY': '123'}</msg>
 <var>${headers}</var>
 <arg>X-API-KEY</arg>
 <arg>${API_KEY}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2025-04-30T10:06:08.120604" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.271266" elapsed="0.000000"/>
 </kw>
 <kw name="Create Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:08.120604" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2025-05-23T12:04:31.271266" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': '123'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
 <arg>backend</arg>
 <arg>${BASE_URL}</arg>
 <arg>headers=${headers}</arg>
 <doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2025-04-30T10:06:08.120604" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:31.271266" elapsed="0.000000"/>
 </kw>
 <kw name="GET On Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:08.884491" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/calls 
+<msg time="2025-05-23T12:04:32.165058" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/calls 
  path_url=/calls 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '123'} 
  body=None 
  </msg>
-<msg time="2025-04-30T10:06:08.884491" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/calls 
- status=401, reason=Unauthorized 
- headers={'Date': 'Wed, 30 Apr 2025 16:06:08 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '99077b4a-dcfc-4df7', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938848e01c5edab4-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
- body=&lt;!doctype html&gt;
-&lt;html lang=en&gt;
-&lt;title&gt;401 Unauthorized&lt;/title&gt;
-&lt;h1&gt;Unauthorized&lt;/h1&gt;
-&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+<msg time="2025-05-23T12:04:32.165058" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/calls 
+ status=200, reason=OK 
+ headers={'Date': 'Fri, 23 May 2025 18:04:31 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': 'http://localhost:3000', 'rndr-id': 'd6dcc8ef-9846-47c0', 'vary': 'Origin, Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '944679e5acdddab4-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=[{"date":"2025-04-02 21:36:00","duration":30,"id":4,"user_id":3},{"date":"2025-04-01 18:27:00","duration":30,"id":5,"user_id":3},{"date":"2025-04-02 20:29:00","duration":30,"id":6,"user_id":3},{"date":"2025-04-03 18:58:00","duration":36,"id":8,"user_id":1},{"date":"2023-06-21 21:44:00","duration":36,"id":9,"user_id":4},{"date":"2025-04-09 19:57:00","duration":30,"id":10,"user_id":14},{"date":"2025-04-10 21:03:00","duration":30,"id":11,"user_id":3},{"date":"2025-04-30 23:06:00","duration":30,"id":12,"user_id":3},{"date":"2025-05-07 23:23:00","duration":30,"id":14,"user_id":3},{"date":"2025-05-15 13:03:00","duration":30,"id":15,"user_id":3},{"date":"2025-05-15 13:03:00","duration":30,"id":16,"user_id":3},{"date":"2025-06-01 13:47:00","duration":30,"id":17,"user_id":5},{"date":"2025-05-07 22:20:00","duration":30,"id":18,"user_id":4},{"date":"2025-05-14 16:13:00","duration":30,"id":30,"user_id":3}]
  
  </msg>
-<msg time="2025-04-30T10:06:08.886514" level="FAIL">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls</msg>
+<msg time="2025-05-23T12:04:32.165058" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>backend</arg>
 <arg>/calls</arg>
 <doc>Sends a GET request on a previously created HTTP Session.</doc>
-<status status="FAIL" start="2025-04-30T10:06:08.120604" elapsed="0.765910">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls</status>
+<status status="PASS" start="2025-05-23T12:04:31.271266" elapsed="0.893792"/>
 </kw>
 <kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2025-05-23T12:04:32.165058" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
 <arg>${response.status_code}</arg>
 <arg>200</arg>
 <doc>Fails if objects are unequal after converting them to strings.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:08.886514" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:32.165058" elapsed="0.000000"/>
 </kw>
 <kw name="Dictionary Should Contain Key" owner="Collections">
 <arg>${response.json()[0]}</arg>
 <arg>id</arg>
 <doc>Fails if ``key`` is not found from ``dictionary``.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:08.888518" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:32.165058" elapsed="0.004388"/>
 </kw>
-<status status="FAIL" start="2025-04-30T10:06:08.116566" elapsed="0.771952">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls</status>
+<status status="PASS" start="2025-05-23T12:04:31.271266" elapsed="0.898180"/>
 </test>
-<test id="s1-s1-t4" name="Get Calls with Users (GET /calls/users)" line="33">
+<test id="s1-t4" name="Get Calls with Users (GET /calls/users)" line="33">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2025-04-30T10:06:08.888518" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<msg time="2025-05-23T12:04:32.169446" level="INFO">${headers} = {'X-API-KEY': '123'}</msg>
 <var>${headers}</var>
 <arg>X-API-KEY</arg>
 <arg>${API_KEY}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2025-04-30T10:06:08.888518" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:32.169446" elapsed="0.000000"/>
 </kw>
 <kw name="Create Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:08.888518" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2025-05-23T12:04:32.169446" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': '123'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
 <arg>backend</arg>
 <arg>${BASE_URL}</arg>
 <arg>headers=${headers}</arg>
 <doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2025-04-30T10:06:08.888518" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:32.169446" elapsed="0.000000"/>
 </kw>
 <kw name="GET On Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:09.549593" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/calls/users 
+<msg time="2025-05-23T12:04:39.329410" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/calls/users 
  path_url=/calls/users 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '123'} 
  body=None 
  </msg>
-<msg time="2025-04-30T10:06:09.549593" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/calls/users 
- status=401, reason=Unauthorized 
- headers={'Date': 'Wed, 30 Apr 2025 16:06:09 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '935c65be-1b86-4265', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938848e4cf27dab4-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
- body=&lt;!doctype html&gt;
-&lt;html lang=en&gt;
-&lt;title&gt;401 Unauthorized&lt;/title&gt;
-&lt;h1&gt;Unauthorized&lt;/h1&gt;
-&lt;p&gt;API key inválida o ausente&lt;/p&gt;
- 
+<msg time="2025-05-23T12:04:39.329410" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/calls/users 
+ status=200, reason=OK 
+ headers={'Date': 'Fri, 23 May 2025 18:04:38 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': 'http://localhost:3000', 'rndr-id': 'fe0cbea6-d156-4552', 'vary': 'Origin, Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '944679eb591049ee-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=[{"client_name":"Tech Innovations Inc.","date":"2025-04-02 21:36:00","duration":30,"id_call":4,"id_client":1,"id_emotions":10,"id_user":3,"report":{"id_report":4,"overall_emotion":63.9642,"path":"no_path","speakers":[{"emotions":{"anger":0.901774,"happiness":0.0592086,"neutrality":0.0388547,"sadness":0.000162991,"text_sentiment":"neutral","text_sentiment_score":0.628375},"role":"Agent","voice":{"hnr":-97.4344,"loudness":0.0199541,"pitch":239.282,"pitch_std_dev":38.4249,"tempo":144.231,"zcr":0.170038}},{"emotions":{"anger":0.706406,"happiness":0.1808,"neutrality":0.0893656,"sadness":0.0234283,"text_sentiment":"negative","text_sentiment_score":0.57766},"role":"Client","voice":{"hnr":-104.631,"loudness":0.0176469,"pitch":159.743,"pitch_std_dev":45.3602,"tempo":89.2857,"zcr":0.149389}}],"suggestions":["Offer to provide additional information about the Spanish classes, including location, schedule, and fees.","Ask the client if they would like assistance with anything else, such as resources for learning Spanish or other language options.","Suggest scheduling a follow-up call to check on the client\u2019s progress or any further questions they may have regarding language learning."],"summary":"The conversation is in Spanish, where Ana (the agent) introduces herself and informs the client (who does not speak Spanish well) about a Spanish teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},"silence_percentage":58.2754,"transcript":{"id_transcript":4,"language":"es","text":"AGENT:\n  Hola, \u00bfqu\u00e9 tal?\n\nAGENT:\n  T\u00fa eres...\n\nAGENT:\n  Mark, no, Filipe, no.\n\nAGENT:\n  Pao.\n\nAGENT:\n  Hola, yo soy Ana.\n\nAGENT:\n  Encantada.\n\nCLIENT:\n  Ana, yo no hablo muy bien espa\u00f1ol.\n\nCLIENT:\n  Y no s\u00e9 si conoces a un profesor para ir a clases.\n\nAGENT:\n  S\u00ed, conozco una profesora.\n\nAGENT:\n  Se llama Cecilia Carreras.\n\nAGENT:\n  Vive en la calle San Jos\u00e9.\n\nCLIENT:\n  \u00bfT\u00fa?"},"user":{"email":"tom.green@company.com","id":3,"id_team":1,"name":"Tom Green","role":"Agent"}},{"client_name":"Tech Innovations Inc.","date":"2025-04-01 18:27:00","duration":30,"id_call":5,"id_client":1,"id_emotions":13,"id_user":3,"report":{"id_report":5,"overall_emotion":63.9642,"path":"no_path","speakers":[{"emotions":{"anger":0.901774,"happiness":0.0592086,"neutrality":0.0388547,"sadness":0.000162991,"text_sentiment":"neutral","text_sentiment_score":0.628375},"role":"Agent","voice":{"hnr":-97.4344,"loudness":0.0199541,"pitch":239.282,"pitch_std_dev":38.4249,"tempo":144.231,"zcr":0.170038}},{"emotions":{"anger":0.706406,"happiness":0.1808,"neutrality":0.0893656,"sadness":0.0234283,"text_sentiment":"negative","text_sentiment_score":0.57766},"role":"Client","voice":{"hnr":-104.631,"loudness":0.0176469,"pitch":159.743,"pitch_std_dev":45.3602,"tempo":89.2857,"zcr":0.149389}}],"suggestions":["Offer to assist the client in finding additional resources for language learning, such as online courses or language exchange programs.","Encourage the client to practice their Spanish with her during the conversation to build their confidence.","Ask the client about their specific needs or goals for learning Spanish to tailor their search for a teacher or resources accordingly."],"summary":"In this conversation, Ana (the agent) greets the client and introduces herself. The client (SPEAKER 2) mentions that they don't speak Spanish well and inquires if Ana knows a teacher for Spanish classes. Ana responds positively, providing the name and address of a teacher named Cecilia Carreras."},"silence_percentage":58.2754,"transcript":{"id_transcript":5,"language":"es","text":"AGENT:\n  Hola, \u00bfqu\u00e9 tal?\n\nAGENT:\n  T\u00fa eres...\n\nAGENT:\n  Mark, no, Filipe, no.\n\nAGENT:\n  Pao.\n\nAGENT:\n  Hola, yo soy Ana.\n\nAGENT:\n  Encantada.\n\nCLIENT:\n  Ana, yo no hablo muy bien espa\u00f1ol.\n\nCLIENT:\n  Y no s\u00e9 si conoces a un profesor para ir a clases.\n\nAGENT:\n  S\u00ed, conozco una profesora.\n\nAGENT:\n  Se llama Cecilia Carreras.\n\nAGENT:\n  Vive en la calle San Jos\u00e9.\n\nCLIENT:\n  \u00bfT\u00fa?"},"user":{"email":"tom.green@company.com","id":3,"id_team":1,"name":"Tom Green","role":"Agent"}},{"client_name":"Tech Innovations Inc.","date":"2025-04-02 20:29:00","duration":30,"id_call":6,"id_client":1,"id_emotions":16,"id_user":3,"report":{"id_report":6,"overall_emotion":63.9642,"path":"no_path","speakers":[{"emotions":{"anger":0.901774,"happiness":0.0592086,"neutrality":0.0388547,"sadness":0.000162991,"text_sentiment":"neutral","text_sentiment_score":0.628375},"role":"Agent","voice":{"hnr":-97.4344,"loudness":0.0199541,"pitch":239.282,"pitch_std_dev":38.4249,"tempo":144.231,"zcr":0.170038}},{"emotions":{"anger":0.706406,"happiness":0.1808,"neutrality":0.0893656,"sadness":0.0234283,"text_sentiment":"negative","text_sentiment_score":0.57766},"role":"Client","voice":{"hnr":-104.631,"loudness":0.0176469,"pitch":159.743,"pitch_std_dev":45.3602,"tempo":89.2857,"zcr":0.149389}}],"suggestions":["Offer to provide the client's contact information to Cecilia Carreras for easier communication and scheduling.","Suggest online resources or classes that the client could take if they prefer not to meet in person.","Ask the client about their specific needs or preferences regarding the lessons to ensure a good match with the teacher."],"summary":"The client, who struggles with Spanish, is looking for a teacher to take classes. The agent introduces herself as Ana and informs the client that she knows a teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},"silence_percentage":58.2754,"transcript":{"id_transcript":6,"language":"es","text":"AGENT:\n  Hola, \u00bfqu\u00e9 tal?\n\nAGENT:\n  T\u00fa eres...\n\nAGENT:\n  Mark, no, Filipe, no.\n\nAGENT:\n  Pao.\n\nAGENT:\n  Hola, yo soy Ana.\n\nAGENT:\n  Encantada.\n\nCLIENT:\n  Ana, yo no hablo muy bien espa\u00f1ol.\n\nCLIENT:\n  Y no s\u00e9 si conoces a un profesor para ir a clases.\n\nAGENT:\n  S\u00ed, conozco una profesora.\n\nAGENT:\n  Se llama Cecilia Carreras.\n\nAGENT:\n  Vive en la calle San Jos\u00e9.\n\nCLIENT:\n  \u00bfT\u00fa?"},"user":{"email":"tom.green@company.com","id":3,"id_team":1,"name":"Tom Green","role":"Agent"}},{"client_name":"Green Solutions Ltd.","date":"2025-04-03 18:58:00","duration":36,"id_call":8,"id_client":2,"id_emotions":22,"id_user":1,"report":{"id_report":8,"overall_emotion":91.3722,"path":"no_path","speakers":[{"emotions":{"anger":0.016802,"happiness":0.495181,"neutrality":0.0697223,"sadness":0.418295,"text_sentiment":"negative","text_sentiment_score":0.987463},"role":"Agent","voice":{"hnr":-47.4044,"loudness":0.0417069,"pitch":187.881,"pitch_std_dev":24.0827,"tempo":144.231,"zcr":0.13956}},{"emotions":{"anger":0.00267854,"happiness":0.505856,"neutrality":0.467794,"sadness":0.0236722,"text_sentiment":"negative","text_sentiment_score":0.996418},"role":"Client","voice":{"hnr":-30.5237,"loudness":0.0455987,"pitch":227.912,"pitch_std_dev":33.4556,"tempo":117.188,"zcr":0.15823}}],"suggestions":["Provide more detailed information about the saxoboom, including its history and how it differs from other instruments.","Ask the client if they have experience playing the saxoboom or if they would like tips on how to master it.","Offer additional resources or lessons for learning the saxoboom to enhance the client's experience."],"summary":"The conversation revolves around a discussion about a musical instrument called a saxoboom. The agent (SPEAKER 1) explains that the saxoboom is often confused with other instruments but is unique and requires years of practice to master. The client (SPEAKER 2) expresses excitement upon realizing they have a saxoboom and agrees to demonstrate it."},"silence_percentage":22.3191,"transcript":{"id_transcript":8,"language":"en","text":"AGENT:\n  but it's a saxoboom.\n\nAGENT:\n  It's a different kind of instrument.\n\nAGENT:\n  A lot of people confuse them, but um...\n\nAGENT:\n  Saxoboom is a...\n\nCLIENT:\n  People confuse them?\n\nAGENT:\n  Well, you know, because they look similar,\n\nAGENT:\n  but a saxoboom is its own kind of instrument\n\nAGENT:\n  that takes years to master.\n\nAGENT:\n  If we happen to have one here,\n\nAGENT:\n  could you maybe just show us what it's like to...\n\nCLIENT:\n  You don't have a sax...\n\nCLIENT:\n  Oh my God!\n\nCLIENT:\n  This is a saxoboom.\n\nCLIENT:\n  Are you kidding me?\n\nCLIENT:\n  This is a real...\n\nCLIENT:\n  It's a little harder to find a saxoboom.\n\nAGENT:\n  Could you show us the magic?\n\nAGENT:\n  Could you give us a little taste?\n\nCLIENT:\n  Here it is.\n\nAGENT:\n  Rare as a Stradivarius.\n\nCLIENT:\n  Yes, I will give you a taste."},"user":{"email":"john.doe@company.com","id":1,"id_team":1,"name":"John Doe","role":"Admin"}},{"client_name":"Alpha Technologies","date":"2023-06-21 21:44:00","duration":36,"id_call":9,"id_client":17,"id_emotions":25,"id_user":4,"report":{"id_report":9,"overall_emotion":21.4748,"path":"no_path","speakers":[{"emotions":{"anger":0.016802,"happiness":0.495181,"neutrality":0.0697223,"sadness":0.418295,"text_sentiment":"negative","text_sentiment_score":0.987463},"role":"Agent","voice":{"hnr":-47.4044,"loudness":0.0417069,"pitch":187.881,"pitch_std_dev":24.0827,"tempo":144.231,"zcr":0.13956}},{"emotions":{"anger":0.00267854,"happiness":0.505856,"neutrality":0.467794,"sadness":0.0236722,"text_sentiment":"negative","text_sentiment_score":0.996418},"role":"Client","voice":{"hnr":-30.5237,"loudness":0.0455987,"pitch":227.912,"pitch_std_dev":33.4556,"tempo":117.188,"zcr":0.15823}}],"suggestions":["Encourage the client to play a short sample of the saxoboom to create an engaging experience.","Provide additional information about the history and uses of the saxoboom to enhance the conversation.","Ask the client if they have any specific questions or topics they would like to discuss regarding the saxoboom."],"summary":"The agent and client are discussing a unique musical instrument called the saxoboom. Th... (set the log level to DEBUG or TRACE to see the full content) 
  </msg>
-<msg time="2025-04-30T10:06:09.549593" level="FAIL">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls/users</msg>
+<msg time="2025-05-23T12:04:39.329410" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>backend</arg>
 <arg>/calls/users</arg>
 <doc>Sends a GET request on a previously created HTTP Session.</doc>
-<status status="FAIL" start="2025-04-30T10:06:08.888518" elapsed="0.661075">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls/users</status>
+<status status="PASS" start="2025-05-23T12:04:32.169446" elapsed="7.159964"/>
 </kw>
 <kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2025-05-23T12:04:39.333565" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
 <arg>${response.status_code}</arg>
 <arg>200</arg>
 <doc>Fails if objects are unequal after converting them to strings.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:09.549593" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:39.329410" elapsed="0.004155"/>
 </kw>
 <kw name="Dictionary Should Contain Key" owner="Collections">
 <arg>${response.json()[0]}</arg>
 <arg>user</arg>
 <doc>Fails if ``key`` is not found from ``dictionary``.</doc>
-<status status="NOT RUN" start="2025-04-30T10:06:09.549593" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:39.333565" elapsed="0.000000"/>
 </kw>
-<status status="FAIL" start="2025-04-30T10:06:08.888518" elapsed="0.661075">HTTPError: 401 Client Error: Unauthorized for url: https://agileavengers-2.onrender.com/calls/users</status>
+<status status="PASS" start="2025-05-23T12:04:32.169446" elapsed="7.164119"/>
 </test>
-<test id="s1-s1-t5" name="Get Reports (GET /reports)" line="40">
+<test id="s1-t5" name="Get Reports (GET /reports)" line="40">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2025-04-30T10:06:09.553679" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<msg time="2025-05-23T12:04:39.333565" level="INFO">${headers} = {'X-API-KEY': '123'}</msg>
 <var>${headers}</var>
 <arg>X-API-KEY</arg>
 <arg>${API_KEY}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2025-04-30T10:06:09.549593" elapsed="0.004086"/>
+<status status="PASS" start="2025-05-23T12:04:39.333565" elapsed="0.000000"/>
 </kw>
 <kw name="Create Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:09.553679" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2025-05-23T12:04:39.333565" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': '123'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
 <arg>backend</arg>
 <arg>${BASE_URL}</arg>
 <arg>headers=${headers}</arg>
 <doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2025-04-30T10:06:09.553679" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:39.333565" elapsed="0.000000"/>
 </kw>
 <kw name="GET On Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:14.929923" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/reports 
+<msg time="2025-05-23T12:04:43.017111" level="INFO">GET Request : url=https://agileavengers-2.onrender.com/reports 
  path_url=/reports 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': ''} 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '123'} 
  body=None 
  </msg>
-<msg time="2025-04-30T10:06:14.929923" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/reports 
+<msg time="2025-05-23T12:04:43.017111" level="INFO">GET Response : url=https://agileavengers-2.onrender.com/reports 
  status=200, reason=OK 
- headers={'Date': 'Wed, 30 Apr 2025 16:06:14 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '02c0e30e-b996-4f97', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '938848e8aeccdab4-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
- body=[{"call":{"agent":"Tom Green","client":1,"date":"2025-04-01","id_call":1},"id_report":1,"summary":"The client, who is not fluent in Spanish, is seeking a recommendation for a Spanish teacher. The agent provides the name and address of a teacher named Cecilia Carreras."},{"call":{"agent":"John Doe","client":1,"date":"2025-04-03","id_call":2},"id_report":2,"summary":"The client, Ana, is seeking help with finding a Spanish teacher for classes. The agent, who introduces herself as Ana, confirms that she knows a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":1,"date":"2025-04-03","id_call":3},"id_report":3,"summary":"In this conversation, Ana, the agent, greets the client, who is struggling with Spanish and is looking for a teacher. Ana provides the name of a teacher, Cecilia Carreras, and her location."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-02","id_call":4},"id_report":4,"summary":"The conversation is in Spanish, where Ana (the agent) introduces herself and informs the client (who does not speak Spanish well) about a Spanish teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-01","id_call":5},"id_report":5,"summary":"In this conversation, Ana (the agent) greets the client and introduces herself. The client (SPEAKER 2) mentions that they don't speak Spanish well and inquires if Ana knows a teacher for Spanish classes. Ana responds positively, providing the name and address of a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-02","id_call":6},"id_report":6,"summary":"The client, who struggles with Spanish, is looking for a teacher to take classes. The agent introduces herself as Ana and informs the client that she knows a teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":3,"date":"2025-04-16","id_call":7},"id_report":7,"summary":"The customer service call involves a conversation between Ana (the agent) and a client who is looking for a Spanish teacher. The client, who does not speak Spanish very well, asks Ana if she knows any teachers, to which Ana responds that she knows a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":2,"date":"2025-04-03","id_call":8},"id_report":8,"summary":"The conversation revolves around a discussion about a musical instrument called a saxoboom. The agent (SPEAKER 1) explains that the saxoboom is often confused with other instruments but is unique and requires years of practice to master. The client (SPEAKER 2) expresses excitement upon realizing they have a saxoboom and agrees to demonstrate it."},{"call":{"agent":"Alice Brown","client":17,"date":"2023-06-21","id_call":9},"id_report":9,"summary":"The agent and client are discussing a unique musical instrument called the saxoboom. The agent is explaining the saxoboom and its characteristics while the client expresses excitement upon realizing the saxoboom is present. The client is then asked to demonstrate the instrument."},{"call":{"agent":"Lily Orange","client":15,"date":"2025-04-09","id_call":10},"id_report":10,"summary":"The client, who has limited Spanish proficiency, is seeking a teacher for Spanish classes. The agent responds positively, confirming that they know a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."}]
+ headers={'Date': 'Fri, 23 May 2025 18:04:42 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': 'http://localhost:3000', 'rndr-id': '44d09aba-581d-4c33', 'vary': 'Origin, Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '94467a184d6549e5-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body=[{"call":{"agent":"Tom Green","client":1,"date":"2025-04-02","id_call":4},"id_report":4,"summary":"The conversation is in Spanish, where Ana (the agent) introduces herself and informs the client (who does not speak Spanish well) about a Spanish teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-01","id_call":5},"id_report":5,"summary":"In this conversation, Ana (the agent) greets the client and introduces herself. The client (SPEAKER 2) mentions that they don't speak Spanish well and inquires if Ana knows a teacher for Spanish classes. Ana responds positively, providing the name and address of a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-02","id_call":6},"id_report":6,"summary":"The client, who struggles with Spanish, is looking for a teacher to take classes. The agent introduces herself as Ana and informs the client that she knows a teacher named Cecilia Carreras, who lives on San Jos\u00e9 street."},{"call":{"agent":"John Doe","client":2,"date":"2025-04-03","id_call":8},"id_report":8,"summary":"The conversation revolves around a discussion about a musical instrument called a saxoboom. The agent (SPEAKER 1) explains that the saxoboom is often confused with other instruments but is unique and requires years of practice to master. The client (SPEAKER 2) expresses excitement upon realizing they have a saxoboom and agrees to demonstrate it."},{"call":{"agent":"Alice Brown","client":17,"date":"2023-06-21","id_call":9},"id_report":9,"summary":"The agent and client are discussing a unique musical instrument called the saxoboom. The agent is explaining the saxoboom and its characteristics while the client expresses excitement upon realizing the saxoboom is present. The client is then asked to demonstrate the instrument."},{"call":{"agent":"Lily Orange","client":15,"date":"2025-04-09","id_call":10},"id_report":10,"summary":"The client, who has limited Spanish proficiency, is seeking a teacher for Spanish classes. The agent responds positively, confirming that they know a teacher named Cecilia Carreras who lives on San Jos\u00e9 street."},{"call":{"agent":"Tom Green","client":2,"date":"2025-04-10","id_call":11},"id_report":11,"summary":"Ana (the agent) greets and introduces herself to the client, who is struggling with Spanish and inquiring about a teacher for classes. Ana offers a recommendation for a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-04-30","id_call":12},"id_report":12,"summary":"The conversation is in Spanish, where Ana (SPEAKER 1) introduces herself and informs the client (SPEAKER 2) that she knows a Spanish teacher named Cecilia Carreras who lives on San Jos\u00e9 street. The client expresses difficulty in speaking Spanish and is looking for a teacher for classes."},{"call":{"agent":"Tom Green","client":1,"date":"2025-05-07","id_call":14},"id_report":14,"summary":"The client, who is not fluent in Spanish, is seeking a recommendation for a Spanish teacher. The agent, Ana, responds positively and provides the name and location of a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-05-15","id_call":15},"id_report":15,"summary":"The client, who does not speak Spanish well, is looking for a teacher for classes. The agent provides the name and location of a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-05-15","id_call":16},"id_report":16,"summary":"The client, who struggles with Spanish, is looking for a teacher for classes. The agent offers a recommendation for a teacher named Cecilia Carreras, providing her location."},{"call":{"agent":"Bob White","client":1,"date":"2025-06-01","id_call":17},"id_report":17,"summary":"The client, who speaks limited Spanish, is seeking help finding a Spanish teacher for classes. The agent responds by providing the name and address of a teacher they know."},{"call":{"agent":"Alice Brown","client":1,"date":"2025-05-07","id_call":18},"id_report":18,"summary":"The client, who does not speak Spanish very well, is asking the agent if they know a teacher for classes. The agent responds positively, providing the name and address of a teacher named Cecilia Carreras."},{"call":{"agent":"Tom Green","client":1,"date":"2025-05-14","id_call":30},"id_report":27,"summary":"The client, who does not speak Spanish well, is seeking a teacher for classes. The agent, Ana, responds that she knows a teacher named Cecilia Carreras who lives on San Jos\u00e9 Street."}]
  
  </msg>
-<msg time="2025-04-30T10:06:14.934205" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<msg time="2025-05-23T12:04:43.017111" level="INFO">${response} = &lt;Response [200]&gt;</msg>
 <var>${response}</var>
 <arg>backend</arg>
 <arg>/reports</arg>
 <doc>Sends a GET request on a previously created HTTP Session.</doc>
-<status status="PASS" start="2025-04-30T10:06:09.555988" elapsed="5.378217"/>
+<status status="PASS" start="2025-05-23T12:04:39.337643" elapsed="3.679468"/>
 </kw>
 <kw name="Should Be Equal As Strings" owner="BuiltIn">
-<msg time="2025-04-30T10:06:14.934205" level="INFO">Argument types are:
+<msg time="2025-05-23T12:04:43.020631" level="INFO">Argument types are:
 &lt;class 'int'&gt;
 &lt;class 'str'&gt;</msg>
 <arg>${response.status_code}</arg>
 <arg>200</arg>
 <doc>Fails if objects are unequal after converting them to strings.</doc>
-<status status="PASS" start="2025-04-30T10:06:14.934205" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:43.017111" elapsed="0.003520"/>
 </kw>
 <kw name="Dictionary Should Contain Key" owner="Collections">
 <arg>${response.json()[0]}</arg>
 <arg>summary</arg>
 <doc>Fails if ``key`` is not found from ``dictionary``.</doc>
-<status status="PASS" start="2025-04-30T10:06:14.934205" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:43.020631" elapsed="0.000000"/>
 </kw>
-<status status="PASS" start="2025-04-30T10:06:09.549593" elapsed="5.384612"/>
+<status status="PASS" start="2025-05-23T12:04:39.333565" elapsed="3.687066"/>
 </test>
-<test id="s1-s1-t6" name="Delete Invalid Report (DELETE /reports/0)" line="47">
+<test id="s1-t6" name="Delete Invalid Report (DELETE /reports/0)" line="47">
 <kw name="Create Dictionary" owner="BuiltIn">
-<msg time="2025-04-30T10:06:14.938231" level="INFO">${headers} = {'X-API-KEY': ''}</msg>
+<msg time="2025-05-23T12:04:43.022640" level="INFO">${headers} = {'X-API-KEY': '123'}</msg>
 <var>${headers}</var>
 <arg>X-API-KEY</arg>
 <arg>${API_KEY}</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<status status="PASS" start="2025-04-30T10:06:14.934205" elapsed="0.004026"/>
+<status status="PASS" start="2025-05-23T12:04:43.022640" elapsed="0.000000"/>
 </kw>
 <kw name="Create Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:14.938231" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': ''},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2025-05-23T12:04:43.022640" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'X-API-KEY': '123'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
 <arg>backend</arg>
 <arg>${BASE_URL}</arg>
 <arg>headers=${headers}</arg>
 <doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2025-04-30T10:06:14.938231" elapsed="0.000000"/>
+<status status="PASS" start="2025-05-23T12:04:43.022640" elapsed="0.000000"/>
 </kw>
 <kw name="DELETE On Session" owner="RequestsLibrary">
-<msg time="2025-04-30T10:06:15.562347" level="INFO">DELETE Request : url=https://agileavengers-2.onrender.com/reports/0 
+<msg time="2025-05-23T12:04:43.916005" level="INFO">DELETE Request : url=https://agileavengers-2.onrender.com/reports/0 
  path_url=/reports/0 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '', 'Content-Length': '0'} 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-API-KEY': '123', 'Content-Length': '0'} 
  body=None 
  </msg>
-<msg time="2025-04-30T10:06:15.562347" level="INFO">DELETE Response : url=https://agileavengers-2.onrender.com/reports/0 
- status=401, reason=Unauthorized 
- headers={'Date': 'Wed, 30 Apr 2025 16:06:15 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': '*', 'rndr-id': '9cd0f7b5-16ae-4f4f', 'vary': 'Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '9388490a7e5a49ee-MFE', 'alt-svc': 'h3=":443"; ma=86400'} 
- body=&lt;!doctype html&gt;
-&lt;html lang=en&gt;
-&lt;title&gt;401 Unauthorized&lt;/title&gt;
-&lt;h1&gt;Unauthorized&lt;/h1&gt;
-&lt;p&gt;API key inválida o ausente&lt;/p&gt;
+<msg time="2025-05-23T12:04:43.916005" level="INFO">DELETE Response : url=https://agileavengers-2.onrender.com/reports/0 
+ status=404, reason=Not Found 
+ headers={'Date': 'Fri, 23 May 2025 18:04:43 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': 'http://localhost:3000', 'rndr-id': 'c209c708-3241-4719', 'vary': 'Origin, Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '94467a2f7ad749e3-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body={"error":"Reporte no encontrado"}
  
  </msg>
-<msg time="2025-04-30T10:06:15.562347" level="INFO">${response} = &lt;Response [401]&gt;</msg>
+<msg time="2025-05-23T12:04:43.916005" level="INFO">${response} = &lt;Response [404]&gt;</msg>
 <var>${response}</var>
 <arg>backend</arg>
 <arg>/reports/0</arg>
 <arg>expected_status=any</arg>
 <doc>Sends a DELETE request on a previously created HTTP Session.</doc>
-<status status="PASS" start="2025-04-30T10:06:14.938231" elapsed="0.624116"/>
+<status status="PASS" start="2025-05-23T12:04:43.022640" elapsed="0.893365"/>
 </kw>
 <kw name="Should Be Equal As Strings" owner="BuiltIn">
-<msg time="2025-04-30T10:06:15.566546" level="INFO">Argument types are:
+<msg time="2025-05-23T12:04:43.920225" level="INFO">Argument types are:
 &lt;class 'int'&gt;
 &lt;class 'str'&gt;</msg>
-<msg time="2025-04-30T10:06:15.566546" level="FAIL">401 != 404</msg>
 <arg>${response.status_code}</arg>
 <arg>404</arg>
 <doc>Fails if objects are unequal after converting them to strings.</doc>
-<status status="FAIL" start="2025-04-30T10:06:15.562347" elapsed="0.004199">401 != 404</status>
+<status status="PASS" start="2025-05-23T12:04:43.920225" elapsed="0.000000"/>
 </kw>
-<status status="FAIL" start="2025-04-30T10:06:14.934205" elapsed="0.632341">401 != 404</status>
+<status status="PASS" start="2025-05-23T12:04:43.020631" elapsed="0.899594"/>
 </test>
-<status status="FAIL" start="2025-04-30T10:05:22.069847" elapsed="53.496699"/>
-</suite>
-<status status="FAIL" start="2025-04-30T10:05:21.571088" elapsed="53.995458"/>
+<test id="s1-t7" name="Login With Valid Credentials (POST /login)" line="53">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-05-23T12:04:43.922237" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-API-KEY': '123'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-API-KEY=${API_KEY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-05-23T12:04:43.922237" elapsed="0.000000"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-05-23T12:04:43.924246" level="INFO">Creating Session using : alias=backend, url=https://agileavengers-2.onrender.com, headers={'Content-Type': 'application/json', 'X-API-KEY': '123'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>backend</arg>
+<arg>${BASE_URL}</arg>
+<arg>headers=${headers}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-05-23T12:04:43.922237" elapsed="0.002009"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-05-23T12:04:43.924246" level="INFO">${body} = {'email': 'john.doe@company.com', 'password': 'password123'}</msg>
+<var>${body}</var>
+<arg>email=john.doe@company.com</arg>
+<arg>password=password123</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-05-23T12:04:43.924246" elapsed="0.000000"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-05-23T12:04:46.398388" level="INFO">POST Request : url=https://agileavengers-2.onrender.com/login 
+ path_url=/login 
+ headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-API-KEY': '123', 'Content-Length': '60'} 
+ body=b'{"email": "john.doe@company.com", "password": "password123"}' 
+ </msg>
+<msg time="2025-05-23T12:04:46.398388" level="INFO">POST Response : url=https://agileavengers-2.onrender.com/login 
+ status=200, reason=OK 
+ headers={'Date': 'Fri, 23 May 2025 18:04:45 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'access-control-allow-origin': 'http://localhost:3000', 'rndr-id': 'a4c0e0e3-88c2-4ab7', 'vary': 'Origin, Accept-Encoding', 'x-render-origin-server': 'gunicorn', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '94467a34efc35086-MFE', 'Content-Encoding': 'gzip', 'alt-svc': 'h3=":443"; ma=86400'} 
+ body={"message":"Login successful","user":{"email":"john.doe@company.com","id":1,"id_team":1,"name":"John Doe","role":"Admin"}}
+ 
+ </msg>
+<msg time="2025-05-23T12:04:46.398388" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>backend</arg>
+<arg>/login</arg>
+<arg>json=${body}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-05-23T12:04:43.924246" elapsed="2.474142"/>
+</kw>
+<kw name="Should Be Equal As Strings" owner="BuiltIn">
+<msg time="2025-05-23T12:04:46.398388" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${response.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to strings.</doc>
+<status status="PASS" start="2025-05-23T12:04:46.398388" elapsed="0.000000"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-05-23T12:04:46.401914" level="INFO">${json} = {'message': 'Login successful', 'user': {'email': 'john.doe@company.com', 'id': 1, 'id_team': 1, 'name': 'John Doe', 'role': 'Admin'}}</msg>
+<var>${json}</var>
+<arg>${response.json()}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-05-23T12:04:46.398388" elapsed="0.003526"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${json}</arg>
+<arg>message</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:46.401914" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${json["user"]}</arg>
+<arg>email</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-05-23T12:04:46.401914" elapsed="0.002009"/>
+</kw>
+<doc>Probar inicio de sesión con email y contraseña correctos</doc>
+<status status="PASS" start="2025-05-23T12:04:43.922237" elapsed="2.481686"/>
+</test>
+<status status="PASS" start="2025-05-23T12:04:29.290430" elapsed="17.113493"/>
 </suite>
 <statistics>
 <total>
-<stat pass="1" fail="5" skip="0">All Tests</stat>
+<stat pass="7" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat name="Api" id="s1" pass="1" fail="5" skip="0">Api</stat>
-<stat name="Tests" id="s1-s1" pass="1" fail="5" skip="0">Api.Tests</stat>
+<stat name="Tests" id="s1" pass="7" fail="0" skip="0">Tests</stat>
 </suite>
 </statistics>
 <errors>
+<msg time="2025-05-23T12:04:30.065619" level="ERROR">Error in file 'C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\tests\api\tests.robot' on line 4: Importing library 'JSONLibrary' failed: ModuleNotFoundError: No module named 'JSONLibrary'
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  C:\Users\fabia\OneDrive\Desktop\actireto\AgileAvengers\backend-python\venv\Scripts\robot.exe
+  C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\python311.zip
+  C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\DLLs
+  C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib
+  C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0
+  C:\Users\fabia\OneDrive\Desktop\actireto\agileavengers\backend-python\venv
+  C:\Users\fabia\OneDrive\Desktop\actireto\agileavengers\backend-python\venv\Lib\site-packages</msg>
 </errors>
 </robot>
