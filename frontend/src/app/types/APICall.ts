@@ -1,5 +1,3 @@
-import { Call } from "./Call";
-
 export interface ApiCall {
   id_call: number;
   date: string;

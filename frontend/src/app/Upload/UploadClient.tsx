@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import Navigation from "../components/Navigation";
@@ -6,29 +6,39 @@ import { FileText } from "lucide-react";
 import CallTable from "../components/Data/calltable";
 import ClientOnlySelect from "../components/ClientOnlySelect";
 import { useSearchParams } from "next/navigation";
+import TetrisPopup from "../components/tetrispopup";
 
 const UploadClient = () => {
   const searchParams = useSearchParams();
-  const stored = typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+  const stored =
+    typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
   const fallback = stored ? JSON.parse(stored) : {};
 
   const name = searchParams.get("name") || fallback.name || "";
   const role = searchParams.get("role") || fallback.role || "";
   const id_team = searchParams.get("id_team") || fallback.id_team || "";
   const idFromParams = searchParams.get("id");
-  const id_user = idFromParams && !isNaN(Number(idFromParams)) ? Number(idFromParams) : fallback.id;
-
+  const id_user =
+    idFromParams && !isNaN(Number(idFromParams))
+      ? Number(idFromParams)
+      : fallback.id;
 
   const [file, setFile] = useState<File | null>(null);
-  const [clients, setClients] = useState<{ label: string; value: string }[]>([]);
-  const [selectedClient, setSelectedClient] = useState<{ label: string; value: string } | null>(null);
-  const [agent, setAgent] = useState(name);
+  const [clients, setClients] = useState<{ label: string; value: string }[]>(
+    []
+  );
+  const [selectedClient, setSelectedClient] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
+  const [agent] = useState(name);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
-  const [project, setProject] = useState("");
+  const [project] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [language, setLanguage] = useState("es");
   const [isUploading, setIsUploading] = useState(false);
+  const [showTetrisPopup, setShowTetrisPopup] = useState(false); // NUEVO
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -90,9 +100,9 @@ const UploadClient = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Call uploaded and processed successfully!");
-        setRefreshTrigger(prev => !prev);
-      }
-      else {
+        setRefreshTrigger((prev) => !prev);
+        setShowTetrisPopup(true); // MOSTRAR POPUP AL SUBIR
+      } else {
         console.error("Error:", data);
         alert(data.error || "Error uploading call.");
       }
@@ -125,7 +135,9 @@ const UploadClient = () => {
                   options={clients}
                   value={selectedClient}
                   onChange={(newValue: unknown) =>
-                    setSelectedClient(newValue as { label: string; value: string } | null)
+                    setSelectedClient(
+                      newValue as { label: string; value: string } | null
+                    )
                   }
                   placeholder="Busca o selecciona un cliente"
                   isClearable
@@ -191,7 +203,9 @@ const UploadClient = () => {
             </div>
 
             {file && (
-              <p className="text-gray-400 text-sm mt-2">Selected: {file.name}</p>
+              <p className="text-gray-400 text-sm mt-2">
+                Selected: {file.name}
+              </p>
             )}
 
             <button
@@ -203,16 +217,27 @@ const UploadClient = () => {
 
             {isUploading && (
               <div className="mt-6">
-                <p className="text-gray-400 mb-2">Transcribing and creating report...</p>
+                <p className="text-gray-400 mb-2">
+                  Transcribing and creating report...
+                </p>
                 <div className="w-full bg-gray-800 rounded-full h-2">
                   <div className="bg-purple-500 h-2 rounded-full animate-pulse"></div>
                 </div>
               </div>
             )}
+
+            {/* POPUP DE TETRIS */}
+            <TetrisPopup />
           </>
         )}
+
         <div className="mb-6"></div>
-        <CallTable refresh={refreshTrigger} role={role} id_team={id_team} agentName={name} />
+        <CallTable
+          refresh={refreshTrigger}
+          role={role}
+          id_team={id_team}
+          agentName={name}
+        />
       </div>
     </div>
   );
