@@ -124,7 +124,7 @@ export default function AvengersChess() {
 
     for (let i = 0; i < aiPieces.length; i++) {
       const { row, col } = aiPieces[i];
-      for (let [dr, dc] of directions) {
+      for (const [dr, dc] of directions) {
         const newRow = row + dr;
         const newCol = col + dc;
         if (

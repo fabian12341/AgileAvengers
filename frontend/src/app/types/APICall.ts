@@ -11,6 +11,7 @@ export interface ApiCall {
   transcript?: {
     text?: string;
   };
-  report?: any;
+  report?: Record<string, unknown>;
+
 }
 

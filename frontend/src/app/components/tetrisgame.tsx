@@ -81,7 +81,7 @@ export default function Tetris() {
   }
 
   function getShapeMatrix() {
-    let shape = shapes[currentShape];
+    const shape = shapes[currentShape];
     let matrix = shape;
     for (let i = 0; i < currentRotation; i++) {
       matrix = rotate(matrix);
@@ -93,8 +93,8 @@ export default function Tetris() {
     for (let i = 0; i < matrix.length; i++) {
       for (let j = 0; j < matrix[i].length; j++) {
         if (matrix[i][j]) {
-          let newX = x + j;
-          let newY = y + i;
+          const newX = x + j;
+          const newY = y + i;
           if (newX < 0 || newX >= COLS || newY >= ROWS) return false;
           if (newY >= 0 && board[newY][newX]) return false;
         }
@@ -105,12 +105,12 @@ export default function Tetris() {
 
   function placePiece() {
     const matrix = getShapeMatrix();
-    let newBoard = board.map((row) => row.slice());
+    const newBoard = board.map((row) => row.slice());
     for (let i = 0; i < matrix.length; i++) {
       for (let j = 0; j < matrix[i].length; j++) {
         if (matrix[i][j]) {
-          let x = pos.x + j;
-          let y = pos.y + i;
+          const x = pos.x + j;
+          const y = pos.y + i;
           if (y >= 0) newBoard[y][x] = currentShape;
         }
       }
@@ -119,8 +119,8 @@ export default function Tetris() {
   }
 
   function clearLines(board: number[][]) {
-    let newBoard = board.filter((row) => row.some((cell) => cell === 0));
-    let cleared = ROWS - newBoard.length;
+    const newBoard = board.filter((row) => row.some((cell) => cell === 0));
+    const cleared = ROWS - newBoard.length;
     for (let i = 0; i < cleared; i++) {
       newBoard.unshift(Array(COLS).fill(0));
     }
@@ -157,7 +157,7 @@ export default function Tetris() {
       } else if (e.key === "ArrowDown") {
         moveDown();
       } else if (e.key === "ArrowUp") {
-        let nextRotation = (currentRotation + 1) % 4;
+        const nextRotation = (currentRotation + 1) % 4;
         let rotatedMatrix = shapes[currentShape];
         for (let i = 0; i < nextRotation; i++)
           rotatedMatrix = rotate(rotatedMatrix);
