@@ -11,7 +11,16 @@ export interface ApiCall {
   transcript?: {
     text?: string;
   };
-  report?: Record<string, unknown>;
-
+  report?: {
+    id_report: number;
+    summary: string;
+    overall_emotion?: number;
+    silence_percentage?: number;
+    suggestions?: string[];
+    path?: string;
+    speakers?: {
+      name: string;
+      emotion: string;
+    }[];
+  } | null;
 }
-
