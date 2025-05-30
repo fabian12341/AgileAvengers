@@ -38,7 +38,7 @@ const UploadClient = () => {
   const [time, setTime] = useState("");
   const [language, setLanguage] = useState("es");
   const [isUploading, setIsUploading] = useState(false);
-  const [showTetrisPopup, setShowTetrisPopup] = useState(false); // NUEVO
+  //const [showTetrisPopup, setShowTetrisPopup] = useState(false); // NUEVO
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -101,7 +101,7 @@ const UploadClient = () => {
       if (res.ok) {
         alert("Call uploaded and processed successfully!");
         setRefreshTrigger((prev) => !prev);
-        setShowTetrisPopup(true); // MOSTRAR POPUP AL SUBIR
+        //setShowTetrisPopup(true); // MOSTRAR POPUP AL SUBIR
       } else {
         console.error("Error:", data);
         alert(data.error || "Error uploading call.");
@@ -225,11 +225,10 @@ const UploadClient = () => {
                 </div>
               </div>
             )}
-
-            {/* POPUP DE TETRIS */}
-            <TetrisPopup />
           </>
         )}
+        {/* POPUP DE TETRIS */}
+        <TetrisPopup />
 
         <div className="mb-6"></div>
         <CallTable

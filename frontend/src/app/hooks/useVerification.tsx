@@ -32,14 +32,17 @@ export const useVerification = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verify-code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
-        },
-        body: JSON.stringify({ receiver_email: email, code }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/verify-code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
+          },
+          body: JSON.stringify({ receiver_email: email, code }),
+        }
+      );
 
       const rawText = await response.text();
       console.log("Raw response text:", rawText);
@@ -48,6 +51,7 @@ export const useVerification = () => {
       try {
         data = JSON.parse(rawText);
       } catch (err) {
+        console.error("JSON parse error:", err);
         setError("Invalid JSON returned from server.");
         setLoading(false);
         return { success: false };
@@ -60,7 +64,6 @@ export const useVerification = () => {
         return { success: false };
       }
 
-      
       setMessage("Verification successful");
       setLoading(false);
       return { success: true };
