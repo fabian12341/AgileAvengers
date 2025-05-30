@@ -45,13 +45,13 @@ const CallTable: React.FC<{
 
         const calls: Call[] = filtered.map((call: ApiCall) => ({
           id: call.id_call,
-          name: call.user?.name || "Desconocido",
+          name: call.client_name ?? "Desconocido", // Usa client_name para name, con valor por defecto
           date: call.date.split(" ")[0],
           duration: `${Math.floor(call.duration / 60)}:${(call.duration % 60)
             .toString()
             .padStart(2, "0")}`,
-          agent: call.user?.role || "Sin rol",
-          sentimentScore: 80,
+          agent: call.user?.name ?? call.user?.role ?? "Sin rol", // Prioriza user.name, luego user.role
+          sentimentScore: call.report?.overall_emotion ?? 0, // Usa overall_emotion o 0 como default
           transcript:
             typeof call.transcript?.text === "string"
               ? call.transcript.text.split("\n\n").map((block) => {
@@ -67,12 +67,44 @@ const CallTable: React.FC<{
                   };
                 })
               : [],
-          report: call.report || null,
+          report: call.report
+            ? {
+                id_report: call.report.id_report,
+                summary: call.report.summary,
+                overall_emotion: call.report.overall_emotion,
+                silence_percentage: call.report.silence_percentage,
+                suggestions: call.report.suggestions,
+                path: call.report.path,
+                speakers: call.report.speakers?.map((speaker) => {
+                  const emotion = speaker.emotion ?? "unknown"; // Valor por defecto si emotion es undefined o null
+                  return {
+                    role: speaker.name,
+                    emotions: {
+                      happiness: emotion.toLowerCase() === "happy" ? 1 : 0,
+                      sadness: emotion.toLowerCase() === "sad" ? 1 : 0,
+                      anger: emotion.toLowerCase() === "angry" ? 1 : 0,
+                      neutrality: emotion.toLowerCase() === "neutral" ? 1 : 0,
+                      text_sentiment: emotion,
+                      text_sentiment_score: emotion !== "unknown" ? 1 : 0, // Ajusta según si hay emoción válida
+                    },
+                    voice: {
+                      pitch: 0, // Valor por defecto, ajusta si tienes datos
+                      pitch_std_dev: 0,
+                      loudness: 0,
+                      zcr: 0,
+                      hnr: 0,
+                      tempo: 0,
+                    },
+                    // download: undefined, // Opcional, no hay datos en ApiCall
+                  };
+                }),
+              }
+            : null,
           download: call.report?.path ? (
             <button
               onClick={async () => {
                 try {
-                  const url = `${call.report.path}`;
+                  const url = call.report?.path ?? "";
                   window.open(url, "_blank");
                 } catch (error) {
                   console.error("Error al abrir el PDF:", error);
