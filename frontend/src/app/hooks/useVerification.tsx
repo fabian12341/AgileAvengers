@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export const useVerification = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedEmail = localStorage.getItem("recoveryEmail");
-      console.log("Retrieved email from localStorage:", savedEmail);
       setEmail(savedEmail);
     }
   }, []);
@@ -44,21 +45,9 @@ export const useVerification = () => {
         }
       );
 
-      const rawText = await response.text();
-      console.log("Raw response text:", rawText);
-
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (err) {
-        console.error("JSON parse error:", err);
-        setError("Invalid JSON returned from server.");
-        setLoading(false);
-        return { success: false };
-      }
+      const data = await response.json();
 
       if (!response.ok) {
-        console.log("Response body (error):", data);
         setError(data.message || "Verification failed");
         setLoading(false);
         return { success: false };
@@ -66,6 +55,10 @@ export const useVerification = () => {
 
       setMessage("Verification successful");
       setLoading(false);
+
+      // Redirect to "Set New Password" page
+      router.push("/SetNewPassword");
+
       return { success: true };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");

@@ -687,4 +687,30 @@ def verify_code():
 
     return jsonify({"message": "Code verified successfully."})
 
-    
+
+
+
+    # Ruta para establecer una nueva contraseña
+@main.route('/set-new-password', methods=['POST'])
+def set_new_password():
+    require_api_key()
+
+    data = request.json
+    receiver_email = data.get("receiver_email")
+    new_password = data.get("new_password")
+
+    if not receiver_email or not new_password:
+        return jsonify({"error": "Missing 'receiver_email' or 'new_password'"}), 400
+
+    user = User.query.filter_by(email=receiver_email).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Hashing the new password securely
+    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+    # Updating the user's password in the database
+    user.password = hashed_password
+    db.session.commit()
+
+    return jsonify({"message": "Password updated successfully."})
