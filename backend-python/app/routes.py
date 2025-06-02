@@ -710,7 +710,7 @@ def set_new_password():
         return jsonify({"error": "User not found"}), 404
 
     # Hashing the new password securely
-    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     # Updating the user's password in the database
     user.password = hashed_password
