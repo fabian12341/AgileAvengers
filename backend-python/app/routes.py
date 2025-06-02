@@ -695,7 +695,10 @@ def verify_code():
 def set_new_password():
     require_api_key()
 
-    data = request.json
+    data = request.get_json(force=True, silent=True)
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+
     receiver_email = data.get("receiver_email")
     new_password = data.get("new_password")
 
