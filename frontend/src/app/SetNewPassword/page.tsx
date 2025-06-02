@@ -57,7 +57,7 @@ export default function SetNewPassword() {
       if (response.ok) {
         setMessage("Password updated successfully.");
         setTimeout(() => {
-          router.push("/login"); // Redirect to login page after success
+          router.push(`/Home?email=${encodeURIComponent(email)}`); // Redirect to Home page after success
         }, 2000); // Delay for showing the success message
       } else {
         setError(data.error || "Failed to update password.");
