@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaKey } from "react-icons/fa";
 import { useVerification } from "../hooks/useVerification";
+import Image from "next/image";
+import myLogo from "../components/ui/assets/LOGOSHIELDAI.png";
 
 export default function VerifyCode() {
   const [code, setCode] = useState("");
@@ -25,18 +27,19 @@ export default function VerifyCode() {
       setFormError("Verification failed. Please check your code.");
       return;
     }
-
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
       <div className="w-full max-w-md p-6 sm:p-8 rounded-xl bg-gray-800 shadow-lg">
-        <h1 className="text-white text-3xl font-semibold mb-6 text-center">
-          NEORIS
-        </h1>
+        <div className="flex justify-center mb-4">
+          <Image src={myLogo} alt="Shield-AI Logo" width={250} height={80} />
+        </div>
 
         {formError && (
-          <div className="text-red-500 text-sm mb-4 text-center">{formError}</div>
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {formError}
+          </div>
         )}
 
         {error && (
@@ -44,7 +47,9 @@ export default function VerifyCode() {
         )}
 
         {message && (
-          <div className="text-green-500 text-sm mb-4 text-center">{message}</div>
+          <div className="text-green-500 text-sm mb-4 text-center">
+            {message}
+          </div>
         )}
 
         <div className="mb-4">
