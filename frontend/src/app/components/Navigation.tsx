@@ -4,7 +4,7 @@ import Link from "next/link";
 import Button from "./ui/button";
 import { UserCircle, Menu } from "lucide-react";
 import Image from "next/image";
-import myLogo from "./ui/assets/NEORISlogolight.png";
+import myLogo from "./ui/assets/LOGOSHIELDAI.png";
 import { NavigationProps } from "../types/NavigationType";
 
 const Navigation: React.FC<NavigationProps> = ({ name, role, id_team, id }) => {
@@ -21,8 +21,8 @@ const Navigation: React.FC<NavigationProps> = ({ name, role, id_team, id }) => {
           <Image
             src={myLogo}
             alt="Logo"
-            width={100}
-            height={40}
+            width={140}
+            height={80}
             className="cursor-pointer"
           />
         </Link>
@@ -53,7 +53,7 @@ const Navigation: React.FC<NavigationProps> = ({ name, role, id_team, id }) => {
           }`}
         >
           <Button variant="ghost" className="text-white hover:text-gray-300">
-            {(role === "TeamLeader" || role === "Admin") ? "Calls" : "Uploads"}
+            {role === "TeamLeader" || role === "Admin" ? "Calls" : "Uploads"}
           </Button>
         </Link>
         <Link

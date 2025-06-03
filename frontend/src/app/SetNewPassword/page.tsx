@@ -77,7 +77,9 @@ export default function SetNewPassword() {
         </h1>
 
         {message && (
-          <div className="text-green-500 text-sm mb-4 text-center">{message}</div>
+          <div className="text-green-500 text-sm mb-4 text-center">
+            {message}
+          </div>
         )}
         {error && (
           <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
