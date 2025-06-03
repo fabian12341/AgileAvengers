@@ -34,7 +34,10 @@ const pieceIcons: Record<PieceType, string> = {
 };
 
 export default function ChessGame() {
-  const emptyRow = Array(8).fill({ type: "empty", player: null });
+  const emptyRow: Piece[] = Array(8).fill({
+    type: "empty",
+    player: null,
+  } as Piece);
 
   const initialBoard: Piece[][] = [
     [
@@ -63,12 +66,21 @@ export default function ChessGame() {
   ];
 
   const [board, setBoard] = useState<Piece[][]>(initialBoard);
-  const [selected, setSelected] = useState<{ row: number; col: number } | null>(null);
+  const [selected, setSelected] = useState<{ row: number; col: number } | null>(
+    null
+  );
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
-  const [promotion, setPromotion] = useState<{ row: number; col: number; player: 1 | 2 } | null>(null);
+  const [promotion, setPromotion] = useState<{
+    row: number;
+    col: number;
+    player: 1 | 2;
+  } | null>(null);
   const [lastMove, setLastMove] = useState<Move | null>(null);
 
-  function findKingPosition(player: 1 | 2, boardState: Piece[][]): { row: number; col: number } | null {
+  function findKingPosition(
+    player: 1 | 2,
+    boardState: Piece[][]
+  ): { row: number; col: number } | null {
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         const piece = boardState[row][col];
@@ -80,14 +92,22 @@ export default function ChessGame() {
     return null;
   }
 
-  function canMove(piece: Piece, from: { row: number; col: number }, to: { row: number; col: number }, boardState: Piece[][] = board): boolean {
+  function canMove(
+    piece: Piece,
+    from: { row: number; col: number },
+    to: { row: number; col: number },
+    boardState: Piece[][] = board
+  ): boolean {
     const rowDiff = to.row - from.row;
     const colDiff = to.col - from.col;
 
     const target = boardState[to.row][to.col];
     if (target.player === piece.player) return false;
 
-    const isPathClear = (start: { row: number; col: number }, end: { row: number; col: number }) => {
+    const isPathClear = (
+      start: { row: number; col: number },
+      end: { row: number; col: number }
+    ) => {
       const rowStep = Math.sign(end.row - start.row);
       const colStep = Math.sign(end.col - start.col);
 
@@ -112,10 +132,10 @@ export default function ChessGame() {
         if (
           colDiff === 0 &&
           boardState[to.row][to.col].type === "empty" &&
-          (
-            rowDiff === direction ||
-            (from.row === startRow && rowDiff === 2 * direction && boardState[from.row + direction][from.col].type === "empty")
-          )
+          (rowDiff === direction ||
+            (from.row === startRow &&
+              rowDiff === 2 * direction &&
+              boardState[from.row + direction][from.col].type === "empty"))
         ) {
           return true;
         }
@@ -123,7 +143,7 @@ export default function ChessGame() {
         if (
           Math.abs(colDiff) === 1 &&
           rowDiff === direction &&
-          (target.player && target.player !== piece.player ||
+          ((target.player && target.player !== piece.player) ||
             (lastMove &&
               lastMove.piece.type === "pawn" &&
               Math.abs(lastMove.from.row - lastMove.to.row) === 2 &&
@@ -139,23 +159,37 @@ export default function ChessGame() {
         return (rowDiff === 0 || colDiff === 0) && isPathClear(from, to);
 
       case "knight":
-        return (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 1) || (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 2);
+        return (
+          (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 1) ||
+          (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 2)
+        );
 
       case "bishop":
         return Math.abs(rowDiff) === Math.abs(colDiff) && isPathClear(from, to);
 
       case "queen":
-        return (rowDiff === 0 || colDiff === 0 || Math.abs(rowDiff) === Math.abs(colDiff)) && isPathClear(from, to);
+        return (
+          (rowDiff === 0 ||
+            colDiff === 0 ||
+            Math.abs(rowDiff) === Math.abs(colDiff)) &&
+          isPathClear(from, to)
+        );
 
       case "king": {
         if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) return true;
         if (!piece.hasMoved && rowDiff === 0 && Math.abs(colDiff) === 2) {
           const rookCol = colDiff > 0 ? 7 : 0;
           const rook = boardState[from.row][rookCol];
-          if (rook.type === "rook" && rook.player === piece.player && !rook.hasMoved) {
+          if (
+            rook.type === "rook" &&
+            rook.player === piece.player &&
+            !rook.hasMoved
+          ) {
             const between = colDiff > 0 ? [5, 6] : [1, 2, 3];
-            if (between.every(c => boardState[from.row][c].type === "empty") &&
-                !isKingUnderAttack(piece.player!, boardState)) {
+            if (
+              between.every((c) => boardState[from.row][c].type === "empty") &&
+              !isKingUnderAttack(piece.player!, boardState)
+            ) {
               return true;
             }
           }
@@ -176,7 +210,10 @@ export default function ChessGame() {
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         const piece = boardState[row][col];
-        if (piece.player === opponent && canMove(piece, { row, col }, kingPosition, boardState)) {
+        if (
+          piece.player === opponent &&
+          canMove(piece, { row, col }, kingPosition, boardState)
+        ) {
           return true;
         }
       }
@@ -206,7 +243,7 @@ export default function ChessGame() {
       return;
     }
 
-    const newBoard = board.map(r => r.map(c => ({ ...c })));
+    const newBoard = board.map((r) => r.map((c) => ({ ...c })));
 
     if (
       selectedPiece.type === "pawn" &&
@@ -216,10 +253,7 @@ export default function ChessGame() {
       newBoard[selected.row][col] = { type: "empty", player: null };
     }
 
-    if (
-      selectedPiece.type === "king" &&
-      Math.abs(col - selected.col) === 2
-    ) {
+    if (selectedPiece.type === "king" && Math.abs(col - selected.col) === 2) {
       const rookFrom = col > selected.col ? 7 : 0;
       const rookTo = col > selected.col ? col - 1 : col + 1;
       newBoard[row][rookTo] = newBoard[row][rookFrom];
@@ -247,8 +281,11 @@ export default function ChessGame() {
   function handlePromotion(pieceType: PieceType) {
     if (!promotion) return;
 
-    const newBoard = board.map(r => r.map(c => ({ ...c })));
-    newBoard[promotion.row][promotion.col] = { type: pieceType, player: promotion.player };
+    const newBoard = board.map((r) => r.map((c) => ({ ...c })));
+    newBoard[promotion.row][promotion.col] = {
+      type: pieceType,
+      player: promotion.player,
+    };
 
     setBoard(newBoard);
     setPromotion(null);
@@ -260,21 +297,32 @@ export default function ChessGame() {
   return (
     <div className="flex flex-col items-center justify-center relative">
       <h2 className="text-2xl font-bold text-white mb-2">Chess Game</h2>
-      <div className="text-white mb-2">Turn: {currentPlayer === 1 ? "Player 1" : "Player 2"}</div>
+      <div className="text-white mb-2">
+        Turn: {currentPlayer === 1 ? "Player 1" : "Player 2"}
+      </div>
       <div className="grid grid-cols-8 border-4 border-gray-700 relative z-10">
         {board.map((row, rIdx) =>
           row.map((piece, cIdx) => {
             const isSelected = selected?.row === rIdx && selected?.col === cIdx;
             const isBlack = (rIdx + cIdx) % 2 === 1;
             const pieceColor = piece.player === 1 ? "text-white" : "text-black";
-            const isKingTile = piece.type === "king" && piece.player === currentPlayer;
-            const isKingInCheck = isKingTile && kingInCheck && findKingPosition(currentPlayer, board)?.row === rIdx && findKingPosition(currentPlayer, board)?.col === cIdx;
+            const isKingTile =
+              piece.type === "king" && piece.player === currentPlayer;
+            const isKingInCheck =
+              isKingTile &&
+              kingInCheck &&
+              findKingPosition(currentPlayer, board)?.row === rIdx &&
+              findKingPosition(currentPlayer, board)?.col === cIdx;
 
             return (
               <button
                 key={`${rIdx}-${cIdx}`}
                 onClick={() => handleClick(rIdx, cIdx)}
-                className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-xl md:text-2xl font-bold ${isBlack ? "bg-gray-700" : "bg-gray-300"} ${isKingInCheck ? "ring-4 ring-red-500 animate-pulse" : ""} ${isSelected ? "ring-4 ring-yellow-400" : ""} ${pieceColor}`}
+                className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-xl md:text-2xl font-bold ${
+                  isBlack ? "bg-gray-700" : "bg-gray-300"
+                } ${isKingInCheck ? "ring-4 ring-red-500 animate-pulse" : ""} ${
+                  isSelected ? "ring-4 ring-yellow-400" : ""
+                } ${pieceColor}`}
               >
                 {pieceIcons[piece.type]}
               </button>
@@ -285,7 +333,9 @@ export default function ChessGame() {
       {promotion && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-20">
           <div className="bg-white p-4 rounded shadow-lg">
-            <h3 className="text-lg font-bold mb-2">Choose a piece for promotion:</h3>
+            <h3 className="text-lg font-bold mb-2">
+              Choose a piece for promotion:
+            </h3>
             <div className="grid grid-cols-4 gap-2">
               {["rook", "knight", "bishop", "queen"].map((type) => (
                 <button
