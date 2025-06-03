@@ -63,6 +63,7 @@ export default function SetNewPassword() {
         setError(data.error || "Failed to update password.");
       }
     } catch (err) {
+      console.error(err);
       setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);

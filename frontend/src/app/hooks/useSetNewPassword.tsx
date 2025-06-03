@@ -34,7 +34,10 @@ export const useSetNewPassword = () => {
             "Content-Type": "application/json",
             "x-api-key": process.env.NEXT_PUBLIC_API_KEY,
           },
-          body: JSON.stringify({ receiver_email: email, new_password: newPassword }),
+          body: JSON.stringify({
+            receiver_email: email,
+            new_password: newPassword,
+          }),
         }
       );
 
@@ -48,6 +51,7 @@ export const useSetNewPassword = () => {
         return { success: false };
       }
     } catch (err) {
+      console.error(err);
       setError("An error occurred. Please try again.");
       return { success: false };
     } finally {
