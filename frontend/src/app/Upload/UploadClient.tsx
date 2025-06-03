@@ -51,7 +51,7 @@ const UploadClient = () => {
       .then((data) => {
         const options = data.map((c: { id_client: number; name: string }) => ({
           label: c.name,
-          value: c.name,
+          value: String(c.id_client),
         }));
         setClients(options);
       });
