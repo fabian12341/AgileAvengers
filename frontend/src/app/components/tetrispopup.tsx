@@ -8,14 +8,12 @@ import dynamic from "next/dynamic";
 const Tetris = dynamic(() => import("./tetrisgame"), { ssr: false });
 const Snake = dynamic(() => import("./snakegame"), { ssr: false });
 const AvengersChess = dynamic(() => import("./avengerschess"), { ssr: false });
-const AvengersChessAI = dynamic(() => import("./avengerschessAI"), {
-  ssr: false,
-});
+
 
 export default function MiniGamesPopup() {
   const [open, setOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<
-    "tetris" | "snake" | "chess" | "chessAI" | null
+    "tetris" | "snake" | "chess" | null
   >(null);
 
   return (
@@ -64,12 +62,6 @@ export default function MiniGamesPopup() {
                   >
                     Avengers Chess
                   </button>
-                  <button
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white py-3 px-6 rounded text-lg w-2/3"
-                    onClick={() => setSelectedGame("chessAI")}
-                  >
-                    Avengers Chess (vs IA)
-                  </button>
                 </div>
               </>
             )}
@@ -77,7 +69,6 @@ export default function MiniGamesPopup() {
             {selectedGame === "tetris" && <Tetris />}
             {selectedGame === "snake" && <Snake />}
             {selectedGame === "chess" && <AvengersChess />}
-            {selectedGame === "chessAI" && <AvengersChessAI />}
           </div>
         </div>
       )}
