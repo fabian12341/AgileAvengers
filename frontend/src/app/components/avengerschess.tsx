@@ -34,40 +34,37 @@ const pieceIcons: Record<PieceType, string> = {
 };
 
 export default function ChessGame() {
-  const createEmptyRow = (): Piece[] =>
-    Array(8)
-      .fill(null)
-      .map(() => ({ type: "empty", player: null }));
+  const emptyRow = Array(8)
+    .fill(null)
+    .map(() => ({ type: "empty", player: null }));
 
   const initialBoard: Piece[][] = [
     [
-      { type: "rook", player: 2, hasMoved: false },
-      { type: "knight", player: 2, hasMoved: false },
-      { type: "bishop", player: 2, hasMoved: false },
-      { type: "queen", player: 2, hasMoved: false },
-      { type: "king", player: 2, hasMoved: false },
-      { type: "bishop", player: 2, hasMoved: false },
-      { type: "knight", player: 2, hasMoved: false },
-      { type: "rook", player: 2, hasMoved: false },
+      { type: "rook", player: 2 },
+      { type: "knight", player: 2 },
+      { type: "bishop", player: 2 },
+      { type: "queen", player: 2 },
+      { type: "king", player: 2 },
+      { type: "bishop", player: 2 },
+      { type: "knight", player: 2 },
+      { type: "rook", player: 2 },
     ],
     Array(8)
       .fill(null)
-      .map(() => ({ type: "pawn", player: 2, hasMoved: false })),
-    ...Array(4)
-      .fill(null)
-      .map(() => createEmptyRow()),
+      .map(() => ({ type: "pawn", player: 2 })),
+    ...Array(4).fill(emptyRow),
     Array(8)
       .fill(null)
-      .map(() => ({ type: "pawn", player: 1, hasMoved: false })),
+      .map(() => ({ type: "pawn", player: 1 })),
     [
-      { type: "rook", player: 1, hasMoved: false },
-      { type: "knight", player: 1, hasMoved: false },
-      { type: "bishop", player: 1, hasMoved: false },
-      { type: "queen", player: 1, hasMoved: false },
-      { type: "king", player: 1, hasMoved: false },
-      { type: "bishop", player: 1, hasMoved: false },
-      { type: "knight", player: 1, hasMoved: false },
-      { type: "rook", player: 1, hasMoved: false },
+      { type: "rook", player: 1 },
+      { type: "knight", player: 1 },
+      { type: "bishop", player: 1 },
+      { type: "queen", player: 1 },
+      { type: "king", player: 1 },
+      { type: "bishop", player: 1 },
+      { type: "knight", player: 1 },
+      { type: "rook", player: 1 },
     ],
   ];
 
@@ -98,64 +95,6 @@ export default function ChessGame() {
     return null;
   }
 
-  function isSquareUnderAttack(
-    row: number,
-    col: number,
-    player: 1 | 2,
-    boardState: Piece[][]
-  ): boolean {
-    const opponent = player === 1 ? 2 : 1;
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const piece = boardState[r][c];
-        if (
-          piece.player === opponent &&
-          canMove(piece, { row: r, col: c }, { row, col }, boardState)
-        ) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  function isKingUnderAttack(player: 1 | 2, boardState: Piece[][]): boolean {
-    const kingPos = findKingPosition(player, boardState);
-    if (!kingPos) return false;
-    return isSquareUnderAttack(kingPos.row, kingPos.col, player, boardState);
-  }
-
-  function canCastle(
-    king: Piece,
-    from: { row: number; col: number },
-    to: { row: number; col: number },
-    boardState: Piece[][]
-  ): boolean {
-    const colDiff = to.col - from.col;
-    if (Math.abs(colDiff) !== 2 || to.row !== from.row) return false;
-    if (king.hasMoved) return false;
-
-    const rookCol = colDiff > 0 ? 7 : 0;
-    const rook = boardState[from.row][rookCol];
-    if (rook.type !== "rook" || rook.player !== king.player || rook.hasMoved)
-      return false;
-
-    const step = colDiff > 0 ? 1 : -1;
-    for (let c = from.col + step; c !== rookCol; c += step) {
-      if (boardState[from.row][c].type !== "empty") return false;
-    }
-
-    if (isKingUnderAttack(king.player!, boardState)) return false;
-
-    const path = [from.col + step, from.col + 2 * step];
-    for (const c of path) {
-      if (isSquareUnderAttack(from.row, c, king.player!, boardState))
-        return false;
-    }
-
-    return true;
-  }
-
   function canMove(
     piece: Piece,
     from: { row: number; col: number },
@@ -164,6 +103,7 @@ export default function ChessGame() {
   ): boolean {
     const rowDiff = to.row - from.row;
     const colDiff = to.col - from.col;
+
     const target = boardState[to.row][to.col];
     if (target.player === piece.player) return false;
 
@@ -173,12 +113,16 @@ export default function ChessGame() {
     ) => {
       const rowStep = Math.sign(end.row - start.row);
       const colStep = Math.sign(end.col - start.col);
-      let r = start.row + rowStep;
-      let c = start.col + colStep;
-      while (r !== end.row || c !== end.col) {
-        if (boardState[r][c].type !== "empty") return false;
-        r += rowStep;
-        c += colStep;
+
+      let currentRow = start.row + rowStep;
+      let currentCol = start.col + colStep;
+
+      while (currentRow !== end.row || currentCol !== end.col) {
+        if (boardState[currentRow][currentCol].type !== "empty") {
+          return false;
+        }
+        currentRow += rowStep;
+        currentCol += colStep;
       }
       return true;
     };
@@ -187,6 +131,7 @@ export default function ChessGame() {
       case "pawn": {
         const direction = piece.player === 1 ? -1 : 1;
         const startRow = piece.player === 1 ? 6 : 1;
+
         if (
           colDiff === 0 &&
           boardState[to.row][to.col].type === "empty" &&
@@ -197,6 +142,7 @@ export default function ChessGame() {
         ) {
           return true;
         }
+
         if (
           Math.abs(colDiff) === 1 &&
           rowDiff === direction &&
@@ -209,17 +155,21 @@ export default function ChessGame() {
         ) {
           return true;
         }
+
         return false;
       }
       case "rook":
         return (rowDiff === 0 || colDiff === 0) && isPathClear(from, to);
+
       case "knight":
         return (
           (Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 1) ||
           (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 2)
         );
+
       case "bishop":
         return Math.abs(rowDiff) === Math.abs(colDiff) && isPathClear(from, to);
+
       case "queen":
         return (
           (rowDiff === 0 ||
@@ -227,11 +177,182 @@ export default function ChessGame() {
             Math.abs(rowDiff) === Math.abs(colDiff)) &&
           isPathClear(from, to)
         );
-      case "king":
+
+      case "king": {
         if (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1) return true;
-        return canCastle(piece, from, to, boardState);
+        if (!piece.hasMoved && rowDiff === 0 && Math.abs(colDiff) === 2) {
+          const rookCol = colDiff > 0 ? 7 : 0;
+          const rook = boardState[from.row][rookCol];
+          if (
+            rook.type === "rook" &&
+            rook.player === piece.player &&
+            !rook.hasMoved
+          ) {
+            const between = colDiff > 0 ? [5, 6] : [1, 2, 3];
+            if (
+              between.every((c) => boardState[from.row][c].type === "empty") &&
+              !isKingUnderAttack(piece.player!, boardState)
+            ) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
       default:
         return false;
     }
   }
+
+  function isKingUnderAttack(player: 1 | 2, boardState: Piece[][]): boolean {
+    const kingPosition = findKingPosition(player, boardState);
+    if (!kingPosition) return false;
+
+    const opponent = player === 1 ? 2 : 1;
+
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const piece = boardState[row][col];
+        if (
+          piece.player === opponent &&
+          canMove(piece, { row, col }, kingPosition, boardState)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  function handleClick(row: number, col: number) {
+    const piece = board[row][col];
+
+    if (!selected) {
+      if (piece.player === currentPlayer) setSelected({ row, col });
+      return;
+    }
+
+    const selectedPiece = board[selected.row][selected.col];
+    const targetPiece = board[row][col];
+
+    if (targetPiece.player === currentPlayer) {
+      setSelected(null);
+      return;
+    }
+
+    if (!canMove(selectedPiece, selected, { row, col })) {
+      setSelected(null);
+      return;
+    }
+
+    const newBoard = board.map((r) => r.map((c) => ({ ...c })));
+
+    if (
+      selectedPiece.type === "pawn" &&
+      Math.abs(col - selected.col) === 1 &&
+      board[row][col].type === "empty"
+    ) {
+      newBoard[selected.row][col] = { type: "empty", player: null };
+    }
+
+    if (selectedPiece.type === "king" && Math.abs(col - selected.col) === 2) {
+      const rookFrom = col > selected.col ? 7 : 0;
+      const rookTo = col > selected.col ? col - 1 : col + 1;
+      newBoard[row][rookTo] = newBoard[row][rookFrom];
+      newBoard[row][rookFrom] = { type: "empty", player: null };
+    }
+
+    newBoard[row][col] = { ...selectedPiece, hasMoved: true };
+    newBoard[selected.row][selected.col] = { type: "empty", player: null };
+
+    setBoard(newBoard);
+    setLastMove({ from: selected, to: { row, col }, piece: selectedPiece });
+
+    if (
+      selectedPiece.type === "pawn" &&
+      ((currentPlayer === 1 && row === 0) || (currentPlayer === 2 && row === 7))
+    ) {
+      setPromotion({ row, col, player: currentPlayer });
+    } else {
+      setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+    }
+
+    setSelected(null);
+  }
+
+  function handlePromotion(pieceType: PieceType) {
+    if (!promotion) return;
+
+    const newBoard = board.map((r) => r.map((c) => ({ ...c })));
+    newBoard[promotion.row][promotion.col] = {
+      type: pieceType,
+      player: promotion.player,
+    };
+
+    setBoard(newBoard);
+    setPromotion(null);
+    setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+  }
+
+  const kingInCheck = isKingUnderAttack(currentPlayer, board);
+
+  return (
+    <div className="flex flex-col items-center justify-center relative">
+      <h2 className="text-2xl font-bold text-white mb-2">Chess Game</h2>
+      <div className="text-white mb-2">
+        Turn: {currentPlayer === 1 ? "Player 1" : "Player 2"}
+      </div>
+      <div className="grid grid-cols-8 border-4 border-gray-700 relative z-10">
+        {board.map((row, rIdx) =>
+          row.map((piece, cIdx) => {
+            const isSelected = selected?.row === rIdx && selected?.col === cIdx;
+            const isBlack = (rIdx + cIdx) % 2 === 1;
+            const pieceColor = piece.player === 1 ? "text-white" : "text-black";
+            const isKingTile =
+              piece.type === "king" && piece.player === currentPlayer;
+            const isKingInCheck =
+              isKingTile &&
+              kingInCheck &&
+              findKingPosition(currentPlayer, board)?.row === rIdx &&
+              findKingPosition(currentPlayer, board)?.col === cIdx;
+
+            return (
+              <button
+                key={`${rIdx}-${cIdx}`}
+                onClick={() => handleClick(rIdx, cIdx)}
+                className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-xl md:text-2xl font-bold ${
+                  isBlack ? "bg-gray-700" : "bg-gray-300"
+                } ${isKingInCheck ? "ring-4 ring-red-500 animate-pulse" : ""} ${
+                  isSelected ? "ring-4 ring-yellow-400" : ""
+                } ${pieceColor}`}
+              >
+                {pieceIcons[piece.type]}
+              </button>
+            );
+          })
+        )}
+      </div>
+      {promotion && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-20">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <h3 className="text-lg font-bold mb-2">
+              Choose a piece for promotion:
+            </h3>
+            <div className="grid grid-cols-4 gap-2">
+              {["rook", "knight", "bishop", "queen"].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => handlePromotion(type as PieceType)}
+                  className="p-2 border rounded text-xl bg-gray-200 hover:bg-gray-300"
+                >
+                  {pieceIcons[type as PieceType]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
