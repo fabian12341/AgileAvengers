@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 type Point = { x: number; y: number };
 
 const BOARD_SIZE = 15;
 const INITIAL_SNAKE: Point[] = [{ x: 7, y: 7 }];
 const INITIAL_FOOD: Point = { x: 5, y: 5 };
+const BLOCK_COUNT = 10;
 
 const DIRECTIONS: Record<string, Point> = {
   ArrowUp: { x: 0, y: -1 },
@@ -13,11 +14,52 @@ const DIRECTIONS: Record<string, Point> = {
   ArrowRight: { x: 1, y: 0 },
 };
 
+const GAME_OVER_TEXT = "Game Over!";
+
 export default function Snake() {
   const [snake, setSnake] = useState<Point[]>(INITIAL_SNAKE);
   const [food, setFood] = useState<Point>(INITIAL_FOOD);
   const [direction, setDirection] = useState<Point>(DIRECTIONS.ArrowRight);
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [blocks, setBlocks] = useState<Point[]>([]);
+  const [activeLetterIndex, setActiveLetterIndex] = useState<number>(0);
+
+  // Refs para audio
+  const bgMusicRef = useRef<HTMLAudioElement>(null);
+  const gameOverRef = useRef<HTMLAudioElement>(null);
+
+  // Generar bloques al iniciar
+  const generateBlocks = (snakePositions: Point[], foodPosition: Point): Point[] => {
+    const newBlocks: Point[] = [];
+    while (newBlocks.length < BLOCK_COUNT) {
+      const block = {
+        x: Math.floor(Math.random() * BOARD_SIZE),
+        y: Math.floor(Math.random() * BOARD_SIZE),
+      };
+      if (
+        !snakePositions.some(s => s.x === block.x && s.y === block.y) &&
+        !(foodPosition.x === block.x && foodPosition.y === block.y) &&
+        !newBlocks.some(b => b.x === block.x && b.y === block.y)
+      ) {
+        newBlocks.push(block);
+      }
+    }
+    return newBlocks;
+  };
+
+  useEffect(() => {
+    setBlocks(generateBlocks(snake, food));
+  }, []);
+
+  // Reproducir música de fondo al montar
+  useEffect(() => {
+    if (bgMusicRef.current) {
+      bgMusicRef.current.volume = 0.2;
+      bgMusicRef.current.play().catch(() => {
+        // Puede que el autoplay falle en algunos navegadores
+      });
+    }
+  }, []);
 
   const moveSnake = () => {
     setSnake((prevSnake) => {
@@ -26,27 +68,42 @@ export default function Snake() {
         y: (prevSnake[0].y + direction.y + BOARD_SIZE) % BOARD_SIZE,
       };
 
-      // Colisión con el cuerpo
       if (
         prevSnake.some(
           (segment) => segment.x === newHead.x && segment.y === newHead.y
         )
       ) {
-        setGameOver(true);
+        triggerGameOver();
+        return prevSnake;
+      }
+
+      if (blocks.some(block => block.x === newHead.x && block.y === newHead.y)) {
+        triggerGameOver();
         return prevSnake;
       }
 
       const newSnake = [newHead, ...prevSnake];
 
-      // Comer comida
       if (newHead.x === food.x && newHead.y === food.y) {
         placeFood(newSnake);
       } else {
-        newSnake.pop(); // Elimina la cola si no comió
+        newSnake.pop();
       }
 
       return newSnake;
     });
+  };
+
+  const triggerGameOver = () => {
+    setGameOver(true);
+    // Parar música fondo y reproducir game over
+    if (bgMusicRef.current) {
+      bgMusicRef.current.pause();
+      bgMusicRef.current.currentTime = 0;
+    }
+    if (gameOverRef.current) {
+      gameOverRef.current.play();
+    }
   };
 
   const placeFood = (snakePositions: Point[]) => {
@@ -59,7 +116,7 @@ export default function Snake() {
     } while (
       snakePositions.some(
         (segment) => segment.x === newFood.x && segment.y === newFood.y
-      )
+      ) || blocks.some(block => block.x === newFood.x && block.y === newFood.y)
     );
     setFood(newFood);
   };
@@ -70,7 +127,6 @@ export default function Snake() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key in DIRECTIONS) {
         setDirection((currentDir) => {
-          // Evitar reversa
           if (
             (e.key === "ArrowUp" && currentDir.y === 1) ||
             (e.key === "ArrowDown" && currentDir.y === -1) ||
@@ -93,47 +149,124 @@ export default function Snake() {
     return () => clearInterval(interval);
   }, [direction, gameOver]);
 
+  useEffect(() => {
+    if (!gameOver) {
+      setActiveLetterIndex(0);
+      return;
+    }
+    const animationInterval = setInterval(() => {
+      setActiveLetterIndex((prev) => (prev + 1) % GAME_OVER_TEXT.length);
+    }, 150);
+
+    return () => clearInterval(animationInterval);
+  }, [gameOver]);
+
   return (
-    <div>
-      <h2 className="text-white mb-2">Snake Game</h2>
-      {gameOver && (
-        <div className="text-red-500 font-bold mb-2">
-          Game Over! Refresh para jugar otra vez.
-        </div>
-      )}
-      <div
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white select-none p-4">
+      {/* Audio */}
+      <audio ref={bgMusicRef} src="/Snake1.mp3" loop preload="auto" />
+      <audio ref={gameOverRef} src="/SGM.mp3" preload="auto" />
+
+      <h2
         style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${BOARD_SIZE}, 20px)`,
-          gridTemplateRows: `repeat(${BOARD_SIZE}, 20px)`,
-          gap: 1,
-          backgroundColor: "#222",
-          border: "2px solid #555",
+          color: "#90ee90",
+          fontFamily: "'Courier New', Courier, monospace",
+          textShadow: "0 0 10px #32cd32",
+          marginBottom: 15,
         }}
       >
-        {[...Array(BOARD_SIZE * BOARD_SIZE)].map((_, i) => {
-          const x = i % BOARD_SIZE;
-          const y = Math.floor(i / BOARD_SIZE);
-          const isSnake = snake.some((seg) => seg.x === x && seg.y === y);
-          const isFood = food.x === x && food.y === y;
+        Snake Game
+      </h2>
 
-          return (
-            <div
-              key={i}
+      {gameOver ? (
+        <div
+          style={{
+            fontWeight: "bold",
+            fontSize: "2rem",
+            fontFamily: "'Courier New', Courier, monospace",
+            userSelect: "none",
+            display: "inline-block",
+            letterSpacing: 4,
+          }}
+        >
+          {GAME_OVER_TEXT.split("").map((char, idx) => (
+            <span
+              key={idx}
               style={{
-                width: 20,
-                height: 20,
-                backgroundColor: isSnake
-                  ? "limegreen"
-                  : isFood
-                  ? "red"
-                  : "#111",
-                borderRadius: isSnake ? 4 : 0,
+                color: idx === activeLetterIndex ? "#ff0000" : "#440000",
+                textShadow:
+                  idx === activeLetterIndex
+                    ? "0 0 10px #ff0000, 0 0 20px #ff4d4d"
+                    : "none",
+                transition: "color 0.2s ease",
+                cursor: "default",
               }}
-            />
-          );
-        })}
-      </div>
+            >
+              {char}
+            </span>
+          ))}
+          <div style={{ fontSize: "1rem", marginTop: 10, color: "#ff5555" }}>
+            Tus clientes te necesitan Vengador.
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${BOARD_SIZE}, 22px)`,
+            gridTemplateRows: `repeat(${BOARD_SIZE}, 22px)`,
+            gap: 2,
+            backgroundColor: "#121212",
+            border: "3px solid #444",
+            borderRadius: 8,
+            width: BOARD_SIZE * 24,
+            margin: "0 auto",
+            boxShadow: "0 0 20px #1e90ff",
+          }}
+        >
+          {[...Array(BOARD_SIZE * BOARD_SIZE)].map((_, i) => {
+            const x = i % BOARD_SIZE;
+            const y = Math.floor(i / BOARD_SIZE);
+            const isSnake = snake.some((seg) => seg.x === x && seg.y === y);
+            const isFood = food.x === x && food.y === y;
+            const isBlock = blocks.some(b => b.x === x && b.y === y);
+
+            let backgroundColor = "#222";
+            let borderRadius = 0;
+            let boxShadow = "none";
+
+            if (isSnake) {
+              backgroundColor = "#32cd32";
+              borderRadius = 6;
+              boxShadow = "0 0 8px #32cd32";
+            } else if (isFood) {
+              backgroundColor = "#ff3b3b";
+              borderRadius = "50%";
+              boxShadow = "0 0 12px #ff3b3b";
+            } else if (isBlock) {
+              backgroundColor = "#8b0000";
+              borderRadius = 3;
+              boxShadow = "inset 0 0 10px #550000";
+            } else {
+              backgroundColor = "#111";
+            }
+
+            return (
+              <div
+                key={i}
+                style={{
+                  width: 22,
+                  height: 22,
+                  backgroundColor,
+                  borderRadius,
+                  boxShadow,
+                  transition: "background-color 0.3s ease",
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

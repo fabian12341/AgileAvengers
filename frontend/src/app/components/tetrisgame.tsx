@@ -2,38 +2,37 @@
 
 import React, { useState, useEffect, useRef } from "react";
 
-// ... consts sin cambios ...
 const ROWS_DEFAULT = 15;
 const COLS_DEFAULT = 12;
 const BLOCK_SIZE_DEFAULT = 30;
 
 const shapes = [
   [],
-  [[1, 1, 1, 1]], // I
+  [[1, 1, 1, 1]],
   [
     [1, 1],
     [1, 1],
-  ], // O
+  ],
   [
     [0, 1, 0],
     [1, 1, 1],
-  ], // T
+  ],
   [
     [1, 0, 0],
     [1, 1, 1],
-  ], // J
+  ],
   [
     [0, 0, 1],
     [1, 1, 1],
-  ], // L
+  ],
   [
     [1, 1, 0],
     [0, 1, 1],
-  ], // S
+  ],
   [
     [0, 1, 1],
     [1, 1, 0],
-  ], // Z
+  ],
 ];
 
 const colors = [
@@ -90,26 +89,28 @@ export default function Tetris() {
   const [blockSize] = useState(BLOCK_SIZE_DEFAULT);
 
   const [board, setBoard] = useState(
-    Array(ROWS_DEFAULT)
-      .fill(0)
-      .map(() => Array(COLS_DEFAULT).fill(0))
+    Array(ROWS_DEFAULT).fill(0).map(() => Array(COLS_DEFAULT).fill(0))
   );
   const [currentShape, setCurrentShape] = useState(randomShape());
   const [currentRotation, setCurrentRotation] = useState(0);
   const [pos, setPos] = useState({ x: 3, y: 0 });
   const [gameOver, setGameOver] = useState(false);
-
   const [dropInterval, setDropInterval] = useState(300);
 
   const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const gameOverRef = useRef<HTMLAudioElement | null>(null);
 
+  // 🕒 Efecto para cerrar el juego tras 5 minutos
   useEffect(() => {
-    setBoard(
-      Array(rows)
-        .fill(0)
-        .map(() => Array(cols).fill(0))
-    );
+    const timeoutId = setTimeout(() => {
+      setGameOver(true);
+    }, 5 * 60 * 1000); // 5 minutos en milisegundos
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
+    setBoard(Array(rows).fill(0).map(() => Array(cols).fill(0)));
     setPos({ x: Math.floor(cols / 2) - 2, y: 0 });
   }, [rows, cols]);
 
@@ -133,9 +134,7 @@ export default function Tetris() {
   }, [gameOver]);
 
   function rotate(matrix: number[][]) {
-    return matrix[0].map((_, index) =>
-      matrix.map((row) => row[index]).reverse()
-    );
+    return matrix[0].map((_, index) => matrix.map((row) => row[index]).reverse());
   }
 
   function getShapeMatrix() {
@@ -203,39 +202,28 @@ export default function Tetris() {
     }
   }
 
-  // ⛔️ Aquí se evita el scroll con flechas
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (gameOver) return;
-
       const matrix = getShapeMatrix();
-      if (
-        e.key === "ArrowLeft" ||
-        e.key === "ArrowRight" ||
-        e.key === "ArrowDown" ||
-        e.key === "ArrowUp"
-      ) {
-        e.preventDefault(); // ✅ prevenir comportamiento del navegador
+      if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"].includes(e.key)) {
+        e.preventDefault();
       }
-
-      if (e.key === "ArrowLeft") {
-        if (isValidPosition(pos.x - 1, pos.y, matrix))
-          setPos({ ...pos, x: pos.x - 1 });
-      } else if (e.key === "ArrowRight") {
-        if (isValidPosition(pos.x + 1, pos.y, matrix))
-          setPos({ ...pos, x: pos.x + 1 });
+      if (e.key === "ArrowLeft" && isValidPosition(pos.x - 1, pos.y, matrix)) {
+        setPos({ ...pos, x: pos.x - 1 });
+      } else if (e.key === "ArrowRight" && isValidPosition(pos.x + 1, pos.y, matrix)) {
+        setPos({ ...pos, x: pos.x + 1 });
       } else if (e.key === "ArrowDown") {
         moveDown();
       } else if (e.key === "ArrowUp") {
         const nextRotation = (currentRotation + 1) % 4;
         let rotatedMatrix = shapes[currentShape];
-        for (let i = 0; i < nextRotation; i++)
-          rotatedMatrix = rotate(rotatedMatrix);
-        if (isValidPosition(pos.x, pos.y, rotatedMatrix))
+        for (let i = 0; i < nextRotation; i++) rotatedMatrix = rotate(rotatedMatrix);
+        if (isValidPosition(pos.x, pos.y, rotatedMatrix)) {
           setCurrentRotation(nextRotation);
+        }
       }
     }
-
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [pos, currentRotation, currentShape, board, gameOver]);
@@ -255,11 +243,7 @@ export default function Tetris() {
 
       <h1 className="text-4xl font-bold mb-6 text-pink-500">TetriShield AI</h1>
 
-      <div
-        className={`relative ${
-          gameOver ? "opacity-30 blur-sm transition-all duration-500" : ""
-        }`}
-      >
+      <div className={`relative ${gameOver ? "opacity-30 blur-sm transition-all duration-500" : ""}`}>
         <div
           style={{
             display: "grid",
@@ -281,18 +265,15 @@ export default function Tetris() {
                 relativeY >= 0 &&
                 relativeY < matrix.length &&
                 matrix[relativeY][relativeX] === 1;
-
               const colorIndex = isCurrent ? currentShape : cell;
               const bgColor = colors[colorIndex] || "transparent";
-
               return (
                 <div
                   key={`${x}-${y}`}
                   style={{
                     width: blockSize,
                     height: blockSize,
-                    backgroundColor:
-                      bgColor === "none" ? "transparent" : bgColor,
+                    backgroundColor: bgColor === "none" ? "transparent" : bgColor,
                     border: "1px solid #333",
                   }}
                 />
@@ -305,17 +286,12 @@ export default function Tetris() {
       {gameOver && (
         <GameOverDisplay
           onRestart={() => {
-            setBoard(
-              Array(rows)
-                .fill(0)
-                .map(() => Array(cols).fill(0))
-            );
+            setBoard(Array(rows).fill(0).map(() => Array(cols).fill(0)));
             setGameOver(false);
             setCurrentShape(randomShape());
             setCurrentRotation(0);
             setPos({ x: Math.floor(cols / 2) - 2, y: 0 });
             setDropInterval(300);
-
             if (gameOverRef.current) gameOverRef.current.pause();
             if (bgMusicRef.current) {
               bgMusicRef.current.currentTime = 0;
