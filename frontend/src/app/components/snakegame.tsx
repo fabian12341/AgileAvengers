@@ -24,11 +24,9 @@ export default function Snake() {
   const [blocks, setBlocks] = useState<Point[]>([]);
   const [activeLetterIndex, setActiveLetterIndex] = useState<number>(0);
 
-  // Refs para audio
   const bgMusicRef = useRef<HTMLAudioElement>(null);
   const gameOverRef = useRef<HTMLAudioElement>(null);
 
-  // Generar bloques al iniciar
   const generateBlocks = (snakePositions: Point[], foodPosition: Point): Point[] => {
     const newBlocks: Point[] = [];
     while (newBlocks.length < BLOCK_COUNT) {
@@ -51,13 +49,10 @@ export default function Snake() {
     setBlocks(generateBlocks(snake, food));
   }, []);
 
-  // Reproducir música de fondo al montar
   useEffect(() => {
     if (bgMusicRef.current) {
       bgMusicRef.current.volume = 0.2;
-      bgMusicRef.current.play().catch(() => {
-        // Puede que el autoplay falle en algunos navegadores
-      });
+      bgMusicRef.current.play().catch(() => {});
     }
   }, []);
 
@@ -69,15 +64,9 @@ export default function Snake() {
       };
 
       if (
-        prevSnake.some(
-          (segment) => segment.x === newHead.x && segment.y === newHead.y
-        )
+        prevSnake.some((segment) => segment.x === newHead.x && segment.y === newHead.y) ||
+        blocks.some(block => block.x === newHead.x && block.y === newHead.y)
       ) {
-        triggerGameOver();
-        return prevSnake;
-      }
-
-      if (blocks.some(block => block.x === newHead.x && block.y === newHead.y)) {
         triggerGameOver();
         return prevSnake;
       }
@@ -96,7 +85,6 @@ export default function Snake() {
 
   const triggerGameOver = () => {
     setGameOver(true);
-    // Parar música fondo y reproducir game over
     if (bgMusicRef.current) {
       bgMusicRef.current.pause();
       bgMusicRef.current.currentTime = 0;
@@ -163,7 +151,7 @@ export default function Snake() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white select-none p-4">
-      {/* Audio */}
+      {/* Audio files */}
       <audio ref={bgMusicRef} src="/Snake1.mp3" loop preload="auto" />
       <audio ref={gameOverRef} src="/SGM.mp3" preload="auto" />
 
@@ -206,7 +194,7 @@ export default function Snake() {
             </span>
           ))}
           <div style={{ fontSize: "1rem", marginTop: 10, color: "#ff5555" }}>
-            Tus clientes te necesitan Vengador.
+            Tus clientes te necesitan Avenger.
           </div>
         </div>
       ) : (
@@ -232,7 +220,7 @@ export default function Snake() {
             const isBlock = blocks.some(b => b.x === x && b.y === y);
 
             let backgroundColor = "#222";
-            let borderRadius = 0;
+            let borderRadius: string | number = 0;
             let boxShadow = "none";
 
             if (isSnake) {
