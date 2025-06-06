@@ -2,37 +2,37 @@
 
 import React, { useState, useEffect, useRef } from "react";
 
-const ROWS = 20;
-const COLS = 10;
-const BLOCK_SIZE = 30;
+const ROWS_DEFAULT = 15;
+const COLS_DEFAULT = 12;
+const BLOCK_SIZE_DEFAULT = 30;
 
 const shapes = [
   [],
-  [[1, 1, 1, 1]], // I
+  [[1, 1, 1, 1]],
   [
     [1, 1],
     [1, 1],
-  ], // O
+  ],
   [
     [0, 1, 0],
     [1, 1, 1],
-  ], // T
+  ],
   [
     [1, 0, 0],
     [1, 1, 1],
-  ], // J
+  ],
   [
     [0, 0, 1],
     [1, 1, 1],
-  ], // L
+  ],
   [
     [1, 1, 0],
     [0, 1, 1],
-  ], // S
+  ],
   [
     [0, 1, 1],
     [1, 1, 0],
-  ], // Z
+  ],
 ];
 
 const colors = [
@@ -50,34 +50,91 @@ function randomShape() {
   return Math.floor(Math.random() * (shapes.length - 1)) + 1;
 }
 
+const GameOverDisplay = ({ onRestart }: { onRestart: () => void }) => {
+  const letters = "GAME OVER".split("");
+
+  return (
+    <div className="flex flex-col items-center gap-4 mt-8">
+      <div className="grid grid-cols-9 gap-1">
+        {letters.map((char, i) => (
+          <div
+            key={i}
+            className="text-4xl md:text-6xl font-extrabold text-white drop-shadow-lg animate-bounce"
+            style={{
+              animationDelay: `${i * 0.2}s`,
+              animationDuration: "0.8s",
+              animationIterationCount: "infinite",
+              animationTimingFunction: "ease-in-out",
+              color: "#FF416C",
+            }}
+          >
+            {char === " " ? "\u00A0" : char}
+          </div>
+        ))}
+      </div>
+      <p className="text-gray-300">Presiona para reiniciar</p>
+      <button
+        onClick={onRestart}
+        className="bg-gradient-to-r from-purple-600 to-pink-500 px-6 py-3 rounded-lg shadow-lg text-white font-semibold hover:scale-105 transition-transform"
+      >
+        Restart Game
+      </button>
+    </div>
+  );
+};
+
 export default function Tetris() {
+  const [rows] = useState(ROWS_DEFAULT);
+  const [cols] = useState(COLS_DEFAULT);
+  const [blockSize] = useState(BLOCK_SIZE_DEFAULT);
+
   const [board, setBoard] = useState(
-    Array(ROWS)
-      .fill(0)
-      .map(() => Array(COLS).fill(0))
+    Array(ROWS_DEFAULT).fill(0).map(() => Array(COLS_DEFAULT).fill(0))
   );
   const [currentShape, setCurrentShape] = useState(randomShape());
   const [currentRotation, setCurrentRotation] = useState(0);
   const [pos, setPos] = useState({ x: 3, y: 0 });
   const [gameOver, setGameOver] = useState(false);
+  const [dropInterval, setDropInterval] = useState(300);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
+  const gameOverRef = useRef<HTMLAudioElement | null>(null);
+
+  // 🕒 Efecto para cerrar el juego tras 5 minutos
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setGameOver(true);
+    }, 5 * 60 * 1000); // 5 minutos en milisegundos
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = 0.5;
-      audioRef.current.play().catch(() => {
-        console.log(
-          "Se requiere interacción del usuario para reproducir audio automáticamente."
-        );
+    setBoard(Array(rows).fill(0).map(() => Array(cols).fill(0)));
+    setPos({ x: Math.floor(cols / 2) - 2, y: 0 });
+  }, [rows, cols]);
+
+  useEffect(() => {
+    if (bgMusicRef.current) {
+      bgMusicRef.current.volume = 0.5;
+      bgMusicRef.current.play().catch(() => {
+        console.log("Se requiere interacción del usuario para reproducir audio automáticamente.");
       });
     }
   }, []);
 
+  useEffect(() => {
+    if (gameOver) {
+      if (bgMusicRef.current) bgMusicRef.current.pause();
+      if (gameOverRef.current) {
+        gameOverRef.current.currentTime = 0;
+        gameOverRef.current.play();
+      }
+    }
+  }, [gameOver]);
+
   function rotate(matrix: number[][]) {
-    return matrix[0].map((_, index) =>
-      matrix.map((row) => row[index]).reverse()
-    );
+    return matrix[0].map((_, index) => matrix.map((row) => row[index]).reverse());
   }
 
   function getShapeMatrix() {
@@ -95,7 +152,7 @@ export default function Tetris() {
         if (matrix[i][j]) {
           const newX = x + j;
           const newY = y + i;
-          if (newX < 0 || newX >= COLS || newY >= ROWS) return false;
+          if (newX < 0 || newX >= cols || newY >= rows) return false;
           if (newY >= 0 && board[newY][newX]) return false;
         }
       }
@@ -120,9 +177,9 @@ export default function Tetris() {
 
   function clearLines(board: number[][]) {
     const newBoard = board.filter((row) => row.some((cell) => cell === 0));
-    const cleared = ROWS - newBoard.length;
+    const cleared = rows - newBoard.length;
     for (let i = 0; i < cleared; i++) {
-      newBoard.unshift(Array(COLS).fill(0));
+      newBoard.unshift(Array(cols).fill(0));
     }
     return newBoard;
   }
@@ -135,10 +192,11 @@ export default function Tetris() {
       let newBoard = placePiece();
       newBoard = clearLines(newBoard);
       setBoard(newBoard);
-      setCurrentShape(randomShape());
+      const newShape = randomShape();
+      setCurrentShape(newShape);
       setCurrentRotation(0);
-      setPos({ x: 3, y: 0 });
-      if (!isValidPosition(3, 0, shapes[currentShape])) {
+      setPos({ x: Math.floor(cols / 2) - 2, y: 0 });
+      if (!isValidPosition(Math.floor(cols / 2) - 2, 0, shapes[newShape])) {
         setGameOver(true);
       }
     }
@@ -148,21 +206,22 @@ export default function Tetris() {
     function handleKey(e: KeyboardEvent) {
       if (gameOver) return;
       const matrix = getShapeMatrix();
-      if (e.key === "ArrowLeft") {
-        if (isValidPosition(pos.x - 1, pos.y, matrix))
-          setPos({ ...pos, x: pos.x - 1 });
-      } else if (e.key === "ArrowRight") {
-        if (isValidPosition(pos.x + 1, pos.y, matrix))
-          setPos({ ...pos, x: pos.x + 1 });
+      if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"].includes(e.key)) {
+        e.preventDefault();
+      }
+      if (e.key === "ArrowLeft" && isValidPosition(pos.x - 1, pos.y, matrix)) {
+        setPos({ ...pos, x: pos.x - 1 });
+      } else if (e.key === "ArrowRight" && isValidPosition(pos.x + 1, pos.y, matrix)) {
+        setPos({ ...pos, x: pos.x + 1 });
       } else if (e.key === "ArrowDown") {
         moveDown();
       } else if (e.key === "ArrowUp") {
         const nextRotation = (currentRotation + 1) % 4;
         let rotatedMatrix = shapes[currentShape];
-        for (let i = 0; i < nextRotation; i++)
-          rotatedMatrix = rotate(rotatedMatrix);
-        if (isValidPosition(pos.x, pos.y, rotatedMatrix))
+        for (let i = 0; i < nextRotation; i++) rotatedMatrix = rotate(rotatedMatrix);
+        if (isValidPosition(pos.x, pos.y, rotatedMatrix)) {
           setCurrentRotation(nextRotation);
+        }
       }
     }
     window.addEventListener("keydown", handleKey);
@@ -173,51 +232,23 @@ export default function Tetris() {
     if (gameOver) return;
     const interval = setInterval(() => {
       moveDown();
-    }, 1000);
+    }, dropInterval);
     return () => clearInterval(interval);
-  }, [pos, currentRotation, currentShape, board, gameOver]);
+  }, [pos, currentRotation, currentShape, board, gameOver, dropInterval]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      {/* 🎵 Música de fondo */}
-      <audio ref={audioRef} src="/tetris-theme.mp3" loop />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
+      <audio ref={bgMusicRef} src="/tetris.mp3" loop />
+      <audio ref={gameOverRef} src="/gameover.mp3" />
 
-      {/* Botón por si se bloquea la reproducción automática */}
-      <button
-        className="mb-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-500"
-        onClick={() => audioRef.current?.play()}
-      >
-        Play Music
-      </button>
+      <h1 className="text-4xl font-bold mb-6 text-pink-500">TetriShield AI</h1>
 
-      <h1 className="text-4xl font-bold mb-6">TetriShield AI</h1>
-      <div className="text-3xl mb-6 flex justify-center gap-4">🦸🛡️🕷️⚡🦇</div>
-      {gameOver ? (
-        <div>
-          <p className="text-2xl mb-4">Game Over</p>
-          <button
-            className="px-4 py-2 bg-purple-700 rounded"
-            onClick={() => {
-              setBoard(
-                Array(ROWS)
-                  .fill(0)
-                  .map(() => Array(COLS).fill(0))
-              );
-              setGameOver(false);
-              setCurrentShape(randomShape());
-              setCurrentRotation(0);
-              setPos({ x: 3, y: 0 });
-            }}
-          >
-            Restart
-          </button>
-        </div>
-      ) : (
+      <div className={`relative ${gameOver ? "opacity-30 blur-sm transition-all duration-500" : ""}`}>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: `repeat(${COLS}, ${BLOCK_SIZE}px)`,
-            gridTemplateRows: `repeat(${ROWS}, ${BLOCK_SIZE}px)`,
+            gridTemplateColumns: `repeat(${cols}, ${blockSize}px)`,
+            gridTemplateRows: `repeat(${rows}, ${blockSize}px)`,
             gap: 1,
             border: "2px solid white",
             backgroundColor: "#111",
@@ -234,18 +265,15 @@ export default function Tetris() {
                 relativeY >= 0 &&
                 relativeY < matrix.length &&
                 matrix[relativeY][relativeX] === 1;
-
               const colorIndex = isCurrent ? currentShape : cell;
               const bgColor = colors[colorIndex] || "transparent";
-
               return (
                 <div
                   key={`${x}-${y}`}
                   style={{
-                    width: BLOCK_SIZE,
-                    height: BLOCK_SIZE,
-                    backgroundColor:
-                      bgColor === "none" ? "transparent" : bgColor,
+                    width: blockSize,
+                    height: blockSize,
+                    backgroundColor: bgColor === "none" ? "transparent" : bgColor,
                     border: "1px solid #333",
                   }}
                 />
@@ -253,9 +281,28 @@ export default function Tetris() {
             })
           )}
         </div>
+      </div>
+
+      {gameOver && (
+        <GameOverDisplay
+          onRestart={() => {
+            setBoard(Array(rows).fill(0).map(() => Array(cols).fill(0)));
+            setGameOver(false);
+            setCurrentShape(randomShape());
+            setCurrentRotation(0);
+            setPos({ x: Math.floor(cols / 2) - 2, y: 0 });
+            setDropInterval(300);
+            if (gameOverRef.current) gameOverRef.current.pause();
+            if (bgMusicRef.current) {
+              bgMusicRef.current.currentTime = 0;
+              bgMusicRef.current.play();
+            }
+          }}
+        />
       )}
+
       <p className="mt-4 text-gray-400 text-sm">
-        Use arrow keys to move and rotate
+        Usa flechas para mover y rotar las piezas
       </p>
     </div>
   );
