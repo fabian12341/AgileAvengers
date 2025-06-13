@@ -75,6 +75,11 @@ Revolucionar el servicio al cliente mediante el uso de inteligencia artificial, 
 
 ---
 
+##  Diagrama de arquitectura
+![image](https://github.com/user-attachments/assets/557d9452-75a2-4989-bdbf-a998c476aed1)
+- Link documento de diseño: https://docs.google.com/document/d/15sFg94BuVnpSTJMvZ__TVR51v49fH9T0/edit?usp=sharing&ouid=112768537533110237587&rtpof=true&sd=true
+
+
 ## Link a la plataforma
 
 - https://agile-avengers-hwuk.vercel.app/
