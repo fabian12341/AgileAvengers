@@ -1,4 +1,4 @@
-# AgileAvengers – Plataforma AI para Servicio al Cliente 🤖📞
+# AgileAvengers – Plataforma AI para Servicio al Cliente 
 
 **AgileAvengers** es una plataforma web diseñada para **potenciar el servicio al cliente en startups** mediante inteligencia artificial. Nuestra solución permite analizar llamadas, generar reportes emocionales y facilitar la toma de decisiones, todo con una interfaz intuitiva y gamificada.
 
@@ -75,10 +75,10 @@ Revolucionar el servicio al cliente mediante el uso de inteligencia artificial, 
 
 ---
 
-## Instalación y ejecución
+## Link a la plataforma
 
-### 1. Clona el repositorio
+- https://agile-avengers-hwuk.vercel.app/
 
-```bash
-git clone https://github.com/fabian12341/AgileAvengers.git
-cd AgileAvengers
+Credenciales:
+- Se encuentran en este documenteo: https://docs.google.com/document/d/1RwKIPbKT-geXOt-WU7GzbJJYKllbTxLjC1GbbrrloHI/edit?usp=sharing
+
